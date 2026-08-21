@@ -4,31 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Formulario</title>
+    <link rel="stylesheet" href="estilo/style.css">
 </head>
 <body>
     <header>
-        <nav>
+        
+        <nav class="navegacion">
             <ul>
+                <li><img  src="../logoAccettaSinMargenes.png" alt="logo empresa" class="imagen-izquierda" ></li>
                 <li><a href="index.html">Nostros</a></li>
                 <li><a href="formulario.html">Contacto</a></li>
                 <li><a href="login.html">Ingresar</a></li>
-            </ul> 
+                <a href="https://www.instagram.com/vascoaccetta/" target="_blank">
+                    <img class="instagram-logo" src="../instagramlogo.png" alt="logo instagram" >
+                </a>
+            </ul>
         </nav>
     </header>
-    <main>
-        <h1>Contacto</h1>
-        <h2>Arquitecto Accetta</h2>
-        <p>Nombre: Marcelo Accetta</p>
-        <p>Email:<a href="mailto:arqaccetta@gmail.com">arqaccetta@gmail.com</a></p>
-        <p>Telefono: 2657-657808</p>
-        <h2>Formulario de Contacto</h2>
+    <main> 
+        <div class="info-contacto">
+            <h1>Contacto</h1>
+            <h2>Arquitecto Accetta</h2>
+            <p>Email: <a href="mailto:arqaccetta@gmail.com">arqaccetta@gmail.com</a></p>
+            <p>Telefono: 2657-657808</p>  
+        </div>
+        
         <form action="#" method="post">
+            <h2>Formulario de Contacto</h2>
             <label for="nombre">Nombre:</label>
-            <input type="text" id="nombre" name="nombre" required><br>
+            <input type="text" id="nombre" name="nombre" placeholder="Ingrese su nombre..." required><br>
             <label for="correo">Correo electronico:</label>
-            <input type="email" id="correo" name="correo" required><br>
+            <input type="email" id="correo" name="correo" placeholder="ejemplo@gmail.com"required><br>
             <label for="telefono">Telefono:</label>
-            <input type="number" id="telefono" name="telefono" minlength="10" maxlength="10" required><br>
+            <input type="tel" id="telefono" name="telefono" minlength="10" maxlength="10" pattern="[0-9]{10}" placeholder="2664123456" required><br>
             <label for="asunto">Asunto:</label>
             <select id="asunto" name="asunto" required>
                 <option value="">Seleccione un asunto</option>
@@ -37,13 +45,16 @@
                 <option value="reclamo">Reclamo</option>  
             <select><br>
             <label for="mensaje">Mensaje:</label>
-            <textarea id="mensaje" name="mensaje" rows="5" required></textarea><br>    
+            <textarea id="mensaje" name="mensaje" rows="5" placeholder="Describe brevemente como podemos ayudarte"required></textarea><br>    
             
             <button type="submit">Enviar</button>
         </form>
     </main>
     <footer>
-        Copyright © 2026 Sistema Gestion de Obras. Todos los derechos reservados.
+        <a href="https://www.instagram.com/vascoaccetta/" target="_blank">
+                <img class="instagram-logo" src="../instagramlogo.png" alt="logo instagram" >
+                </a>
+        <p>Copyright © 2026 Sistema Gestion de Obras. Todos los derechos reservados.</p>
     </footer>
 </body>
 </html>

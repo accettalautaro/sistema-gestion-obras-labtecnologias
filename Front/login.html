@@ -4,14 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ingresar</title>
+    <link rel="stylesheet" href="estilo/style.css">
 </head>
 <body>
     <header>
-        <nav>
+        <nav class="navegacion">
             <ul>
+                <li><img src="../logoAccettaSinMargenes.png" alt="logo empresa" ></li>
                 <li><a href="index.html">Nostros</a></li>
                 <li><a href="formulario.html">Contacto</a></li>
                 <li><a href="login.html">Ingresar</a></li>
+                <a href="https://www.instagram.com/vascoaccetta/" target="_blank">
+                    <img class="instagram-logo" src="../instagram logo.jpg" alt="logo instagram" width="25" height="25">
+                </a>
 
             </ul>
         </nav>
@@ -22,11 +27,19 @@
             <input type="text" id="usuario" name="usuario" required><br>
             <label for="contrasena">Contraseña:</label>
             <input type="password" id="contrasena" name="contrasena" required><br>
+            <select id="asunto" name="asunto" required>
+                <option value="">Tipo de Usuario</option>
+                <option value="consulta">Arquitecto</option>
+                <option value="sugerencia">Cliente</option>
+            <select><br>
             <button type="submit">Ingresar</button> 
         </form>
     </main>    
     <footer>
-        Copyright © 2026 Sistema Gestion de Obras. Todos los derechos reservados.
+        <a href="https://www.instagram.com/vascoaccetta/" target="_blank">
+                <img class="instagram-logo" src="../instagramlogo.png" alt="logo instagram" >
+                </a>
+        <p>Copyright © 2026 Sistema Gestion de Obras. Todos los derechos reservados.</p>
     </footer>
 </body>
 </html>
