@@ -112,6 +112,7 @@ form{
     flex-direction:column;
     gap:var(--espaciado-xs);
     max-width:25rem;
+    padding: 20px;;
     margin-left:auto;
     margin-right:auto;
     margin-top:var(--espaciado-md);
@@ -339,8 +340,10 @@ button:hover {
 
 @media (max-width: 950px) {
     .navegacion ul {
-        flex-direction: column;
-        gap:var(--espaciado-sm);
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: var(--espaciado-sm);
         padding:var(--espaciado-sm);
     }
 
@@ -349,7 +352,16 @@ button:hover {
     }
 
     .imagen-izquierda {
-        width:min(17.5rem, 100%);
+        width:min(12rem, 35vw);
+    }
+
+    .contenedor-dos-columnas .columna-imagen {
+        display: none;
+    }
+
+    .instagram-logo {
+        width: 2.5rem !important;
+        height: 2.5rem !important;
     }
 
     .grid-proyectos {
