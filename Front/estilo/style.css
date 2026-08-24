@@ -12,7 +12,7 @@
     --espaciado-xs:0.25rem;
     --espaciado-sm:0.625rem;
     --espaciado-md:1.25rem;
-    --espaciado-lg:2.5rem;
+    --espaciado-lg:5rem;
     --radio:0.375rem;
     --radio-tarjeta:0.625rem;
 }
@@ -27,6 +27,7 @@ h1,
 h2{
     color:var(--color-hover);
 }
+    
 .imagen-izquierda{
     display:block;
     margin-left:0;
@@ -38,6 +39,20 @@ h2{
 .navegacion li:first-child{
     margin-right:auto;
 }
+
+header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+.imagen-perfil{
+    display:block;
+    width:min(315px, 100%);
+    height:315px;
+    margin:0 auto;
+    object-fit:cover;
+}
+
 .navegacion{
     font-family:var(--fuente-principal);
     background-color:var(--color-primario);
@@ -52,7 +67,7 @@ h2{
     object-fit:contain;
 }
 .instagram-logo:hover{
-    content:url("../../instragramhover.png" );
+    content:url("../Imagenes/instragramhover.png" );
 }
 a, a:visited{
     color:var(--color-texto);
@@ -72,6 +87,17 @@ ul{
     list-style:none;
     margin:0;
     padding:0;
+}
+body{
+    font-family: var(--fuente-principal);
+    margin: 0;
+    display: flex;
+    flex-direction: column; 
+    min-height: 100vh;
+}
+.contenido-principal{
+    flex: 1;
+    padding-bottom: var(--espaciado-lg);
 }
 footer{
     background-color:var(--color-fondo);
@@ -117,10 +143,12 @@ button:hover {
     font-family:var(--fuente-principal);
     display:flex;
     flex-direction:column;
+    align-items:center;
     text-align:center;
     gap:0px;
     max-width:25rem;
     margin:0 auto;
+    margin-top:var(--espaciado-md);
     margin-bottom:var(--espaciado-md);
 }
 #estudio{
@@ -132,7 +160,7 @@ button:hover {
     text-align:justify;
     gap:0px;
     padding:var(--espaciado-md);
-    padding: right 60px;
+    padding-right: 60px;
     max-width:400px;
     margin-left:0;
     margin-right:auto;
@@ -157,6 +185,7 @@ button:hover {
 .contenedor-dos-columnas {
     display: flex;
     align-items: stretch;
+    margin-bottom: var(--espaciado-lg);
 }
 .columna-imagen {
     flex: 1;
@@ -172,6 +201,21 @@ button:hover {
     max-width: none;
     box-sizing: border-box;
     margin: 0;
+}
+#Nosotros{
+    scroll-margin-top: 100px;
+    font-family:var(--fuente-principal);
+    color:var(--color-texto);
+    background-color:var(--color-fondo);
+    display:flex;
+    flex-direction:column;
+    text-align:justify;
+    gap:0px;
+    padding:var(--espaciado-md);
+    width:100%;
+    max-width:none;
+    margin:0 0 var(--espaciado-lg);
+
 }
 .proyectos {
     font-family: 'Roboto', Helvetica, sans-serif;
@@ -237,7 +281,63 @@ button:hover {
     margin: 0;
 }
 
-@media (max-width: 600px) {
+#diagrama {
+    scroll-margin-top: 100px;
+    font-family: var(--fuente-principal);
+    margin: 0 var(--espaciado-md) var(--espaciado-lg);
+    padding: 0 var(--espaciado-md);
+}
+
+#diagrama h2 {
+    margin: 0 0 var(--espaciado-md);
+    font-size: 1.5rem;
+    text-align: center;
+}
+
+.tabla-gantt {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 1000px;
+    font-size: 13px;
+}
+
+.tabla-gantt th,
+.tabla-gantt td {
+    border: 1px solid var(--color-borde);
+    padding: 6px;
+    text-align: center;
+}
+
+.tabla-gantt th {
+    background-color: var(--color-backgroud-secciones);
+    color: white;
+}
+
+.tabla-gantt .quincenas th {
+    background-color: #7a7a7a;
+    color: white;
+    font-size: 11px;
+    width: 3%;
+}
+
+.tabla-gantt .tarea {
+    text-align: left;
+    font-weight: bold;
+    background-color: var(--color-backgroud-secciones);
+    color: white;
+    width: 15%;
+}
+
+.activa {
+    background-color: var(--color-resaltado);
+}
+#perfil{
+    width:min(315px, 100%);
+    margin:0 auto;
+    text-align:left;
+}
+
+@media (max-width: 950px) {
     .navegacion ul {
         flex-direction: column;
         gap:var(--espaciado-sm);
@@ -259,4 +359,5 @@ button:hover {
     .proyecto img {
         height:15rem;
     }
+
 }
