@@ -355,6 +355,12 @@ button:hover {
         width:min(12rem, 35vw);
     }
 
+    .navegacion .imagen-izquierda {
+        content: url("../Imagenes/logosimple.png");
+        width: 3.5rem;
+        height: auto;
+    }
+
     .contenedor-dos-columnas .columna-imagen {
         display: none;
     }
