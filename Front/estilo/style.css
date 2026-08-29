@@ -1,20 +1,28 @@
 :root{
-    --color-primario:#FFFFFF;
-    --color-texto:#949494;
-    --color-fondo:#E4E4E5;
-    --color-hover:#000000;
-    --color-backgroud-secciones:#3C3C3C;
-    --color-resaltado:#CE7A02;
-    --color-borde:#B8C4CA;
+    
     --color-sombra:rgba(0, 0, 0, 0.12);
     --color-sombra-hover:rgba(0, 0, 0, 0.18);
-    --fuente-principal:'Roboto', Helvetica, sans-serif;
+
     --espaciado-xs:0.25rem;
     --espaciado-sm:0.625rem;
     --espaciado-md:1.25rem;
     --espaciado-lg:5rem;
     --radio:0.375rem;
     --radio-tarjeta:0.625rem;
+
+    --color-seccion:#232323;
+    --color-primario:#FFFFFF;
+    --color-texto1:#000000;
+    --color-seccionclaro: #F4F4F4;  
+    --color-texto2: #999999;
+    --color-texto2-resaltado:#666666;
+    --color-texto3:#333333;
+    --color-texto-footer:#898989;
+    --color-texto-seccion:#D3D3D3;
+    --color-resaltado:#CE7A02;
+    --fuente-principal:"Roboto", "Helvetica Neue", sans-serif;
+    --fuente-secundaria:"Open Sans", "Helvetica Neue", sans-serif;
+
 }
 *{
     box-sizing:border-box;
@@ -30,8 +38,10 @@ h2{
     
 .imagen-izquierda{
     display:block;
+
     margin-left:0;
-    width: 28.125rem;
+    width: 300px;
+    height: 78px;
     height:auto;
     
 
@@ -52,13 +62,38 @@ header {
     margin:0 auto;
     object-fit:cover;
 }
+nav{
+    background-color: var(--color-primario);
+}
 
 .navegacion{
     font-family:var(--fuente-principal);
     background-color:var(--color-primario);
-    color:var(--color-texto);
+    color:var(--color-texto2-resaltado);
     text-decoration:none;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--espaciado-md);
+    flex-wrap: wrap;
+    margin-left: 70px;
+    margin-right: 70px;
+    padding-left: 15px;
+    padding-right: 15px;
+}
 
+.nav-brand {
+    display: flex;
+    align-items: center;
+    margin-right: auto;
+}
+
+.logo-completa {
+    display: block;
+}
+
+.logo-simple {
+    display: none;
 }
 .instagram-logo{
     
@@ -75,17 +110,18 @@ a, a:visited{
     
 }
     .navegacion a:hover, .info-contacto a:hover{
-    color:var(--color-hover);
+    color:var(--color-texto1);
     text-decoration:underline;
     text-decoration-color:var(--color-resaltado);
 }
-ul{
+.links{
     display: flex;
     justify-content: right;
     align-items: center;
     gap: var(--espaciado-md);
     list-style:none;
-    margin:0;
+    margin-left:auto;
+    margin-right:0;
     padding:0;
 }
 body{
@@ -99,6 +135,17 @@ body{
     flex: 1;
     padding-bottom: var(--espaciado-lg);
 }
+.hamburguer {
+    display: none;
+    flex-direction: row ;
+    margin-left: auto;
+    width: 30px;
+    height: 30px;
+    gap: 5px;
+    cursor: pointer;
+    
+}
+
 footer{
     background-color:var(--color-fondo);
     color:var(--color-texto);
@@ -339,26 +386,58 @@ button:hover {
 }
 
 @media (max-width: 950px) {
+    .navegacion {
+        justify-content: space-between;
+    }
+
+    .hamburguer {
+        display: flex;
+        margin-left: auto;
+    }
+    .links {
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background-color: var(--color-primario);
+
+    }
+
+    .links.active {
+        display: flex;
+    }
     .navegacion ul {
         flex-direction: row;
         flex-wrap: wrap;
         justify-content: center;
+        
         gap: var(--espaciado-sm);
         padding:var(--espaciado-sm);
     }
-
-    .navegacion li:first-child {
-        margin-right: 0;
-    }
-
-    .imagen-izquierda {
-        width:min(12rem, 35vw);
-    }
-
     .navegacion .imagen-izquierda {
         content: url("../Imagenes/logosimple.png");
         width: 3.5rem;
         height: auto;
+    }
+    .nav-brand {
+        margin-right: 0;
+    }
+
+    .logo-completa {
+        display: none;
+    }
+
+    .logo-simple {
+        display: block;
+        width: 3.5rem;
+        height: auto;
+    }
+
+    .imagen-izquierda {
+        width:min(12rem, 35vw);
     }
 
     .contenedor-dos-columnas .columna-imagen {
