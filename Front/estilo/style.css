@@ -27,6 +27,70 @@
 *{
     box-sizing:border-box;
 }
+.seccion-estudio {
+    display: grid;
+    /* Creamos 12 columnas exactas */
+    grid-template-columns: repeat(12, 1fr);
+    grid-template-rows: auto;
+    min-height: 100vh; /* Mínimo 100% de la altura de la pantalla */
+    background-color: #1c1c1c; /* Fondo carbón */
+    color: #ffffff;
+    align-items: stretch; /* Ambos elementos se expanden a la misma altura */
+}
+.estudio-imagen {
+    /* Ocupa desde la columna 7 hasta la 13 */
+    grid-column: 7 / 13;
+    grid-row: 1;
+    min-height: 400px; /* Altura mínima para la imagen */
+    align-self: stretch; /* Se estira a la altura del contenido */
+    padding-top: 30px;
+    padding-bottom: 30px;
+    padding-right: 70px; /* Margen derecho igual al navbar */
+    
+    background-image: url('../Imagenes/seccionEstudio.jpg'); 
+    background-size: cover; 
+    background-position: center;
+}
+.estudio-texto {
+    /* Ocupa desde la columna 1 hasta la 7 */
+    grid-column: 1 / 7;
+    grid-row: 1;
+    padding-top: 30px;  
+    padding-bottom: 30px;
+    padding-left: 85px; /* Margen izquierdo igual al navbar */
+    padding-right: 40px; /* Un pequeño margen a la derecha para que no toque el borde del monitor */
+}
+.titulo-fino {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 300; /* El grosor Light de tu captura */
+    font-size: 33px;  /* El tamaño de tu captura */
+    line-height: 40px; /* El interlineado de tu captura */
+    margin-bottom: 30px;
+    margin-top: 0;
+}
+.texto-claro {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 1.6;
+    opacity: 0.8; /* Le baja el brillo al blanco para diferenciarlo del título */
+    margin-bottom: 20px;
+}
+.boton-blanco {
+    display: inline-block;
+    padding: 12px 26px;
+    margin-top: 20px;
+    border: 2px solid #ffffff;
+    color: #ffffff;
+    text-transform: uppercase;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease-in-out;
+}
+.boton-blanco:hover {
+    background-color: #ffffff;
+    color: #1c1c1c;
+}
 p{
     margin-top:0;
     line-height:1.5;
@@ -200,19 +264,27 @@ button:hover {
     margin-bottom:var(--espaciado-md);
 }
 #estudio{
-    font-family:var(--fuente-principal);
-    color:var(--color-primario);
-    background-color:var(--color-backgroud-secciones);
-    display:flex;
-    flex-direction:column;
-    text-align:justify;
-    gap:0px;
-    padding:var(--espaciado-md);
-    padding-right: 60px;
-    max-width:400px;
-    margin-left:0;
-    margin-right:auto;
-    margin-bottom:var(--espaciado-md);
+    font-family:var(--fuente-secundaria);
+    color:var(--color-texto-seccion);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 25px;
+    background-color:var(--color-seccion);
+    display: flex;
+    
+    
+}
+#tituloEstudio{
+    font-family: var(--fuente-principal);
+    color: var(--color-primario);
+    font-size: 33px;
+    font-weight: 300;
+    line-height: 40px;
+}
+.row{
+    padding-left: 15px;
+    padding-right: 15px;
+    
 }
 #botonnoboton{
     display:inline-block;
