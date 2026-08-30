@@ -66,6 +66,29 @@ header.header-scrolled {
     will-change: opacity, transform;
 }
 
+.pagina-proyectos .hero-reveal {
+    position: sticky;
+    top: 0;
+    z-index: 0;
+    height: 100svh;
+}
+
+.pagina-proyectos .hero-reveal .carrusel-contenido {
+    will-change: opacity, transform;
+}
+
+.pagina-proyectos {
+    background-color: var(--color-primario);
+}
+
+.pagina-proyectos .proyectos-cortina {
+    position: relative;
+    z-index: 2;
+    min-height: 100vh;
+    background-color: var(--color-primario);
+    display: flow-root;
+}
+
 /* Esta capa tiene fondo propio y un z-index superior: es el telon que cubre el hero. */
 .pagina-inicio .seccion-contenido {
     position: relative;
