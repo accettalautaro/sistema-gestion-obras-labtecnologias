@@ -268,7 +268,8 @@ header.header-scrolled {
 }
 .titulo-fino {
     font-family: 'Roboto', sans-serif;
-    font-weight: 300; /* El grosor Light de tu captura */
+    font-style: normal;
+    font-weight: 300 ; /* El grosor Light de tu captura */
     font-size: 33px;  /* El tamaño de tu captura */
     line-height: 40px; /* El interlineado de tu captura */
     margin-bottom: 30px;
@@ -298,6 +299,110 @@ header.header-scrolled {
     background-color: var(--color-primario);
     color:var(--color-seccion);
 }
+/*ESTILO SECCION PROYECTOS*/
+#grilla-proyectos {
+    position: relative;
+    z-index: 2;
+    background-color: var(--color-primario);
+    color: var(--color-texto1);
+    padding: 4rem 0 2rem;
+}
+#grilla-proyectos h2{
+    font-family: var(--fuente-principal);
+    color: var(--color-seccion);
+    padding-left: 85px;
+}
+/* Contenedor principal de la grilla */
+    .proyectos-grilla {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 columnas de igual tamaño */
+    gap: 0; /* Sin márgenes entre las imágenes, como el original */
+    width: 100%;
+    }
+
+    /* Cada ítem de la grilla */
+    .proyecto-item {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 1 / 1; /* Fuerza a que cada recuadro sea un cuadrado perfecto */
+    }
+
+    /* Enlace que envuelve la imagen y el overlay */
+    .proyecto-link {
+    display: block;
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
+    color: #333; /* Color del texto cuando aparece el overlay */
+    }
+
+    /* Estilos de la imagen base */
+    .proyecto-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease-in-out; /* Animación de la imagen */
+    display: block;
+    }
+
+    /* Capa superpuesta (Overlay blanco) */
+    .proyecto-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0); /* Inicia transparente */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: all 0.5s ease-in-out; /* Velocidad de la transición del hover */
+    text-align: center;
+    }
+
+    /* Efectos al pasar el mouse (Hover) */
+    .proyecto-item:hover img {
+    transform: scale(1.05); /* Efecto de zoom a la imagen (img-scale-in) */
+    }
+
+    .proyecto-item:hover .proyecto-overlay {
+    background-color: rgba(255, 255, 255, 1); /* Fondo blanco sólido */
+    opacity: 1; /* Hace visible el texto y el fondo */
+    }
+
+    /* Tipografía del overlay */
+    .proyecto-titulo {
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 700; /* Negrita */
+    font-size: 1.2rem;
+    margin-bottom: 5px;
+    display: block;
+    text-transform: uppercase;
+    }
+
+    .proyecto-categoria {
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 400;
+    font-size: 0.9rem;
+    color: #666;
+    display: block;
+    }
+
+    /* Responsive: Ajuste para pantallas más pequeñas */
+    @media (max-width: 992px) {
+    .proyectos-grilla {
+        grid-template-columns: repeat(2, 1fr); /* Pasa a 2 columnas en tablets */
+    }
+    }
+
+    @media (max-width: 576px) {
+    .proyectos-grilla {
+        grid-template-columns: 1fr; /* Pasa a 1 columna en celulares */
+    }
+    }
+/*--------------------*/
 p{
     margin-top:0;
     line-height:1.5;
