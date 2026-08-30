@@ -25,6 +25,8 @@
     --fuente-secundaria:"Open Sans", "Helvetica Neue", sans-serif;
 
 }
+
+
 *{
     box-sizing:border-box;
 }
@@ -247,13 +249,13 @@ header.header-scrolled {
     /* Ocupa desde la columna 1 hasta la 7 */
     grid-column: 1 / 7;
     grid-row: 1;
-    padding-top: 30px;  
+    padding-top: 80px;  
     padding-bottom: 30px;
     padding-left: 85px; /* Margen izquierdo igual al navbar */
     padding-right: 40px; /* Un pequeño margen a la derecha para que no toque el borde del monitor */
 }
 .titulo-fino {
-    font-family: 'Roboto', sans-serif;
+    font-family: var(--fuente-principal);
     font-style: normal;
     font-weight: 300 ; /* El grosor Light de tu captura */
     font-size: 33px;  /* El tamaño de tu captura */
@@ -262,7 +264,7 @@ header.header-scrolled {
     margin-top: 0;
 }
 .texto-claro {
-    font-family: 'Roboto', sans-serif;
+    font-family:var(--fuente-principal);
     font-weight: 400;
     font-size: 16px;
     line-height: 1.6;
@@ -360,7 +362,7 @@ header.header-scrolled {
 
     /* Tipografía del overlay */
     .proyecto-titulo {
-    font-family: 'Open Sans', sans-serif;
+    font-family: var(--fuente-secundaria);
     font-weight: 700; /* Negrita */
     font-size: 1.2rem;
     margin-bottom: 5px;
@@ -369,10 +371,10 @@ header.header-scrolled {
     }
 
     .proyecto-categoria {
-    font-family: 'Open Sans', sans-serif;
+    font-family:var(--fuente-secundaria);
     font-weight: 400;
     font-size: 0.9rem;
-    color: #666;
+    color:var(--color-texto2-resaltado);
     display: block;
     }
 
@@ -519,6 +521,10 @@ body{
     padding-bottom: var(--espaciado-lg);
 }
 
+.main.contenido-principal {
+    padding-top: 110px;
+}
+
 .pagina-inicio {
     padding-top: 0;
     padding-bottom: 0;
@@ -611,7 +617,7 @@ button:hover {
 
 }
 .proyectos {
-    font-family: 'Roboto', Helvetica, sans-serif;
+    font-family: var(--fuente-principal);
     max-width:68.75rem;
     margin:3.75rem auto;
     padding:0 var(--espaciado-lg);
@@ -681,6 +687,12 @@ button:hover {
 }
 
 @media (max-width: 950px) {
+    .estudio-texto{
+        grid-column: 1/13;
+    }
+    .estudio-imagen{
+        display: none;
+    }
     .navegacion {
         justify-content: space-between;
     }
