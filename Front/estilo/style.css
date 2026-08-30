@@ -335,8 +335,8 @@ body{
 }
 
 footer{
-    background-color:var(--color-fondo);
-    color:var(--color-texto);
+    background-color:var(--color-seccionclaro);
+    color:var(--color-texto-footer);
     text-align:center;
     padding:var(--espaciado-md);
     font-size:0.875rem;
@@ -355,7 +355,7 @@ form{
 }
 input, select, textarea {
     padding:var(--espaciado-sm);
-    border:1px solid var(--color-borde);
+    border:1px solid var(--color-texto-footer);
     border-radius:var(--radio);
 }
 input:focus, select:focus, textarea:focus {
@@ -365,16 +365,17 @@ input:focus, select:focus, textarea:focus {
 }
 button {
     padding:var(--espaciado-sm);
-    border:1px solid var(--color-borde);
+    border:1px solid var(--color-seccionclaro);
     border-radius:var(--radio);
     color:var(--color-primario);
-    background:var(--color-hover);
+    background:var(--color-seccion);
 }
 
 button:hover {
     background:var(--color-resaltado);
     color:var(--color-primario);
 }
+
 .info-contacto{
     font-family:var(--fuente-principal);
     display:flex;
