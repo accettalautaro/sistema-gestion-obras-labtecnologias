@@ -342,16 +342,23 @@ footer{
     font-size:0.875rem;
 }
 form{
+
     font-family:var(--fuente-principal);
     display:flex;
     flex-direction:column;
     gap:var(--espaciado-xs);
     max-width:25rem;
-    padding: 20px;;
+    padding-left: 80px;
+    padding-right: 80px;
+    padding-bottom: 20px;
+    padding-top: 20px;
+    background-color: var(--color-primario);
+    border-radius: 2%;
     margin-left:auto;
     margin-right:auto;
     margin-top:var(--espaciado-md);
     margin-bottom:var(--espaciado-md);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 input, select, textarea {
     padding:var(--espaciado-sm);
