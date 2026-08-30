@@ -29,19 +29,22 @@
     box-sizing:border-box;
 }
 /*ESTILOS HEADER*/
-header {
+header  {
     position: fixed; /* Cambiado a fixed para que el carrusel quede por debajo */
     top: 0;
     left: 0;
     width: 100%; /* Necesario al usar fixed */
     z-index: 1000;
     background-color: transparent; /* Fondo transparente por defecto */
+    
     transition: background-color 0.4s ease, box-shadow 0.4s ease; /* Transición suave */
 }
 header.header-scrolled {
     background-color: var(--color-primario);
+    color: var(--color-texto2);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Opcional: agrega una pequeña sombra al bajar */
 }
+
 
 /*ESTILOS CARRUCEL */
 .carrusel-contenedor {
@@ -125,6 +128,13 @@ header.header-scrolled {
     right: 20px;
 }
 
+/*ESTILO MAIN*/
+
+.main{
+    position: relative;
+    z-index: 1;
+    padding-top: 110px;
+}
 /*ESTILOS SECCION ESTUDIO*/
 .seccion-estudio {
     display: grid;
@@ -227,7 +237,7 @@ h2{
 .navegacion {
     font-family: var(--fuente-principal);
     /* background-color: var(--color-primario); <-- Eliminado para no tapar el carrusel */
-    color: var(--color-texto1);
+    color: var(--color-primario);
     text-decoration: none;
     position: relative;
     display: flex;
@@ -238,7 +248,27 @@ h2{
     margin-right: 70px;
     padding-left: 15px;
     padding-right: 15px;
+    border-bottom: 1px solid rgba(255, 255,255, 0.3);
+    transition: color 0.3s ease;
 }
+.navegacion.scrolled {
+    font-family: var(--fuente-principal);
+    /* background-color: var(--color-primario); <-- Eliminado para no tapar el carrusel */
+    color: var(--color-texto2);
+    text-decoration: none;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--espaciado-md);
+    flex-wrap: wrap;
+    margin-left: 70px;
+    margin-right: 70px;
+    padding-left: 15px;
+    padding-right: 15px;
+    border-bottom: 1px solid rgba(255, 255,255, 0.3);
+    transition: color 0.3s ease;
+}
+
 
 .nav-brand {
     display: flex;

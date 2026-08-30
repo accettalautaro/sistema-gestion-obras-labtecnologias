@@ -4,27 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Formulario</title>
+    <script src="Scrips/app.js" defer></script>
     <link rel="stylesheet" href="estilo/style.css">
 </head>
 <body>
     <header>
         
-        <nav class="navegacion">
-            <ul>
-                <li><img  src="Imagenes/logoAccettaSinMargenes.png" alt="logo empresa" class="imagen-izquierda" ></li>
+        <nav>
+            <div class="navegacion">
+                <img  src="Imagenes/logoAccettaSinMargenesBlanco.png" alt="logo empresa" class="imagen-izquierda" >
+            <div class="hamburguer" id="hamburguer">
+                <img src="Imagenes/menu.png" alt="menu">
+            </div>
+            <ul class="links" id="links">
                 <li><a href="index.html">Inicio</a></li>
                 <li><a href="proyectos.html">Proyectos</a></li>
                 <li><a href="formulario.html">Contacto</a></li>
                 <li><a href="login.html">Ingresar</a></li>
-                <a href="https://www.instagram.com/vascoaccetta/" target="_blank">
-                    <img class="instagram-logo" src="Imagenes/instagramlogo.png" alt="logo instagram" >
-                </a>
+                <li><a href="https://www.instagram.com/vascoaccetta/" target="_blank">
+                    <img class="instagram-logo" src="Imagenes/instagramlogoBlanco.png" alt="logo instagram" >
+                </a></li>
+
             </ul>
+            </div>
+            
         </nav>
     </header>
-    <main class="contenido-principal"> 
+    <main class="contenido-principal">
+        <section class="carrusel-contenedor">
+                    <div class="carrusel-slide">
+                            <div class="fondo-imagen" style="background-image: url('Imagenes/casanieve.jpg');"></div>
+                            <div class="carrusel-contenido">
+                                <h2>Contacto</h2>
+                            </div>
+                        </a>
+                    </div>
+                
+        
+        </section>
         <div class="info-contacto">
-            <h1>Contacto</h1>
             <h2>Arquitecto Accetta</h2>
             <p>Email: <a href="mailto:arqaccetta@gmail.com">arqaccetta@gmail.com</a></p>
             <p>Telefono: 2657-657808</p>  

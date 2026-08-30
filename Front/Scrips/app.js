@@ -4,17 +4,29 @@ const link = document.getElementById('links');
 hamburguer.addEventListener('click', () => {
     link.classList.toggle('active');
 });
+/*SCROLL HEADER */
 const header = document.querySelector('header');
-
+const nav = document.querySelector('.navegacion');
+const logo = document.querySelector('.imagen-izquierda');
+const logoInstagram = document.querySelector('.instagram-logo');
     window.addEventListener('scroll', () => {
         // Si el usuario hace scroll hacia abajo más de 50px
         if (window.scrollY > 50) {
             header.classList.add('header-scrolled');
+            nav.classList.add('scrolled');
+            logo.src = 'Imagenes/logoAccettaSinMargenes.png';
+            logoInstagram.src='Imagenes/instagramlogo.png';
         } else {
             // Si vuelve arriba, vuelve a ser transparente
+            
             header.classList.remove('header-scrolled');
+            nav.classList.remove('scrolled');
+            logo.src = 'Imagenes/logoAccettaSinMargenesBlanco.png';
+            logoInstagram.src='Imagenes/instagramlogoBlanco.png';
         }
     });
+
+    /*CARRUCEL */
     const track = document.getElementById('carruselTrack');
     const btnPrev = document.getElementById('btnPrev');
     const btnNext = document.getElementById('btnNext');

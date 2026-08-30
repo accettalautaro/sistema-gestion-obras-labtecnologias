@@ -7,22 +7,27 @@
     <link rel="stylesheet" href="estilo/style.css">
 </head>
 <body>
-    <header>
-        <nav class="navegacion">
-            <ul>
-                <li><img src="Imagenes/logoAccettaSinMargenes.png" alt="logo empresa" class="imagen-izquierda" ></li>
+    <header class="header-scrolled">   
+        <nav >
+            <div class=" navegacion scrolled" >
+                <img  src="Imagenes/logoAccettaSinMargenes.png" alt="logo empresa" class="imagen-izquierda" >
+            <div class="hamburguer" id="hamburguer">
+                <img src="Imagenes/menu.png" alt="menu">
+            </div>
+            <ul class="links" id="links">
                 <li><a href="index.html">Inicio</a></li>
                 <li><a href="proyectos.html">Proyectos</a></li>
                 <li><a href="formulario.html">Contacto</a></li>
                 <li><a href="login.html">Ingresar</a></li>
-                <a href="https://www.instagram.com/vascoaccetta/" target="_blank">
-                    <img class="instagram-logo" src="Imagenes/instagramlogo.png" alt="logo instagram" width="25" height="25">
-                </a>
-
+                <li><a href="https://www.instagram.com/vascoaccetta/" target="_blank">
+                    <img class="instagram-logo" src="Imagenes/instagramlogo.png" alt="logo instagram" >
+                </a></li>
             </ul>
+            </div>
+            
         </nav>
     </header>
-    <main class="contenido-principal">
+    <main class=" main contenido-principal">
         <form action="#" method="post">
             <label for="usuario">Usuario:</label>
             <input type="text" id="usuario" name="usuario" required><br>
