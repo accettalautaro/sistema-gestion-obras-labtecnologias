@@ -142,13 +142,6 @@ header.header-scrolled {
     height: 100%;
     position: relative;
 }
-/* El enlace que envuelve todo */
-.carrusel-enlace {
-    display: block;
-    width: 100%;
-    height: 100%;
-    text-decoration: none; /* Quita el subrayado del link */
-}
 /* La imagen de fondo */
 .fondo-imagen {
     width: 100%;
@@ -225,13 +218,6 @@ header.header-scrolled {
     right: 20px;
 }
 
-/*ESTILO MAIN*/
-
-.main{
-    position: relative;
-    z-index: 1;
-    padding-top: 110px;
-}
 /*ESTILOS SECCION ESTUDIO*/
 .seccion-estudio {
     display: grid;
@@ -472,19 +458,6 @@ h2{
 }
 
 
-.nav-brand {
-    display: flex;
-    align-items: center;
-    margin-right: auto;
-}
-
-.logo-completa {
-    display: block;
-}
-
-.logo-simple {
-    display: none;
-}
 .instagram-logo{
     
     width:60px !important;
@@ -622,65 +595,6 @@ button:hover {
     margin-top:var(--espaciado-md);
     margin-bottom:var(--espaciado-md);
 }
-#estudio{
-    font-family:var(--fuente-secundaria);
-    color:var(--color-texto-seccion);
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 25px;
-    background-color:var(--color-seccion);
-    display: flex;
-    
-    
-}
-#tituloEstudio{
-    font-family: var(--fuente-principal);
-    color: var(--color-primario);
-    font-size: 33px;
-    font-weight: 300;
-    line-height: 40px;
-}
-.row{
-    padding-left: 15px;
-    padding-right: 15px;
-    
-}
-#botonnoboton{
-    display:inline-block;
-    padding:var(--espaciado-sm);
-    border:1px solid var(--color-borde);
-    border-radius:var(--radio);
-    color:var(--color-primario);
-    background:var(--color-hover);
-}
-#botonnoboton a,
-#botonnoboton a:visited{
-    color:var(--color-primario);
-    text-decoration:none;
-}
-#botonnoboton:hover{
-    background:var(--color-resaltado);
-}
-.contenedor-dos-columnas {
-    display: flex;
-    align-items: stretch;
-    margin-bottom: var(--espaciado-lg);
-}
-.columna-imagen {
-    flex: 1;
-    order: 1;
-}
-.columna-imagen img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-#estudio {
-    flex: 1;
-    max-width: none;
-    box-sizing: border-box;
-    margin: 0;
-}
 #Nosotros{
     scroll-margin-top: 100px;
     font-family:var(--fuente-principal);
@@ -760,56 +674,6 @@ button:hover {
     margin: 0;
 }
 
-#diagrama {
-    scroll-margin-top: 100px;
-    font-family: var(--fuente-principal);
-    margin: 0 var(--espaciado-md) var(--espaciado-lg);
-    padding: 0 var(--espaciado-md);
-}
-
-#diagrama h2 {
-    margin: 0 0 var(--espaciado-md);
-    font-size: 1.5rem;
-    text-align: center;
-}
-
-.tabla-gantt {
-    border-collapse: collapse;
-    width: 100%;
-    min-width: 1000px;
-    font-size: 13px;
-}
-
-.tabla-gantt th,
-.tabla-gantt td {
-    border: 1px solid var(--color-borde);
-    padding: 6px;
-    text-align: center;
-}
-
-.tabla-gantt th {
-    background-color: var(--color-backgroud-secciones);
-    color: white;
-}
-
-.tabla-gantt .quincenas th {
-    background-color: #7a7a7a;
-    color: white;
-    font-size: 11px;
-    width: 3%;
-}
-
-.tabla-gantt .tarea {
-    text-align: left;
-    font-weight: bold;
-    background-color: var(--color-backgroud-secciones);
-    color: white;
-    width: 15%;
-}
-
-.activa {
-    background-color: var(--color-resaltado);
-}
 #perfil{
     width:min(315px, 100%);
     margin:0 auto;
@@ -853,26 +717,8 @@ button:hover {
         width: 3.5rem;
         height: auto;
     }
-    .nav-brand {
-        margin-right: 0;
-    }
-
-    .logo-completa {
-        display: none;
-    }
-
-    .logo-simple {
-        display: block;
-        width: 3.5rem;
-        height: auto;
-    }
-
     .imagen-izquierda {
         width:min(12rem, 35vw);
-    }
-
-    .contenedor-dos-columnas .columna-imagen {
-        display: none;
     }
 
     .instagram-logo {
