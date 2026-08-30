@@ -137,7 +137,7 @@ header.header-scrolled {
     transition: filter 0.3s ease; /* Efecto suave al pasar el mouse */
 }
 /* Efecto Hover: Cuando pasas el mouse, la imagen se aclara un poco */
-.carrusel-enlace:hover .fondo-imagen {
+.carrusel-slide:hover .fondo-imagen {
     filter: brightness(0.8);
 }
 /* El contenedor del texto */
@@ -151,11 +151,32 @@ header.header-scrolled {
     z-index: 10;
 }
 .carrusel-contenido h2 {
-    font-size: 3.5rem; /* Tamaño del texto */
+    font-size: 2.75rem; /* Tamaño del texto */
     font-family: var(--fuente-principal, sans-serif);
     text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.7); /* Sombra para máxima legibilidad */
     margin: 0;
     text-transform: uppercase;
+}
+
+.boton-hero {
+    display: inline-block;
+    margin-top: 1.25rem;
+    padding: 0.7rem 1.5rem;
+    border: 1px solid var(--color-primario);
+    background-color: transparent;
+    color: var(--color-primario);
+    font-size: 0.95rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.boton-hero:hover,
+.boton-hero:focus-visible {
+    background-color: var(--color-seccion);
+    color: var(--color-primario);
 }
 /* Botones de navegación */
 .carrusel-btn {
