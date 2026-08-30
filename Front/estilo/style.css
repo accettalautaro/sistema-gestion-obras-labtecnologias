@@ -53,6 +53,59 @@ header.header-scrolled {
     height: 100vh; /* 100% del alto de la ventana */
     overflow: hidden; /* Oculta las imágenes que están a los lados */
 }
+
+/* El hero permanece en el fondo mientras las secciones siguientes avanzan sobre el. */
+.pagina-inicio .hero-reveal {
+    position: sticky;
+    top: 0;
+    z-index: 0;
+    height: 100svh;
+}
+
+.pagina-inicio .hero-reveal .carrusel-contenido {
+    will-change: opacity, transform;
+}
+
+/* Esta capa tiene fondo propio y un z-index superior: es el telon que cubre el hero. */
+.pagina-inicio .seccion-contenido {
+    position: relative;
+    z-index: 2;
+    background-color: var(--color-seccion);
+    color: var(--color-primario);
+}
+
+.pagina-inicio .seccion-contenido.reveal {
+    opacity: 1;
+    transform: none;
+}
+
+.pagina-inicio #info-contacto {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: none;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-top: var(--espaciado-md);
+    padding-bottom: var(--espaciado-md);
+    background-color: var(--color-primario);
+    color: var(--color-texto1);
+}
+
+.pagina-inicio #info-contacto.reveal {
+    opacity: 1;
+    transform: none;
+}
+
+.pagina-inicio #Nosotros {
+    position: relative;
+    z-index: 2;
+}
+
+.pagina-inicio #Nosotros.reveal {
+    opacity: 1;
+    transform: none;
+}
 /* La pista que se desliza de lado a lado */
 .carrusel-track {
     display: flex;
@@ -319,9 +372,34 @@ body{
     flex-direction: column; 
     min-height: 100vh;
 }
+
+.reveal {
+    opacity: 0;
+    transform: translateY(42px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .reveal {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+}
+
 .contenido-principal{
     flex: 1;
     padding-bottom: var(--espaciado-lg);
+}
+
+.pagina-inicio {
+    padding-top: 0;
+    padding-bottom: 0;
 }
 .hamburguer {
     display: none;
@@ -458,7 +536,7 @@ button:hover {
     scroll-margin-top: 100px;
     font-family:var(--fuente-principal);
     color:var(--color-texto);
-    background-color:var(--color-fondo);
+    background-color:var(--color-primario);
     display:flex;
     flex-direction:column;
     text-align:justify;
@@ -466,7 +544,7 @@ button:hover {
     padding:var(--espaciado-md);
     width:100%;
     max-width:none;
-    margin:0 0 var(--espaciado-lg);
+    margin:0;
 
 }
 .proyectos {
