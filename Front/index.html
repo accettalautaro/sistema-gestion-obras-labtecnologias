@@ -32,6 +32,47 @@
         </nav>
     </header>
     <main class="contenido-principal">
+            <section class="carrusel-contenedor">
+                <div class="carrusel-track" id="carruselTrack">
+                    
+                    <!-- Slide 1 -->
+                    <div class="carrusel-slide">
+                        <!-- El enlace envuelve a toda la imagen y al texto -->
+                        <a href="proyectos.html" class="carrusel-enlace">
+                            <!-- Cambia la URL por la ruta de tu imagen -->
+                            <div class="fondo-imagen" style="background-image: url('Imagenes/casaverano.jpg');"></div>
+                            <div class="carrusel-contenido">
+                                <h2>Casa de Verano</h2>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Slide 2 -->
+                    <div class="carrusel-slide">
+                        <a href="proyectos.html" class="carrusel-enlace">
+                            <div class="fondo-imagen" style="background-image: url('Imagenes/casanieve.jpg');"></div>
+                            <div class="carrusel-contenido">
+                                <h2>Casa de Invierno</h2>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- Slide 3 -->
+                    <div class="carrusel-slide">
+                        <a href="proyectos.html" class="carrusel-enlace">
+                            <div class="fondo-imagen" style="background-image: url('Imagenes/pasteleria.jpg');"></div>
+                            <div class="carrusel-contenido">
+                                <h2>Pasteleria</h2>
+                            </div>
+                        </a>
+                    </div>
+
+                </div>
+                
+                <!-- Botones Anterior / Siguiente -->
+                <button class="carrusel-btn btn-prev" id="btnPrev">&#10094;</button>
+                <button class="carrusel-btn btn-next" id="btnNext">&#10095;</button>
+            </section>
             
         <section class="seccion-estudio">
             <div class="estudio-imagen"></div>
@@ -51,128 +92,6 @@
             </div>    
             
         </section>
-        <div id="diagrama" style="overflow-x: auto;">
-            <h2>Duracion y costo promedio para la construccion de una casa de 200m<sup>2</sup></h2>
-        <table class="tabla-gantt">
-            <thead>
-                <!-- Fila de Meses (cada mes ocupa 2 columnas gracias al colspan) -->
-                <tr>
-                    <th>Fase / Actividad</th>
-                    <th colspan="2">Mes 1</th>
-                    <th colspan="2">Mes 2</th>
-                    <th colspan="2">Mes 3</th>
-                    <th colspan="2">Mes 4</th>
-                    <th colspan="2">Mes 5</th>
-                    <th colspan="2">Mes 6</th>
-                    <th colspan="2">Mes 7</th>
-                    <th colspan="2">Mes 8</th>
-                    <th colspan="2">Mes 9</th>
-                    <th colspan="2">Mes 10</th>
-                    <th colspan="2">Mes 11</th>
-                    <th colspan="2">Mes 12</th>
-                </tr>
-                <!-- Fila de Quincenas (24 en total) -->
-                <tr class="quincenas">
-                    <th style="background-color: var(--color-backgroud-secciones)"> </th> <!-- Espacio vacío arriba de las tareas -->
-                    <th>Q1</th><th>Q2</th> <th>Q3</th><th>Q4</th> <th>Q5</th><th>Q6</th> 
-                    <th>Q7</th><th>Q8</th> <th>Q9</th><th>Q10</th> <th>Q11</th><th>Q12</th> 
-                    <th>Q13</th><th>Q14</th> <th>Q15</th><th>Q16</th> <th>Q17</th><th>Q18</th> 
-                    <th>Q19</th><th>Q20</th> <th>Q21</th><th>Q22</th> <th>Q23</th><th>Q24</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Tarea 1: 1 mes (2 quincenas) -->
-                <tr>
-                    <td class="tarea">1. Planos, Permisos y Trámites</td>
-                    <td class="activa"></td><td class="activa"></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td>
-                </tr>
-
-                <!-- Tarea 2: 15 días (1 quincena) -->
-                <tr>
-                    <td class="tarea">2. Preparación de Terreno</td>
-                    <td></td><td></td> <td class="activa"></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td>
-                </tr>
-
-                <!-- Tarea 3: 1.5 meses (3 quincenas) -->
-                <tr>
-                    <td class="tarea">3. Cimentación (Zapatas/Platea)</td>
-                    <td></td><td></td> <td class="activa"></td><td class="activa"></td> <td class="activa"></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td>
-                </tr>
-
-                <!-- Tarea 4: 2 meses (4 quincenas) -->
-                <tr>
-                    <td class="tarea">4. Estructura (Columnas, Vigas, Losa)</td>
-                    <td></td><td></td> <td></td><td></td> <td></td><td class="activa"></td> <td class="activa"></td><td class="activa"></td> <td class="activa"></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td>
-                </tr>
-
-                <!-- Tarea 5: 1.5 meses (3 quincenas) -->
-                <tr>
-                    <td class="tarea">5. Mampostería (Paredes)</td>
-                    <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td class="activa"></td><td class="activa"></td> <td class="activa"></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td>
-                </tr>
-
-                <!-- Tarea 6: 1 mes (2 quincenas) -->
-                <tr>
-                    <td class="tarea">6. Cubierta y Techo</td>
-                    <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td class="activa"></td><td class="activa"></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td>
-                </tr>
-
-                <!-- Tarea 7: 1 mes (2 quincenas) -->
-                <tr>
-                    <td class="tarea">7. Cañerías de Agua y Gas</td>
-                    <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td class="activa"></td><td class="activa"></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td>
-                </tr>
-
-                <!-- Tarea 8: 1 mes (2 quincenas) -->
-                <tr>
-                    <td class="tarea">8. Cableado Eléctrico</td>
-                    <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td class="activa"></td> <td class="activa"></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td>
-                </tr>
-
-                <!-- Tarea 9: 2 meses (4 quincenas) -->
-                <tr>
-                    <td class="tarea">9. Revoques (Grueso y Fino)</td>
-                    <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td class="activa"></td> <td class="activa"></td><td class="activa"></td> <td class="activa"></td><td></td> <td></td><td></td> <td></td><td></td>
-                </tr>
-
-                <!-- Tarea 10: 1 mes (2 quincenas) -->
-                <tr>
-                    <td class="tarea">10. Contrapisos y Carpetas</td>
-                    <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td class="activa"></td><td class="activa"></td> <td></td><td></td> <td></td><td></td>
-                </tr>
-
-                <!-- Tarea 11: 1 mes (2 quincenas) -->
-                <tr>
-                    <td class="tarea">11. Pisos y Revestimientos</td>
-                    <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td class="activa"></td><td class="activa"></td> <td></td><td></td>
-                </tr>
-
-                <!-- Tarea 12: 1 mes (2 quincenas) -->
-                <tr>
-                    <td class="tarea">12. Carpintería y Aberturas</td>
-                    <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td class="activa"></td> <td class="activa"></td><td></td>
-                </tr>
-
-                <!-- Tarea 13: 1 mes (2 quincenas) -->
-                <tr>
-                    <td class="tarea">13. Instalación de Artefactos</td>
-                    <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td class="activa"></td><td class="activa"></td>
-                </tr>
-
-                <!-- Tarea 14: 1.5 meses (3 quincenas) -->
-                <tr>
-                    <td class="tarea">14. Pintura Interior y Exterior</td>
-                    <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td class="activa"></td> <td class="activa"></td><td class="activa"></td>
-                </tr>
-
-                <!-- Tarea 15: 15 días (1 quincena) -->
-                <tr>
-                    <td class="tarea">15. Limpieza y Detalles Finales</td>
-                    <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td></td> <td></td><td class="activa"></td>
-                </tr>
-            </tbody>
-        </table>
-        </div>
         <div id="Nosotros">
             <h1 style="text-align: center;">Quien Soy</h1>
             <div id="perfil">
