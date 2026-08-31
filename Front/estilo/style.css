@@ -293,7 +293,8 @@ header.header-scrolled {
     z-index: 2;
     background-color: var(--color-primario);
     color: var(--color-texto1);
-    padding: 4rem 0 2rem;
+    padding-bottom: 0px;
+    padding-top: 30px;
 }
 #grilla-proyectos h2{
     font-family: var(--fuente-principal);
@@ -417,7 +418,7 @@ h2{
 
 .imagen-perfil{
     display:block;
-    width:min(315px, 100%);
+    width:min(315 px, 100%);
     height:315px;
     margin:0 auto;
     object-fit:cover;
@@ -604,17 +605,47 @@ button:hover {
 #Nosotros{
     scroll-margin-top: 100px;
     font-family:var(--fuente-principal);
-    color:var(--color-texto);
-    background-color:var(--color-primario);
+    background-color:var(--color-seccionclaro);
     display:flex;
     flex-direction:column;
-    text-align:justify;
-    gap:0px;
-    padding:var(--espaciado-md);
+    padding-left: 85px;
+    padding-right: 85px;
+    padding-top:40px;
+    padding-bottom: 40px;
     width:100%;
     max-width:none;
     margin:0;
-
+}
+#Nosotros h2{
+    text-align: center;
+    font-style: normal;
+    font-weight: 300;
+    line-height: 40px;
+    font-size: 33px;
+    color: var(--color-seccion);
+}
+#Nosotros h3{
+    margin-top: 0px;
+    font-style: normal;
+    font-weight: 300;
+    font-size: 25px;
+    line-height: 30px;
+    color: var(--color-seccion);
+}
+#Nosotros h4{
+    font-style: normal;
+    font-weight: 300;
+    font-size: 16px;
+    line-height: 19px;
+    color: var(--color-texto2);
+}
+.texto-nosotros{
+    text-align: center;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 29px;
+    color: var(--color-texto2);
 }
 .proyectos {
     font-family: var(--fuente-principal);
