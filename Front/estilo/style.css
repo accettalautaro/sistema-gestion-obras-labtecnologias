@@ -16,7 +16,7 @@
     --color-texto1:#000000;
     --color-seccionclaro: #F4F4F4;  
     --color-texto2: #999999;
-    text-align:center;
+    --color-texto2-resaltado:#666666;
     --color-texto3:#333333;
     --color-texto-footer:#898989;
     --color-texto-seccion:#D3D3D3;
@@ -63,7 +63,7 @@ header.header-scrolled {
 }
 
 .pagina-inicio .hero-reveal .carrusel-contenido {
-    text-align:center;
+    will-change: opacity, transform;
 }
 
 .pagina-proyectos .hero-reveal {
@@ -580,65 +580,16 @@ button:hover {
     scroll-margin-top: 100px;
     font-family:var(--fuente-principal);
     color:var(--color-texto);
-    background-color:var(--color-seccionclaro);
+    background-color:var(--color-primario);
     display:flex;
     flex-direction:column;
-    align-items:center;
-    text-align:center;
-    gap:1.25rem;
-    padding:clamp(3rem, 8vw, 7rem) clamp(1.25rem, 8vw, 7rem);
+    text-align:justify;
+    gap:0px;
+    padding:var(--espaciado-md);
     width:100%;
     max-width:none;
     margin:0;
 
-}
-
-#Nosotros h1 {
-    width:100%;
-    margin:0;
-    color:var(--color-texto1);
-    font-size:clamp(2rem, 4vw, 3.25rem);
-    font-weight:300;
-    letter-spacing:0.02em;
-    text-align:center !important;
-}
-
-#Nosotros #perfil {
-    width:min(100%, 22rem);
-    margin:0 auto;
-    text-align:center;
-}
-
-#Nosotros .imagen-perfil {
-    width:100%;
-    height:auto;
-    aspect-ratio:1;
-    margin:0 auto 1.25rem;
-    filter:grayscale(15%);
-}
-
-#Nosotros #perfil h2 {
-    margin:0;
-    color:var(--color-texto1);
-    font-size:1.35rem;
-    font-weight:400;
-}
-
-#Nosotros #perfil h3 {
-    margin:0.35rem 0 0;
-    color:var(--color-texto2-resaltado);
-    font-size:0.75rem;
-    font-weight:500;
-    letter-spacing:0.12em;
-}
-
-#Nosotros > p {
-    width:min(100%, 48rem);
-    margin:0;
-    color:var(--color-texto3);
-    font-size:1rem;
-    line-height:1.8;
-    text-align:center;
 }
 .proyectos {
     font-family: 'Roboto', Helvetica, sans-serif;
