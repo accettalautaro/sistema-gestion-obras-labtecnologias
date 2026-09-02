@@ -450,6 +450,49 @@ header.header-scrolled {
     }
     }
 /*--------------------*/
+
+/*ESTILO LOGIN*/
+
+.login-style{
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden; 
+}
+
+.login-imagen{
+    width: 100%;
+    height: 100%;
+    background-image: url('../Imagenes/casalogin.jpg');
+    background-size: cover;       /* Escala la imagen cubriendo todo el espacio */
+    background-position: center;  /* Centra la imagen */
+    background-repeat: no-repeat;
+}
+
+.col-9 {
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
+.col-3 {
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
+#contacto{
+    margin-top: 50px;
+}
+
+#contacto a {
+    font-weight: 700;
+}
+
+#contacto a:hover{
+    color:var(--color-texto1);
+    text-decoration:underline;
+    text-decoration-color:var(--color-resaltado);
+}
+
 p{
     margin-top:0;
     line-height:1.5;
@@ -543,6 +586,7 @@ a, a:visited{
     text-decoration:underline;
     text-decoration-color:var(--color-resaltado);
 }
+
 .links {
     display: flex;
     justify-content: right;
@@ -629,11 +673,43 @@ form{
     margin-bottom:var(--espaciado-md);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
+
+.form-login {
+
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.checkbox-container input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+    padding: 0;
+}
+
+.checkbox-container label {
+    margin: 0;
+}
+
 input, select, textarea {
     padding:var(--espaciado-sm);
     border:1px solid var(--color-texto-footer);
     border-radius:var(--radio);
 }
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
 input:focus, select:focus, textarea:focus {
     outline: none;
     border-color: var(--color-resaltado);
