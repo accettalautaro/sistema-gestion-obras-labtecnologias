@@ -105,3 +105,13 @@ const logoInstagram = document.querySelector('.instagram-logo');
 
         actualizarHero();
     }
+
+    /* VALIDACION DNI - Máximo 8 dígitos */
+    const dniInput = document.getElementById('dni');
+    if (dniInput) {
+        dniInput.addEventListener('input', function() {
+            if (this.value.length > 8) {
+                this.value = this.value.slice(0, 8);
+            }
+        });
+    }
