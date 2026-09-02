@@ -457,7 +457,8 @@ header.header-scrolled {
     width: 100%;
     height: 100vh;
     height: 100dvh;
-    overflow: hidden; 
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 .login-imagen{
@@ -481,6 +482,7 @@ header.header-scrolled {
 
 #contacto{
     margin-top: 50px;
+    margin-bottom: 50px;
 }
 
 #contacto a {
@@ -630,7 +632,8 @@ body{
 }
 
 .main.contenido-principal {
-    padding-top: 110px;
+    padding-top: 80px;
+    padding-bottom: 0px;
 }
 
 .pagina-inicio {
@@ -675,7 +678,8 @@ form{
 }
 
 .form-login {
-
+    margin-top: 20;
+    margin-bottom: 0;
 }
 
 .checkbox-container {
