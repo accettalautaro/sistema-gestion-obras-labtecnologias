@@ -840,6 +840,12 @@ button:hover {
     filter: brightness(0.9);
 }
 
+.proyecto-card-link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+}
+
 .info-proyecto {
     padding:var(--espaciado-md);
     text-align: left;
@@ -948,4 +954,328 @@ button:hover {
         filter: brightness(0) invert(1);
     }
 
+}
+
+/* PAGINA INTERNA DE PROYECTO */
+.pagina-proyecto {
+    background-color: var(--color-primario);
+    color: var(--color-texto3);
+    font-family: var(--fuente-principal);
+}
+
+.pagina-proyecto header {
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.35);
+    box-shadow: none;
+}
+
+.pagina-proyecto .navegacion {
+    color: var(--color-primario);
+    border-bottom-color: rgba(255, 255, 255, 0.3);
+}
+
+.pagina-proyecto .navegacion a {
+    color: var(--color-primario);
+}
+
+.pagina-proyecto .navegacion .imagen-izquierda {
+    content: url('../Imagenes/logoAccettaSinMargenesBlanco.png');
+}
+
+.pagina-proyecto .hamburguer img {
+    filter: none;
+}
+
+.pagina-proyecto-main {
+    padding: 0 7vw 7rem;
+}
+
+.proyecto-interna-cabecera,
+.proyecto-interna-seccion,
+.proyecto-detalles {
+    width: calc(100% + 14vw);
+    padding-left: 7vw;
+    padding-right: 7vw;
+    margin-left: -7vw;
+    margin-right: -7vw;
+}
+
+.proyecto-interna-seccion,
+.proyecto-detalles {
+    max-width: none;
+    margin-left: -7vw;
+    margin-right: -7vw;
+}
+
+.proyecto-interna-cabecera {
+    padding-bottom: 0;
+}
+
+.volver-proyectos {
+    display: inline-block;
+    margin-bottom: 3.5rem;
+    color: var(--color-texto2-resaltado);
+    font-size: 0.9rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.volver-proyectos:hover,
+.volver-proyectos:focus-visible {
+    color: var(--color-resaltado);
+}
+
+.proyecto-interna-cabecera h1 {
+    max-width: 900px;
+    margin: 0 0 1.5rem;
+    color: var(--color-seccion);
+    font-size: clamp(3rem, 8vw, 7rem);
+    font-weight: 300;
+    line-height: 0.98;
+}
+
+.proyecto-hero {
+    position: sticky;
+    top: 0;
+    z-index: 0;
+    width: 100vw;
+    min-height: 100svh;
+    margin-left: calc(50% - 50vw);
+    overflow: hidden;
+}
+
+.proyecto-hero .proyecto-imagen-principal {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-height: none;
+    object-fit: cover;
+}
+
+.proyecto-hero-overlay {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100svh;
+    padding: 9rem 7vw 8rem;
+    color: var(--color-primario);
+    background: rgba(0, 0, 0, 0.12);
+}
+
+.proyecto-hero-texto {
+    max-width: 900px;
+    text-align: center;
+}
+
+.proyecto-hero h1 {
+    color: var(--color-primario);
+    font-family: var(--fuente-principal);
+    font-size: clamp(2.2rem, 5vw, 4.5rem);
+}
+
+.proyecto-hero .proyecto-entrada {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.proyecto-retorno,
+.proyecto-interna-seccion,
+.proyecto-detalles {
+    position: relative;
+    z-index: 2;
+    background-color: var(--color-primario);
+}
+
+.proyecto-seccion-imagenes {
+    background-color: var(--color-seccionclaro);
+}
+
+.proyecto-retorno {
+    width: calc(100% + 14vw);
+    margin-left: -7vw;
+    padding: 2rem 7vw 0;
+}
+
+.proyecto-retorno .volver-proyectos {
+    margin-bottom: 0;
+}
+
+.proyecto-entrada {
+    max-width: 700px;
+    margin: 0;
+    color: var(--color-texto2-resaltado);
+    font-size: clamp(1.15rem, 2vw, 1.5rem);
+    line-height: 1.7;
+}
+
+.proyecto-imagen-principal {
+    width: 100%;
+    max-height: 75vh;
+    object-fit: cover;
+    display: block;
+}
+
+.proyecto-interna-seccion {
+    padding-top: 7rem;
+    padding-bottom: 7rem;
+}
+
+.proyecto-interna-seccion + .proyecto-interna-seccion,
+.proyecto-detalles {
+    border-top: 1px solid #e3e3e3;
+}
+
+.proyecto-interna-seccion h2,
+.proyecto-detalles h2 {
+    margin: 0 0 2rem;
+    color: var(--color-seccion);
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 300;
+}
+
+.proyecto-texto-seccion {
+    max-width: 760px;
+    color: var(--color-texto2-resaltado);
+    font-size: 1.1rem;
+    line-height: 1.9;
+}
+
+.proyecto-detalles {
+    padding-top: 5rem;
+    padding-bottom: 7rem;
+}
+
+.proyecto-detalles-lista {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+    margin: 0;
+}
+
+.proyecto-detalle {
+    margin: 0;
+}
+
+.proyecto-detalle dt {
+    margin-bottom: 0.75rem;
+    color: var(--color-texto2);
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.proyecto-detalle dd {
+    margin: 0;
+    color: var(--color-seccion);
+    font-size: 1.15rem;
+}
+
+.proyecto-carrusel {
+    position: relative;
+    width: min(100%, 1000px);
+    margin: 3rem auto 0;
+    overflow: hidden;
+    background-color: var(--color-seccionclaro);
+}
+
+.proyecto-carrusel-track {
+    display: flex;
+    transition: transform 0.6s ease-in-out;
+}
+
+.proyecto-carrusel-slide {
+    flex: 0 0 100%;
+    margin: 0;
+    padding: 0 4rem;
+}
+
+.proyecto-carrusel-slide img {
+    width: 100%;
+    max-height: 600px;
+    object-fit: cover;
+    display: block;
+}
+
+.proyecto-carrusel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3rem;
+    height: 3rem;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background-color: rgba(35, 35, 35, 0.75);
+    color: var(--color-primario);
+    cursor: pointer;
+    font-size: 1.5rem;
+}
+
+.proyecto-carrusel-btn:hover,
+.proyecto-carrusel-btn:focus-visible {
+    background-color: var(--color-seccion);
+}
+
+.proyecto-carrusel-btn[hidden] {
+    display: none;
+}
+
+.proyecto-carrusel-prev {
+    left: 0.75rem;
+}
+
+.proyecto-carrusel-next {
+    right: 0.75rem;
+}
+
+.proyecto-error {
+    min-height: 55vh;
+    padding-top: 4rem;
+}
+
+.proyecto-error[hidden],
+.proyecto-interna-contenido[hidden] {
+    display: none;
+}
+
+@media (max-width: 700px) {
+    .pagina-proyecto-main {
+        padding: 0 1.25rem 4rem;
+    }
+
+    .proyecto-interna-cabecera {
+        padding-bottom: 0;
+    }
+
+    .proyecto-hero {
+        width: 100vw;
+        min-height: 100svh;
+        margin-left: calc(50% - 50vw);
+    }
+
+    .proyecto-hero-overlay {
+        min-height: 100svh;
+        padding: 7rem 1.25rem 5rem;
+    }
+
+    .proyecto-interna-seccion,
+    .proyecto-detalles {
+        padding-top: 4.5rem;
+        padding-bottom: 4.5rem;
+        padding-left: 1.25rem;
+        padding-right: 1.25rem;
+        margin-left: -1.25rem;
+        margin-right: -1.25rem;
+    }
+
+    .proyecto-detalles-lista {
+        grid-template-columns: 1fr;
+    }
+
+    .proyecto-carrusel-slide {
+        padding: 0 2.75rem;
+    }
 }

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proyecto | Accetta Equipamiento</title>
+    <script src="Scrips/app.js" defer></script>
+    <link rel="stylesheet" href="estilo/style.css">
+</head>
+<body class="pagina-proyecto" data-pagina-proyecto>
+    <header>
+        <nav>
+            <div class="navegacion">
+                <img src="Imagenes/logoAccettaSinMargenesBlanco.png" alt="Logo empresa" class="imagen-izquierda">
+                <div class="hamburguer" id="hamburguer">
+                    <img src="Imagenes/menu.png" alt="Abrir menú">
+                </div>
+                <ul class="links" id="links">
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="proyectos.html">Proyectos</a></li>
+                    <li><a href="formulario.html">Contacto</a></li>
+                    <li><a href="login.html">Ingresar</a></li>
+                    <li><a href="https://www.instagram.com/vascoaccetta/" target="_blank">
+                        <img class="instagram-logo" src="Imagenes/instagramlogoBlanco.png" alt="Instagram">
+                    </a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main class="pagina-proyecto-main">
+        <div class="proyecto-interna-contenido" data-proyecto-contenido>
+            <section class="proyecto-interna-cabecera proyecto-hero">
+                <img class="proyecto-imagen-principal" data-proyecto-imagen src="" alt="">
+                <div class="proyecto-hero-overlay">
+                    <div class="proyecto-hero-texto">
+                        <h1 data-proyecto-titulo></h1>
+                    </div>
+                </div>
+            </section>
+
+            <div class="proyecto-retorno">
+                <a class="volver-proyectos" href="proyectos.html">&larr; Volver a proyectos</a>
+            </div>
+
+            <section class="proyecto-interna-seccion">
+                <h2>Concepto</h2>
+                <p class="proyecto-texto-seccion" data-proyecto-concepto></p>
+            </section>
+
+            <section class="proyecto-interna-seccion proyecto-seccion-imagenes">
+                <div class="proyecto-carrusel" data-proyecto-carrusel>
+                    <div class="proyecto-carrusel-track" data-proyecto-track></div>
+                    <button class="proyecto-carrusel-btn proyecto-carrusel-prev" type="button" data-proyecto-prev aria-label="Imagen anterior">&#10094;</button>
+                    <button class="proyecto-carrusel-btn proyecto-carrusel-next" type="button" data-proyecto-next aria-label="Imagen siguiente">&#10095;</button>
+                </div>
+            </section>
+
+            <section class="proyecto-detalles">
+                <h2>Detalles</h2>
+                <dl class="proyecto-detalles-lista">
+                    <div class="proyecto-detalle"><dt>Tipo</dt><dd data-proyecto-tipo></dd></div>
+                    <div class="proyecto-detalle"><dt>Superficie</dt><dd data-proyecto-superficie></dd></div>
+                    <div class="proyecto-detalle"><dt>Ubicación</dt><dd data-proyecto-ubicacion></dd></div>
+                    <div class="proyecto-detalle"><dt>Año</dt><dd data-proyecto-anio></dd></div>
+                </dl>
+            </section>
+        </div>
+
+        <section class="proyecto-error" data-proyecto-error hidden>
+            <h1>Proyecto no encontrado</h1>
+            <p class="proyecto-entrada">El proyecto solicitado no existe o el enlace no es válido.</p>
+            <a class="volver-proyectos" href="proyectos.html">&larr; Volver a proyectos</a>
+        </section>
+    </main>
+
+    <footer>
+        <a href="https://www.instagram.com/vascoaccetta/" target="_blank">
+            <img class="instagram-logo" src="Imagenes/instagramlogo.png" alt="Instagram">
+        </a>
+        <p>Copyright © 2026 Accetta Equipamiento. Todos los derechos reservados.</p>
+    </footer>
+</body>
+</html>
