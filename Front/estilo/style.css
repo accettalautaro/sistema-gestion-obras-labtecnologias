@@ -149,7 +149,7 @@ header.header-scrolled {
     display: flow-root;
 }
 
-/* Esta capa tiene fondo propio y un z-index superior: es el telon que cubre el hero. */
+
 .pagina-inicio .seccion-contenido {
     position: relative;
     z-index: 2;
@@ -351,13 +351,15 @@ header.header-scrolled {
     z-index: 2;
     background-color: var(--color-primario);
     color: var(--color-texto1);
+    padding-top: 75px;
     padding-bottom: 0px;
-    padding-top: 30px;
 }
 #grilla-proyectos h2{
     font-family: var(--fuente-principal);
     color: var(--color-seccion);
     padding-left: 85px;
+    margin-top: 0;
+    margin-bottom: 45px;
 }
 /* Contenedor principal de la grilla */
     .proyectos-grilla {
@@ -935,6 +937,16 @@ button:hover {
 
     .grid-proyectos {
         grid-template-columns: 1fr;
+    }
+
+    #grilla-proyectos {
+        padding-top: 55px;
+        padding-bottom: 55px;
+    }
+
+    #grilla-proyectos h2 {
+        padding-left: 30px;
+        margin-bottom: 35px;
     }
 
     .proyecto img {
