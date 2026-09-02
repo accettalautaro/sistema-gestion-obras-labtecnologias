@@ -169,8 +169,8 @@ header.header-scrolled {
     max-width: none;
     margin-top: 0;
     margin-bottom: 0;
-    padding-top: var(--espaciado-md);
-    padding-bottom: var(--espaciado-md);
+    padding-top: 5rem;
+    padding-bottom: 5rem;
     background-color: var(--color-primario);
     color: var(--color-texto1);
 }
@@ -737,14 +737,123 @@ button:hover {
 .info-contacto{
     font-family:var(--fuente-principal);
     display:flex;
+    justify-content:center;
+    align-items:center;
+    width:100%;
+    padding-top: 8.5rem;
+    padding-bottom: 8.5rem;
+    padding-left: 3.5rem;
+    padding-right: 3.5rem;
+    background: #efefef;
+    margin: 0;
+    border-top: 1px solid rgba(0,0,0,0.04);
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+}
+
+.info-contacto .contacto-card {
+    width: min(100%, 80rem);
+}
+
+.contacto-card {
+    width: min(100%, 58rem);
+    min-height: 18rem;
+    background: rgba(255, 255, 255, 0.38);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 1.3rem;
+    box-shadow: 0 0.5rem 1.25rem rgba(0, 0, 0, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    padding: 4.25rem 4.5rem;
+}
+
+.contacto-logo-wrap {
+    flex: 0 0 15rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.contacto-logo {
+    display: block;
+    width: 100%;
+    max-width: 15rem;
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 0.2rem 0.3rem rgba(0, 0, 0, 0.08));
+}
+
+.contacto-datos {
+    flex: 1;
+    display:flex;
     flex-direction:column;
     align-items:center;
+    justify-content:center;
     text-align:center;
-    gap:0px;
-    max-width:25rem;
-    margin:0 auto;
-    margin-top:var(--espaciado-md);
-    margin-bottom:var(--espaciado-md);
+    font-family: var(--fuente-secundaria);
+    color: var(--color-texto1);
+}
+
+.contacto-datos h3 {
+    margin: 0 0 1.1rem;
+    font-family: var(--fuente-secundaria);
+    font-size: clamp(2rem, 2.2vw, 2.8rem);
+    line-height: 1.15;
+    font-weight: 500;
+    letter-spacing: 0;
+    color: var(--color-texto1);
+}
+
+.contacto-datos p {
+    margin: 0.35rem 0;
+    font-family: var(--fuente-secundaria);
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: var(--color-texto3);
+}
+
+.contacto-direccion {
+    font-style: italic;
+    opacity: 0.95;
+}
+
+.contacto-email a,
+.contacto-email a:visited {
+    color: #1b75d0;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.contacto-email a:hover,
+.contacto-email a:focus-visible {
+    text-decoration: underline;
+    color: #0d5eb7;
+}
+
+.contacto-telefono {
+    font-weight: 500;
+}
+
+@media (max-width: 700px) {
+    .info-contacto {
+        padding: 3rem 1rem;
+    }
+
+    .contacto-card {
+        flex-direction: column;
+        gap: 1.25rem;
+        padding: 2.8rem 1.5rem;
+    }
+
+    .contacto-logo-wrap {
+        flex-basis: auto;
+        width: 100%;
+    }
+
+    .contacto-datos h3 {
+        font-size: 2rem;
+    }
 }
 #Nosotros{
     scroll-margin-top: 100px;
