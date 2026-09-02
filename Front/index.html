@@ -1,92 +1,192 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema Gestion de Obras</title>
     <script src="Scrips/app.js" defer></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link rel="stylesheet" href="estilo/style.css">
 </head>
+
 <body>
     <header>
-        
+
         <nav>
             <div class="navegacion">
-                <img  src="Imagenes/logoAccettaSinMargenesBlanco.png" alt="logo empresa" class="imagen-izquierda" >
-            <div class="hamburguer" id="hamburguer">
-                <img src="Imagenes/menu.png" alt="menu">
-            </div>
-            <ul class="links" id="links">
-                <li><a href="index.html">Inicio</a></li>
-                <li><a href="#Nosotros">Nosotros</a></li>
-                <li><a href="proyectos.html">Proyectos</a></li>
-                <li><a href="formulario.html">Contacto</a></li>
-                <li><a href="login.html">Ingresar</a></li>
-                <li><a href="https://www.instagram.com/vascoaccetta/" target="_blank">
-                    <img class="instagram-logo" src="Imagenes/instagramlogoBlanco.png" alt="logo instagram" >
-                </a></li>
+                <img src="Imagenes/logoAccettaSinMargenesBlanco.png" alt="logo empresa" class="imagen-izquierda">
+                <div class="hamburguer d-lg-none" id="hamburguer" data-bs-toggle="offcanvas"
+                    data-bs-target="#miSidebarMobile" aria-controls="miSidebarMobile">
+                    <img src="Imagenes/menu.png" alt="menu">
+                </div>
+                <ul class="links d-none d-lg-flex" id="links">
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="#Nosotros">Nosotros</a></li>
+                    <li><a href="proyectos.html">Proyectos</a></li>
+                    <li><a href="formulario.html">Contacto</a></li>
+                    <li><a href="login.html">Ingresar</a></li>
+                    <li><a href="https://www.instagram.com/vascoaccetta/" target="_blank">
+                            <img class="instagram-logo" src="Imagenes/instagramlogoBlanco.png" alt="logo instagram">
+                        </a></li>
 
-            </ul>
+                </ul>
+                <div class="offcanvas offcanvas-end" tabindex="-1" id="miSidebarMobile"
+                    aria-labelledby="miSidebarMobileLabel">
+
+                    <!-- Cabecera del menú (con la X para cerrar) -->
+                    <div class="offcanvas-header">
+                        <button id="cerrar-menu" type="button" class="btn-close" data-bs-dismiss="offcanvas"
+                            aria-label="Close"></button>
+                    </div>
+
+                    <!-- Cuerpo del menú (Aquí va TU código del sidebar) -->
+                    <div class="offcanvas-body p-0">
+
+                        <!-- Tu código original copiado tal cual, ajustando que ocupe todo el alto (min-vh-100) y ancho (w-100) del panel -->
+                        <div class="d-flex flex-column flex-shrink-0 p-3 w-100">
+                            <div class=" container d-flex justify-content-center align-items-center w-100 mb-3">
+                                <img src="Imagenes/logoAccettaSinMargenesBlanco.png" alt="logo" class="pe-none"
+                                    width="240" height="80">
+                            </div>
+                            <hr>
+                            <ul class="nav nav-pills flex-column mb-auto">
+                                <li class="nav-item">
+                                    <a href="index.html" class="nav-link " aria-current="page">
+                                        <svg class="bi pe-none me-2" width="16" height="16">
+                                            <use xlink:href="#home"></use>
+                                        </svg>
+                                        Inicio
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#Nosotros" class="nav-link">
+                                        <svg class="bi pe-none me-2" width="16" height="16">
+                                            <use xlink:href="#people-circle"></use>
+                                        </svg>
+                                        Nosotros
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="proyectos.html" class="nav-link">
+                                        <svg class="bi pe-none me-2" width="16" height="16">
+                                            <use xlink:href="#speedometer2"></use>
+                                        </svg>
+                                        Proyectos
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="formulario.html" class="nav-link">
+                                        <svg class="bi pe-none me-2" width="16" height="16">
+                                            <use xlink:href="#table"></use>
+                                        </svg>
+                                        Contacto
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="login.html" class="nav-link">
+                                        <svg class="bi pe-none me-2" width="16" height="16">
+                                            <use xlink:href="#grid"></use>
+                                        </svg>
+                                        Ingresar
+                                    </a>
+                                </li>
+                            </ul>
+                            <hr>
+                            <div class="d-flex justify-content-center align-items-center w-100 ">
+                                <a href="https://www.instagram.com/vascoaccetta/" target="_blank">
+                                    <img id="instagram-logo-hamburguesa" class="instagram-logo"
+                                        src="Imagenes/instagramlogoBlanco.png" alt="logo instagram">
+                                </a>
+                            </div>
+                            <!--  <div class="dropdown">
+                                <a href="#"
+                                    class="d-flex align-items-center link-body-emphasis text-decoration-none dropdown-toggle"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                    <img src="./Sidebars · Bootstrap v5.3_files/mdo.png" alt="" width="32" height="32"
+                                        class="rounded-circle me-2">
+                                    <strong>mdo</strong>
+                                </a>
+                                <ul class="dropdown-menu text-small shadow">
+                                    <li><a class="dropdown-item" href="#">New project...</a></li>
+                                    <li><a class="dropdown-item" href="#">Settings</a></li>
+                                    <li><a class="dropdown-item" href="#">Profile</a></li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <li><a class="dropdown-item" href="#">Sign out</a></li>
+                                </ul>
+                            </div>-->
+                        </div>
+
+                    </div>
+                </div>
             </div>
-            
+
         </nav>
     </header>
-        <main class="contenido-principal pagina-inicio">
-            <section class="carrusel-contenedor hero-reveal">
-                <div class="carrusel-track" id="carruselTrack">
-                    
-                    <!-- Slide 1 -->
-                    <div class="carrusel-slide">
-                        <!-- Cambia la URL por la ruta de tu imagen -->
-                        <div class="fondo-imagen" style="background-image: url('Imagenes/casaverano.jpg');"></div>
-                        <div class="carrusel-contenido">
-                            <h2>Casa de Verano</h2>
-                            <a href="proyectos.html" class="boton-hero">Ver Más</a>
-                        </div>
-                    </div>
+    <main class="contenido-principal pagina-inicio">
+        <section class="carrusel-contenedor hero-reveal">
+            <div class="carrusel-track" id="carruselTrack">
 
-                    <!-- Slide 2 -->
-                    <div class="carrusel-slide">
-                        <div class="fondo-imagen" style="background-image: url('Imagenes/casanieve.jpg');"></div>
-                        <div class="carrusel-contenido">
-                            <h2>Casa de Invierno</h2>
-                            <a href="proyectos.html" class="boton-hero">Ver Más</a>
-                        </div>
+                <!-- Slide 1 -->
+                <div class="carrusel-slide">
+                    <!-- Cambia la URL por la ruta de tu imagen -->
+                    <div class="fondo-imagen" style="background-image: url('Imagenes/casaverano.jpg');"></div>
+                    <div class="carrusel-contenido">
+                        <h2>Casa de Verano</h2>
+                        <a href="proyectos.html" class="boton-hero">Ver Más</a>
                     </div>
-
-                    <!-- Slide 3 -->
-                    <div class="carrusel-slide">
-                        <div class="fondo-imagen" style="background-image: url('Imagenes/pasteleria.jpg');"></div>
-                        <div class="carrusel-contenido">
-                            <h2>Pasteleria</h2>
-                            <a href="proyectos.html" class="boton-hero">Ver Más</a>
-                        </div>
-                    </div>
-
                 </div>
-                
-                <!-- Botones Anterior / Siguiente -->
-                <button class="carrusel-btn btn-prev" id="btnPrev">&#10094;</button>
-                <button class="carrusel-btn btn-next" id="btnNext">&#10095;</button>
-            </section>
-            
+
+                <!-- Slide 2 -->
+                <div class="carrusel-slide">
+                    <div class="fondo-imagen" style="background-image: url('Imagenes/casanieve.jpg');"></div>
+                    <div class="carrusel-contenido">
+                        <h2>Casa de Invierno</h2>
+                        <a href="proyectos.html" class="boton-hero">Ver Más</a>
+                    </div>
+                </div>
+
+                <!-- Slide 3 -->
+                <div class="carrusel-slide">
+                    <div class="fondo-imagen" style="background-image: url('Imagenes/pasteleria.jpg');"></div>
+                    <div class="carrusel-contenido">
+                        <h2>Pasteleria</h2>
+                        <a href="proyectos.html" class="boton-hero">Ver Más</a>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Botones Anterior / Siguiente -->
+            <button class="carrusel-btn btn-prev" id="btnPrev">&#10094;</button>
+            <button class="carrusel-btn btn-next" id="btnNext">&#10095;</button>
+        </section>
+
         <section class="seccion-estudio seccion-contenido reveal">
             <div class="estudio-imagen"></div>
-    
-    <!-- Mitad del texto (Ocupará 5 columnas) -->
+
+            <!-- Mitad del texto (Ocupará 5 columnas) -->
             <div class="estudio-texto">
-            
+
                 <h2 class="titulo-fino">Estudio</h2>
-                
-                <p class="texto-claro">Somos un estudio de Arquitectura con búsquedas diversas. Trabajamos de manera personalizada con cada cliente logrando satisfacer sus necesidades, aportando nuestra impronta y creatividad en el diseño.</p><br>
-                
-                <p class="texto-claro">Abordamos todas las fases de una obra de arquitectura: Proyecto – Dirección – Administración - Construcción, ofreciendo un servicio completo desde el inicio de la idea hasta la finalización de la obra.</p><br>
-                
-                <p class="texto-claro">Ademas ofrecemos un sistema para que puedas seguir el progreso de tu proyecto desde cualquier lugar y en todo momento.</p>
-                    
+
+                <p class="texto-claro">Somos un estudio de Arquitectura con búsquedas diversas. Trabajamos de manera
+                    personalizada con cada cliente logrando satisfacer sus necesidades, aportando nuestra impronta y
+                    creatividad en el diseño.</p><br>
+
+                <p class="texto-claro">Abordamos todas las fases de una obra de arquitectura: Proyecto – Dirección –
+                    Administración - Construcción, ofreciendo un servicio completo desde el inicio de la idea hasta la
+                    finalización de la obra.</p><br>
+
+                <p class="texto-claro">Ademas ofrecemos un sistema para que puedas seguir el progreso de tu proyecto
+                    desde cualquier lugar y en todo momento.</p>
+
                 <a href="#" class="boton-blanco">Ver Más</a>
-            </div>    
-            
+            </div>
+
         </section>
         <section id="grilla-proyectos">
             <h2 class="titulo-fino">Proyectos</h2>
@@ -101,89 +201,108 @@
                     </a>
                 </div>
 
-            <div class="proyecto-item">
-                <a class="proyecto-link" href="#">
-                    <img src="Imagenes/casanieve.jpg" alt="Casa de invierno" />
-                    <div class="proyecto-overlay">
-                        <span class="proyecto-titulo">Casa de invierno</span>
-                        <span class="proyecto-categoria">Casas</span>
-                    </div>
-                </a>
-            </div>
-            <div class="proyecto-item">
-                <a class="proyecto-link" href="#">
-                    <img src="Imagenes/casanieve.jpg" alt="Casa de invierno" />
-                    <div class="proyecto-overlay">
-                        <span class="proyecto-titulo">Casa de invierno</span>
-                        <span class="proyecto-categoria">Casas</span>
-                    </div>
-                </a>
-            </div>
-            <div class="proyecto-item">
-                <a class="proyecto-link" href="#">
-                    <img src="Imagenes/casanieve.jpg" alt="Casa de invierno" />
-                    <div class="proyecto-overlay">
-                        <span class="proyecto-titulo">Casa de invierno</span>
-                        <span class="proyecto-categoria">Casas</span>
-                    </div>
-                </a>
-            </div>
-            <div class="proyecto-item">
-                <a class="proyecto-link" href="#">
-                    <img src="Imagenes/casanieve.jpg" alt="Casa de invierno" />
-                    <div class="proyecto-overlay">
-                        <span class="proyecto-titulo">Casa de invierno</span>
-                        <span class="proyecto-categoria">Casas</span>
-                    </div>
-                </a>
-            </div>
-            <div class="proyecto-item">
-                <a class="proyecto-link" href="#">
-                    <img src="Imagenes/casanieve.jpg" alt="Casa de invierno" />
-                    <div class="proyecto-overlay">
-                        <span class="proyecto-titulo">Casa de invierno</span>
-                        <span class="proyecto-categoria">Casas</span>
-                    </div>
-                </a>
-            </div>
+                <div class="proyecto-item">
+                    <a class="proyecto-link" href="#">
+                        <img src="Imagenes/casanieve.jpg" alt="Casa de invierno" />
+                        <div class="proyecto-overlay">
+                            <span class="proyecto-titulo">Casa de invierno</span>
+                            <span class="proyecto-categoria">Casas</span>
+                        </div>
+                    </a>
+                </div>
+                <div class="proyecto-item">
+                    <a class="proyecto-link" href="#">
+                        <img src="Imagenes/casanieve.jpg" alt="Casa de invierno" />
+                        <div class="proyecto-overlay">
+                            <span class="proyecto-titulo">Casa de invierno</span>
+                            <span class="proyecto-categoria">Casas</span>
+                        </div>
+                    </a>
+                </div>
+                <div class="proyecto-item">
+                    <a class="proyecto-link" href="#">
+                        <img src="Imagenes/casanieve.jpg" alt="Casa de invierno" />
+                        <div class="proyecto-overlay">
+                            <span class="proyecto-titulo">Casa de invierno</span>
+                            <span class="proyecto-categoria">Casas</span>
+                        </div>
+                    </a>
+                </div>
+                <div class="proyecto-item">
+                    <a class="proyecto-link" href="#">
+                        <img src="Imagenes/casanieve.jpg" alt="Casa de invierno" />
+                        <div class="proyecto-overlay">
+                            <span class="proyecto-titulo">Casa de invierno</span>
+                            <span class="proyecto-categoria">Casas</span>
+                        </div>
+                    </a>
+                </div>
+                <div class="proyecto-item">
+                    <a class="proyecto-link" href="#">
+                        <img src="Imagenes/casanieve.jpg" alt="Casa de invierno" />
+                        <div class="proyecto-overlay">
+                            <span class="proyecto-titulo">Casa de invierno</span>
+                            <span class="proyecto-categoria">Casas</span>
+                        </div>
+                    </a>
+                </div>
 
             </div>
         </section>
         <section id="Nosotros">
-            <div  class="reveal">
+            <div class="reveal">
                 <h2>Quien Soy</h2>
                 <div id="perfil">
                     <img src="Imagenes/perfilprovisorio.jpg" alt="foto perfil" class="imagen-perfil">
                     <h3 style="margin-bottom: 0;">Marcelo Accetta</h3>
-                    <h4 style="margin-top: 0;">ARQUITECTO</h4>      
+                    <h4 style="margin-top: 0;">ARQUITECTO</h4>
                 </div>
                 <div class="texto-nosotros">
-                    <p>¡Hola! Soy <strong>Marcelo Accetta</strong>, arquitecto egresado de la <strong>Universidad Nacional de Córdoba</strong> y fundador de <strong>Accetta Equipamiento</strong>.</p>
-                    
-                    <p>A lo largo de mi carrera, he comprendido que la arquitectura va mucho más allá de levantar paredes; se trata de <strong>dar vida a los espacios</strong> y dotarlos de un propósito. Por eso nació Accetta Equipamiento, con la visión de ofrecer <strong>soluciones integrales</strong> donde el <strong>diseño espacial</strong> y el <strong>equipamiento funcional</strong> trabajen en perfecta armonía.</p>
-                    
-                    <p>Mi formación en la UNC me dio las bases técnicas y estéticas, pero es el trabajo del día a día con cada cliente lo que realmente define nuestro enfoque. Nos apasiona <strong>escuchar tus necesidades</strong>, entender cómo habitas o trabajas en un lugar, y transformar esa visión en una <strong>realidad tangible, eficiente y con un alto valor estético</strong>.</p>
-                    
-                    <p>Sabemos que iniciar un proyecto de construcción o remodelación es un paso importante que requiere confianza. Para darte total tranquilidad, integramos la tecnología a nuestro método de trabajo: contamos con un <strong>sistema de gestión de obras exclusivo</strong>. A través de esta plataforma, podrás seguir el progreso de tu construcción paso a paso, desde cualquier lugar y en todo momento, garantizando una <strong>transparencia absoluta</strong>.</p>
-                    
-                    <p>Ya sea que busques optimizar un espacio comercial, renovar tu oficina o darle una nueva identidad a tu hogar, en Accetta Equipamiento estamos listos para <strong>acompañarte en cada etapa</strong>, con la tranquilidad de que siempre tendrás el <strong>control de tu proyecto</strong>.</p>
+                    <p>¡Hola! Soy <strong>Marcelo Accetta</strong>, arquitecto egresado de la <strong>Universidad
+                            Nacional de Córdoba</strong> y fundador de <strong>Accetta Equipamiento</strong>.</p>
+
+                    <p>A lo largo de mi carrera, he comprendido que la arquitectura va mucho más allá de levantar
+                        paredes; se trata de <strong>dar vida a los espacios</strong> y dotarlos de un propósito. Por
+                        eso nació Accetta Equipamiento, con la visión de ofrecer <strong>soluciones integrales</strong>
+                        donde el <strong>diseño espacial</strong> y el <strong>equipamiento funcional</strong> trabajen
+                        en perfecta armonía.</p>
+
+                    <p>Mi formación en la UNC me dio las bases técnicas y estéticas, pero es el trabajo del día a día
+                        con cada cliente lo que realmente define nuestro enfoque. Nos apasiona <strong>escuchar tus
+                            necesidades</strong>, entender cómo habitas o trabajas en un lugar, y transformar esa visión
+                        en una <strong>realidad tangible, eficiente y con un alto valor estético</strong>.</p>
+
+                    <p>Sabemos que iniciar un proyecto de construcción o remodelación es un paso importante que requiere
+                        confianza. Para darte total tranquilidad, integramos la tecnología a nuestro método de trabajo:
+                        contamos con un <strong>sistema de gestión de obras exclusivo</strong>. A través de esta
+                        plataforma, podrás seguir el progreso de tu construcción paso a paso, desde cualquier lugar y en
+                        todo momento, garantizando una <strong>transparencia absoluta</strong>.</p>
+
+                    <p>Ya sea que busques optimizar un espacio comercial, renovar tu oficina o darle una nueva identidad
+                        a tu hogar, en Accetta Equipamiento estamos listos para <strong>acompañarte en cada
+                            etapa</strong>, con la tranquilidad de que siempre tendrás el <strong>control de tu
+                            proyecto</strong>.</p>
                 </div>
-                
+
             </div>
         </section>
-        
+
         <div id="info-contacto" class="info-contacto reveal">
-            <img src="Imagenes/logosimple.png" alt="logo empresa" class="imagen-izquierda" >
+            <img src="Imagenes/logosimple.png" alt="logo empresa" class="imagen-izquierda">
             <h2>Contacto</h2>
-            <p>Email: <a  href="mailto:arqaccetta@gmail.com">arqaccetta@gmail.com</a></p>
-            <p>Telefono: 2657-657808</p>  
+            <p>Email: <a href="mailto:arqaccetta@gmail.com">arqaccetta@gmail.com</a></p>
+            <p>Telefono: 2657-657808</p>
         </div>
-    </main>    
+    </main>
     <footer>
         <a href="https://www.instagram.com/vascoaccetta/" target="_blank">
-                <img class="instagram-logo" src="Imagenes/instagramlogo.png" alt="logo instagram" >
-                </a>
+            <img class="instagram-logo" src="Imagenes/instagramlogo.png" alt="logo instagram">
+        </a>
         <p>Copyright © 2026 Accetta Equipamiento. Todos los derechos reservados.</p>
     </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
 </body>
+
 </html>

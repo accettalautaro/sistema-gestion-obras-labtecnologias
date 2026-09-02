@@ -47,6 +47,64 @@ header.header-scrolled {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Opcional: agrega una pequeña sombra al bajar */
 }
 
+#harmburguer {
+    cursor: pointer;
+}
+#miSidebarMobile{
+    background-color: var(--color-seccion);
+    color: var(--color-primario);
+    font-family: var(--fuente-principal);
+    overflow-x: hidden;
+}
+
+#miSidebarMobile .offcanvas-header,
+#miSidebarMobile .offcanvas-body,
+#miSidebarMobile .offcanvas-body > div {
+
+    background-color: var(--color-seccion);
+    color: var(--color-primario);
+}
+
+#miSidebarMobile .offcanvas-body > div {
+    height: 100%;
+}
+
+#miSidebarMobile .offcanvas-body {
+    overflow-y: hidden;
+}
+
+#cerrar-menu {
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    opacity: 1;
+    background-image: none;
+    color: var(--color-primario);
+    font-size: 1.75rem;
+    line-height: 1;
+}
+
+#cerrar-menu::before {
+    content: "x";
+}
+#miSidebarMobile .nav-link,
+#miSidebarMobile .dropdown-toggle {
+    font-family: var(--fuente-principal);
+    color: var(--color-primario);
+    text-decoration: none;
+}
+
+#miSidebarMobile .nav-link:hover,
+#miSidebarMobile .nav-link:focus,
+#miSidebarMobile .dropdown-toggle:hover,
+#miSidebarMobile .dropdown-toggle:focus {
+    color: var(--color-resaltado);
+}
+
+#miSidebarMobile .nav-link.active {
+    background-color: var(--color-resaltado);
+    color: var(--color-primario);
+}
 
 /*ESTILOS CARRUCEL */
 .carrusel-contenedor {
@@ -460,13 +518,18 @@ h2{
     transition: color 0.3s ease;
 }
 
-
-.instagram-logo{
-    
-    width:60px !important;
-    height:60px !important;
+.instagram-logo{  
+    width:60px ;
+    height:60px ;
     object-fit:contain;
 }
+
+#instagram-logo-hamburguesa {
+    width: 70px;
+    height: 70px;
+    object-fit: contain;
+}
+
 .instagram-logo:hover{
     content:url("../Imagenes/instragramhover.png" );
 }
@@ -771,7 +834,7 @@ button:hover {
     }
     .navegacion .imagen-izquierda {
         content: url("../Imagenes/logosimple.png");
-        width: 3.5rem;
+        width: 6em;
         height: auto;
         filter: brightness(0) invert(1);
     }
@@ -780,8 +843,8 @@ button:hover {
     }
 
     .instagram-logo {
-        width: 2.5rem !important;
-        height: 2.5rem !important;
+        width: 2.5rem ;
+        height: 2.5rem ;
     }
 
     .grid-proyectos {
@@ -801,7 +864,7 @@ button:hover {
         filter: none;
     }
 
-    header.header-scrolled .instagram-logo {
+    header.header-scrolled .navegacion > .links .instagram-logo {
         filter: brightness(0) invert(1);
     }
 

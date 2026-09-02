@@ -1,48 +1,141 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ingresar</title>
     <script src="Scrips/app.js" defer></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link rel="stylesheet" href="estilo/style.css">
 </head>
+
 <body>
-    <header class="header-scrolled">   
-        <nav >
-            <div class=" navegacion scrolled" >
-                <img  src="Imagenes/logoAccettaSinMargenes.png" alt="logo empresa" class="imagen-izquierda" >
-            <div class="hamburguer" id="hamburguer">
-                <img src="Imagenes/menu.png" alt="menu">
+    <header class="header-scrolled">
+        <nav>
+            <div class="navegacion scrolled">
+                <img src="Imagenes/logoAccettaSinMargenes.png" alt="logo empresa" class="imagen-izquierda">
+                <div class="hamburguer d-lg-none" id="hamburguer" data-bs-toggle="offcanvas"
+                    data-bs-target="#miSidebarMobile" aria-controls="miSidebarMobile">
+                    <img src="Imagenes/menu.png" alt="menu">
+                </div>
+                <ul class="links d-none d-lg-flex" id="links">
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="#Nosotros">Nosotros</a></li>
+                    <li><a href="proyectos.html">Proyectos</a></li>
+                    <li><a href="formulario.html">Contacto</a></li>
+                    <li><a href="login.html">Ingresar</a></li>
+                    <li><a href="https://www.instagram.com/vascoaccetta/" target="_blank">
+                            <img class="instagram-logo" src="Imagenes/instagramlogo.png" alt="logo instagram">
+                        </a></li>
+
+                </ul>
+                <div class="offcanvas offcanvas-end" tabindex="-1" id="miSidebarMobile"
+                    aria-labelledby="miSidebarMobileLabel">
+
+                    <!-- Cabecera del menú (con la X para cerrar) -->
+                    <div class="offcanvas-header">
+                        <button id="cerrar-menu" type="button" class="btn-close" data-bs-dismiss="offcanvas"
+                            aria-label="Close"></button>
+                    </div>
+
+                    <!-- Cuerpo del menú (Aquí va TU código del sidebar) -->
+                    <div class="offcanvas-body p-0">
+
+                        <!-- Tu código original copiado tal cual, ajustando que ocupe todo el alto (min-vh-100) y ancho (w-100) del panel -->
+                        <div class="d-flex flex-column flex-shrink-0 p-3 w-100">
+                            <div class=" container d-flex justify-content-center align-items-center w-100 mb-3">
+                                <img src="Imagenes/logoAccettaSinMargenesBlanco.png" alt="logo" class="pe-none"
+                                    width="240" height="80">
+                            </div>
+                            <hr>
+                            <ul class="nav nav-pills flex-column mb-auto">
+                                <li class="nav-item">
+                                    <a href="index.html" class="nav-link " aria-current="page">
+                                        <svg class="bi pe-none me-2" width="16" height="16">
+                                            <use xlink:href="#home"></use>
+                                        </svg>
+                                        Inicio
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="proyectos.html" class="nav-link">
+                                        <svg class="bi pe-none me-2" width="16" height="16">
+                                            <use xlink:href="#speedometer2"></use>
+                                        </svg>
+                                        Proyectos
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="formulario.html" class="nav-link">
+                                        <svg class="bi pe-none me-2" width="16" height="16">
+                                            <use xlink:href="#table"></use>
+                                        </svg>
+                                        Contacto
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="login.html" class="nav-link">
+                                        <svg class="bi pe-none me-2" width="16" height="16">
+                                            <use xlink:href="#grid"></use>
+                                        </svg>
+                                        Ingresar
+                                    </a>
+                                </li>
+                            </ul>
+                            <hr>
+                            <div class="d-flex justify-content-center align-items-center w-100 ">
+                                <a href="https://www.instagram.com/vascoaccetta/" target="_blank">
+                                    <img id="instagram-logo-hamburguesa" class="instagram-logo"
+                                        src="Imagenes/instagramlogoBlanco.png" alt="logo instagram">
+                                </a>
+                            </div>
+                        <!--  <div class="dropdown">
+                                <a href="#"
+                                    class="d-flex align-items-center link-body-emphasis text-decoration-none dropdown-toggle"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                    <img src="./Sidebars · Bootstrap v5.3_files/mdo.png" alt="" width="32" height="32"
+                                        class="rounded-circle me-2">
+                                    <strong>mdo</strong>
+                                </a>
+                                <ul class="dropdown-menu text-small shadow">
+                                    <li><a class="dropdown-item" href="#">New project...</a></li>
+                                    <li><a class="dropdown-item" href="#">Settings</a></li>
+                                    <li><a class="dropdown-item" href="#">Profile</a></li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <li><a class="dropdown-item" href="#">Sign out</a></li>
+                                </ul>
+                            </div>-->
+                    </div>
+
+                </div>
             </div>
-            <ul class="links" id="links">
-                <li><a href="index.html">Inicio</a></li>
-                <li><a href="proyectos.html">Proyectos</a></li>
-                <li><a href="formulario.html">Contacto</a></li>
-                <li><a href="login.html">Ingresar</a></li>
-                <li><a href="https://www.instagram.com/vascoaccetta/" target="_blank">
-                    <img class="instagram-logo" src="Imagenes/instagramlogo.png" alt="logo instagram" >
-                </a></li>
-            </ul>
             </div>
-            
+
         </nav>
     </header>
     <main class=" main contenido-principal">
-        <div >
+        <div>
             <form action="#" method="post">
-            <label for="usuario">Usuario:</label>
-            <input type="text" id="usuario" name="usuario" required><br>
-            <button type="submit">Ingresar</button> 
+                <label for="usuario">Usuario:</label>
+                <input type="text" id="usuario" name="usuario" required><br>
+                <button type="submit">Ingresar</button>
             </form>
         </div>
-        
-    </main>    
+
+    </main>
     <footer>
         <a href="https://www.instagram.com/vascoaccetta/" target="_blank">
-                <img class="instagram-logo" src="Imagenes/instagramlogo.png" alt="logo instagram" >
-                </a>
+            <img class="instagram-logo" src="Imagenes/instagramlogo.png" alt="logo instagram">
+        </a>
         <p>Copyright © 2026 Sistema Gestion de Obras. Todos los derechos reservados.</p>
     </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
 </body>
+
 </html>
