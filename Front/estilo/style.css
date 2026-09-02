@@ -538,7 +538,6 @@ body{
     height: 30px;
     gap: 5px;
     cursor: pointer;
-    
 }
 
 footer{
@@ -726,12 +725,23 @@ button:hover {
     }
     .navegacion {
         justify-content: space-between;
+        color: var(--color-primario);
+    }
+
+    .navegacion.scrolled {
+        justify-content: space-between;
+        color: var(--color-primario);
     }
 
     .hamburguer {
         display: flex;
         margin-left: auto;
     }
+
+    .hamburguer img {
+        filter: brightness(0) invert(1);
+    }
+
     .links {
         display: none;
         flex-direction: column;
@@ -740,12 +750,16 @@ button:hover {
         top: 100%;
         left: 0;
         width: 100%;
-        background-color: var(--color-primario);
+        background-color: var(--color-seccion);
+    }
 
+    .links.active li {
+        margin-right: 0;
     }
 
     .links.active {
         display: flex;
+        justify-content: right;
     }
     .navegacion ul {
         flex-direction: row;
@@ -759,6 +773,7 @@ button:hover {
         content: url("../Imagenes/logosimple.png");
         width: 3.5rem;
         height: auto;
+        filter: brightness(0) invert(1);
     }
     .imagen-izquierda {
         width:min(12rem, 35vw);
@@ -775,6 +790,19 @@ button:hover {
 
     .proyecto img {
         height:15rem;
+    }
+
+    /* Cuando el header se scrollea en móvil */
+    header.header-scrolled .hamburguer img {
+        filter: none;
+    }
+
+    header.header-scrolled .navegacion .imagen-izquierda {
+        filter: none;
+    }
+
+    header.header-scrolled .instagram-logo {
+        filter: brightness(0) invert(1);
     }
 
 }
