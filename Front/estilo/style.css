@@ -655,13 +655,13 @@ body{
     height: 100%;
 }
 
-.login-style .main.contenido-principal .col-3 {
+.login-style .main.contenido-principal .col-md-3 {
     height: 100%;
     padding-bottom: 6rem;
 }
 
 .login-style .form-login {
-    max-height: calc(100% - var(--espaciado-md));
+    max-height: calc(100dvh - 6rem);
     overflow-y: auto;
 }
 
