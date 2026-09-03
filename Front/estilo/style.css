@@ -660,6 +660,11 @@ body{
     padding-bottom: 6rem;
 }
 
+.login-style .form-login {
+    max-height: calc(100% - var(--espaciado-md));
+    overflow-y: auto;
+}
+
 .login-style > footer {
     position: absolute;
     right: 0;
@@ -687,6 +692,21 @@ footer{
     text-align:center;
     padding:var(--espaciado-md);
     font-size:0.875rem;
+}
+
+.login-style > footer {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.7rem;
+    line-height: 1.2;
+}
+
+.login-style > footer .instagram-logo {
+    width: 2rem;
+    height: 2rem;
+}
+
+.login-style > footer p {
+    margin-bottom: 0;
 }
 form{
 
