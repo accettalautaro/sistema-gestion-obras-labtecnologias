@@ -1026,6 +1026,12 @@ button:hover {
 }
 
 @media (max-width: 950px) {
+    #footer-login{
+        position: relative;
+        width: 100%;
+        margin:0;
+        padding: 20px;
+    }
     .estudio-texto{
         grid-column: 1/13;
     }
