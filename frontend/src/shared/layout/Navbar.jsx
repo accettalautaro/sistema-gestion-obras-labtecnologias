@@ -9,9 +9,9 @@ import '../../styles/Navbar.css'
 const links = [
 	{ label: 'Inicio', href: '/' },
 	{ label: 'Nosotros', href: '/#Nosotros' },
-	{ label: 'Proyectos', href: '/proyectos.html' },
-	{ label: 'Contacto', href: '/formulario.html' },
-	{ label: 'Ingresar', href: '/login.html' },
+	{ label: 'Proyectos', href: '#proyectos' },
+	{ label: 'Contacto', href: '#contacto' },
+	{ label: 'Ingresar', href: '#login' },
 ]
 
 function Navbar() {

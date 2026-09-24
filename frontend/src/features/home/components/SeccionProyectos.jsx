@@ -5,7 +5,7 @@ function SeccionProyectos({ proyectos }) {
 			<div className="proyectos-grilla">
 				{proyectos.map((proyecto) => (
 					<div className="proyecto-item" key={proyecto.id}>
-						<a className="proyecto-link" href={`/proyecto.html?id=${proyecto.id}`}>
+						<a className="proyecto-link" href={`#proyecto=${proyecto.id}`}>
 							<img src={proyecto.imagen} alt={proyecto.titulo} />
 							<div className="proyecto-overlay">
 								<span className="proyecto-titulo">{proyecto.titulo}</span>

@@ -39,7 +39,7 @@ function Hero({ proyectos }) {
 						<div className="fondo-imagen" style={{ backgroundImage: `url(${proyecto.imagen})` }} />
 						<div className="carrusel-contenido">
 							<h2>{proyecto.titulo}</h2>
-							<a href={`/proyecto.html?id=${proyecto.id}`} className="boton-hero">Ver Más</a>
+							<a href={`#proyecto=${proyecto.id}`} className="boton-hero">Ver Más</a>
 						</div>
 					</div>
 				))}
