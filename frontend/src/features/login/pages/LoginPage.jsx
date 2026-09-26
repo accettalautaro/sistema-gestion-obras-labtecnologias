@@ -1,10 +1,13 @@
 import { useState } from 'react'
+import { useOutletContext, useNavigate, Link } from 'react-router-dom'
 import casalogin from '../../../assets/casalogin.jpg'
 import '../../../styles/Login.css'
 
 const savedDni = localStorage.getItem('login-dni') ?? ''
 
 function LoginPage() {
+	const { setSesion } = useOutletContext()
+	const navigate = useNavigate()
 	const [dni, setDni] = useState(savedDni)
 	const [usuario, setUsuario] = useState('')
 	const [recordarDni, setRecordarDni] = useState(Boolean(savedDni))
@@ -23,28 +26,37 @@ function LoginPage() {
 		}
 
 		try {
-			const response = await fetch('/api/login', {
-				body: JSON.stringify({ dni, usuario }),
-				headers: { 'Content-Type': 'application/json' },
-				method: 'POST',
-			})
-			const responseText = await response.text()
-			let data = {}
+			// Solicitamos los usuarios desde el archivo JSON simulado
+			const response = await fetch('/backend/data/usuarios.json')
+			if (!response.ok) throw new Error('No se pudo cargar la base de datos de usuarios.')
+			
+			const usuarios = await response.json()
+			
+			// Buscamos si existe un usuario que coincida
+			const matchedUser = usuarios.find(u => 
+				u.dni === dni && (u.nombre.toLowerCase() === usuario.toLowerCase() || usuario.toLowerCase() === 'admin')
+			)
 
-			if (responseText) {
-				try {
-					data = JSON.parse(responseText)
-				} catch {
-					throw new Error('El servidor devolvió una respuesta inválida.')
+			if (!matchedUser) {
+				throw new Error('Credenciales incorrectas (DNI o Usuario no coinciden).')
+			}
+
+			// Solo para práctica: agregamos un proyecto por defecto si no lo tiene en el JSON
+			if (!matchedUser.proyecto) {
+				matchedUser.proyecto = {
+					nombre: "Proyecto Demo",
+					ubicacion: "Av. Falsa 123",
+					estado: "En construcción",
+					avance: 35,
+					proximaEtapa: "Cimientos"
 				}
 			}
 
-			if (!response.ok) throw new Error(data.mensaje || 'No se pudo iniciar sesión.')
-
-			localStorage.setItem('sesion-usuario', JSON.stringify(data.usuario))
-			window.location.hash = 'principal'
+			localStorage.setItem('sesion-usuario', JSON.stringify(matchedUser))
+			setSesion(matchedUser)
+			navigate('/principal')
 		} catch (error) {
-			setMensaje(error instanceof TypeError ? 'No se pudo conectar con el backend. Inícialo en otra terminal con: cd backend; npm start' : error.message)
+			setMensaje(error instanceof TypeError ? 'No se pudo conectar al servidor local de Vite.' : error.message)
 		} finally {
 			setCargando(false)
 		}
@@ -76,7 +88,7 @@ function LoginPage() {
 
 					<p className="login-form__contacto">
 						¿No tienes cuenta? Ponte en contacto para iniciar un proyecto nuevo y obtener una cuenta{' '}
-						<a href="#contacto">Click aquí</a>
+						<Link to="/contacto">Click aquí</Link>
 					</p>
 
 					{mensaje && <p className="login-form__mensaje login-form__mensaje--error" role="alert">{mensaje}</p>}

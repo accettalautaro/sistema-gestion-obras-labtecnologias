@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+
 function SeccionProyectos({ proyectos }) {
 	return (
 		<section id="grilla-proyectos">
@@ -5,13 +7,13 @@ function SeccionProyectos({ proyectos }) {
 			<div className="proyectos-grilla">
 				{proyectos.map((proyecto) => (
 					<div className="proyecto-item" key={proyecto.id}>
-						<a className="proyecto-link" href={`#proyecto=${proyecto.id}`}>
+						<Link className="proyecto-link" to={`/proyecto/${proyecto.id}`}>
 							<img src={proyecto.imagen} alt={proyecto.titulo} />
 							<div className="proyecto-overlay">
 								<span className="proyecto-titulo">{proyecto.titulo}</span>
 								<span className="proyecto-categoria">Residencial</span>
 							</div>
-						</a>
+						</Link>
 					</div>
 				))}
 			</div>

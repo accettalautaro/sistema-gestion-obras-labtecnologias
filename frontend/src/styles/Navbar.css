@@ -133,6 +133,10 @@ header.header-scrolled .navegacion {
     width: 28px;
   }
 
+  header.header-scrolled .hamburguer img {
+    filter: none;
+  }
+
   .offcanvas-backdrop {
     background: rgb(0 0 0 / 55%);
     display: block;

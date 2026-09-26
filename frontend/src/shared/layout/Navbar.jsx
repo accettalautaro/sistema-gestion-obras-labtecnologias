@@ -4,17 +4,12 @@ import logoScrolled from '../../assets/logoAccettaSinMargenes.png'
 import menuIcon from '../../assets/menu.png'
 import instagramLogo from '../../assets/instagramlogoBlanco.png'
 import instagramLogoScrolled from '../../assets/instagramlogo.png'
+import { Link } from 'react-router-dom'
 import '../../styles/Navbar.css'
 
-const links = [
-	{ label: 'Inicio', href: '/' },
-	{ label: 'Nosotros', href: '/#Nosotros' },
-	{ label: 'Proyectos', href: '#proyectos' },
-	{ label: 'Contacto', href: '#contacto' },
-	{ label: 'Ingresar', href: '#login' },
-]
 
-function Navbar() {
+
+function Navbar({ forceScrolled = false , links}) {
 	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 	const [isScrolled, setIsScrolled] = useState(false)
 
@@ -36,11 +31,11 @@ function Navbar() {
 	const closeMobileMenu = () => setIsMobileMenuOpen(false)
 
 	return (
-		<header className={isScrolled ? 'header-scrolled' : ''}>
-			<nav className={`navegacion${isScrolled ? ' scrolled' : ''}`}>
-				<a href="/" className="imagen-izquierda-link" aria-label="Ir al inicio">
-					<img src={isScrolled ? logoScrolled : logo} alt="logo empresa" className="imagen-izquierda" />
-				</a>
+		<header className={(isScrolled || forceScrolled) ? 'header-scrolled' : ''}>
+			<nav className={`navegacion${(isScrolled || forceScrolled) ? ' scrolled' : ''}`}>
+				<Link to="/" className="imagen-izquierda-link" aria-label="Ir al inicio">
+					<img src={(isScrolled || forceScrolled) ? logoScrolled : logo} alt="logo empresa" className="imagen-izquierda" />
+				</Link>
 
 				<button
 					type="button"
@@ -55,12 +50,16 @@ function Navbar() {
 				<ul className="links">
 					{links.map((link) => (
 						<li key={link.label}>
-							<a href={link.href}>{link.label}</a>
+							{link.href.startsWith('http') || link.href.includes('#') ? (
+								<a href={link.href}>{link.label}</a>
+							) : (
+								<Link to={link.href}>{link.label}</Link>
+							)}
 						</li>
 					))}
 					<li>
 						<a href="https://www.instagram.com/vascoaccetta/" target="_blank" rel="noreferrer">
-							<img className="instagram-logo" src={isScrolled ? instagramLogoScrolled : instagramLogo} alt="Instagram" />
+							<img className="instagram-logo" src={(isScrolled || forceScrolled) ? instagramLogoScrolled : instagramLogo} alt="Instagram" />
 						</a>
 					</li>
 				</ul>
@@ -81,7 +80,11 @@ function Navbar() {
 						<ul className="mobile-links">
 							{links.map((link) => (
 								<li key={link.label}>
-									<a href={link.href} onClick={closeMobileMenu}>{link.label}</a>
+									{link.href.startsWith('http') || link.href.includes('#') ? (
+										<a href={link.href} onClick={closeMobileMenu}>{link.label}</a>
+									) : (
+										<Link to={link.href} onClick={closeMobileMenu}>{link.label}</Link>
+									)}
 								</li>
 							))}
 						</ul>

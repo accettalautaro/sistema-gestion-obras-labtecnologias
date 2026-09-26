@@ -1,4 +1,5 @@
 import casaminimalista from '../../../assets/casaminimalista.jpg'
+import { Link } from 'react-router-dom'
 import proyectos from '../data/proyectos.js'
 import '../../../styles/Proyectos.css'
 
@@ -15,7 +16,7 @@ function ProyectosPage() {
 
 				<div className="proyectos-page__grid">
 					{proyectos.map((proyecto) => (
-						<a className="proyecto-card-link" href={`#proyecto=${proyecto.id}`} key={proyecto.id}>
+						<Link className="proyecto-card-link" to={`/proyecto/${proyecto.id}`} key={proyecto.id}>
 							<article className="proyecto-card">
 								<img src={proyecto.imagen} alt={proyecto.titulo} />
 								<div className="proyecto-card__info">
@@ -23,7 +24,7 @@ function ProyectosPage() {
 									<p>{proyecto.tipo}</p>
 								</div>
 							</article>
-						</a>
+						</Link>
 					))}
 				</div>
 			</section>

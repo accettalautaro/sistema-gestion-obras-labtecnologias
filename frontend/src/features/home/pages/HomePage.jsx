@@ -1,6 +1,7 @@
 import estudio from '../../../assets/seccionEstudio.jpg'
 import perfil from '../../../assets/perfilprovisorio.jpg'
 import logoSimple from '../../../assets/logosimple.png'
+import { Link } from 'react-router-dom'
 import Hero from '../components/Hero.jsx'
 import SeccionProyectos from '../components/SeccionProyectos.jsx'
 import proyectosHome from '../data/proyectos.js'
@@ -18,7 +19,7 @@ function HomePage() {
 					<p className="texto-claro">Somos un estudio de Arquitectura con búsquedas diversas. Trabajamos de manera personalizada con cada cliente logrando satisfacer sus necesidades, aportando nuestra impronta y creatividad en el diseño.</p>
 					<p className="texto-claro">Abordamos todas las fases de una obra de arquitectura: Proyecto - Dirección - Administración - Construcción, ofreciendo un servicio completo desde el inicio de la idea hasta la finalización de la obra.</p>
 					<p className="texto-claro">Ademas ofrecemos un sistema para que puedas seguir el progreso de tu proyecto desde cualquier lugar y en todo momento.</p>
-					<a href="#Nosotros" className="boton-blanco">Ver Más</a>
+					<Link to="/#Nosotros" className="boton-blanco">Ver Más</Link>
 				</div>
 			</section>
 

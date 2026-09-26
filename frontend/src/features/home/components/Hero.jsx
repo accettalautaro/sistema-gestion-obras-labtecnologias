@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 
 function Hero({ proyectos }) {
 	const [slideActual, setSlideActual] = useState(0)
@@ -39,7 +40,7 @@ function Hero({ proyectos }) {
 						<div className="fondo-imagen" style={{ backgroundImage: `url(${proyecto.imagen})` }} />
 						<div className="carrusel-contenido">
 							<h2>{proyecto.titulo}</h2>
-							<a href={`#proyecto=${proyecto.id}`} className="boton-hero">Ver Más</a>
+							<Link to={`/proyecto/${proyecto.id}`} className="boton-hero">Ver Más</Link>
 						</div>
 					</div>
 				))}

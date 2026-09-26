@@ -1,9 +1,11 @@
 import { useState } from 'react'
+import { Link, useParams } from 'react-router-dom'
 import proyectos from '../data/proyectos.js'
 import '../../../styles/Proyecto.css'
 
-function ProyectoPage({ proyectoId }) {
-	const proyecto = proyectos.find((item) => item.id === proyectoId)
+function ProyectoPage() {
+	const { id } = useParams()
+	const proyecto = proyectos.find((item) => item.id === Number(id))
 	const [imagenActual, setImagenActual] = useState(0)
 
 	if (!proyecto) {
@@ -11,7 +13,7 @@ function ProyectoPage({ proyectoId }) {
 			<main className="proyecto-page proyecto-page--error contenido-principal">
 				<h1>Proyecto no encontrado</h1>
 				<p>El proyecto solicitado no existe o el enlace no es válido.</p>
-				<a className="volver-proyectos" href="#proyectos">Volver a proyectos</a>
+				<Link className="volver-proyectos" to="/proyectos">Volver a proyectos</Link>
 			</main>
 		)
 	}
@@ -30,7 +32,7 @@ function ProyectoPage({ proyectoId }) {
 			</section>
 
 			<div className="proyecto-page__content">
-				<a className="volver-proyectos" href="#proyectos">&larr; Volver a proyectos</a>
+				<Link className="volver-proyectos" to="/proyectos">&larr; Volver a proyectos</Link>
 
 				<section className="proyecto-page__section">
 					<h2>Concepto</h2>
