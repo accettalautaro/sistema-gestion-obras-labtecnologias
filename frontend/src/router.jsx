@@ -7,6 +7,7 @@ import LoginPage from './features/login/pages/LoginPage.jsx'
 import ProyectosPage from './features/home/pages/ProyectosPage.jsx'
 import ProyectoPage from './features/home/pages/ProyectoPage.jsx'
 import PrincipalPage from './features/principal/pages/PrincipalPage.jsx'
+import ClientesPage from './features/clientes/pages/ClientesPage.jsx'
 
 const loaderProtegido = () => {
   const sessionString = localStorage.getItem('sesion-usuario')
@@ -34,6 +35,7 @@ export const router = createBrowserRouter([
     loader: loaderProtegido,
     children: [
       { index: true, element: <PrincipalPage /> },
+      { path: 'clientes', element: <ClientesPage /> },
     ]
   }
 ])

@@ -1,12 +1,11 @@
 import { Link } from 'react-router-dom'
-import logo from '../../assets/logoAccettaSinMargenesBlanco.png'
 import logoScrolled from '../../assets/logoAccettaSinMargenes.png'
 import menuIcon from '../../assets/menu.png'
 import '../../styles/Navbar.css'
 
 function NavbarGestor({ usuario, handleCerrarSesion }) {
 	return (
-		<header className="header-scrolled">
+		<header className="navbar-site header-scrolled">
 			<nav className="navegacion scrolled">
 				<Link to="/" className="imagen-izquierda-link" aria-label="Ir al inicio">
 					<img src={logoScrolled} alt="logo empresa" className="imagen-izquierda" />

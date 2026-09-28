@@ -1,10 +1,12 @@
 import { NavLink, Outlet, ScrollRestoration, useLoaderData, useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
 import NavbarGestor from './NavbarGestor'
 
 const ENLACES_GESTOR = [
   { id: 1, texto: 'Inicio', destino: '/principal', disponible: true },
-  { id: 2, texto: 'Productos', destino: '/principal/productos', disponible: false },
-  { id: 3, texto: 'Pedidos', destino: '/principal/pedidos', disponible: false },
+  { id: 2, texto: 'Gestión de clientes', destino: '/principal/clientes', disponible: true, requiereArquitecto: true },
+  { id: 3, texto: 'Productos', destino: '/principal/productos', disponible: false },
+  { id: 4, texto: 'Pedidos', destino: '/principal/pedidos', disponible: false },
 ]
 
 // Doble navegación: NavbarGestor (horizontal) + sidebar (vertical) + <Outlet />.
@@ -13,6 +15,27 @@ function LayoutGestor() {
   // esta ruta (protegerRuta en router.jsx), en este caso el usuario logueado.
   const usuario = useLoaderData()
   const navigate = useNavigate()
+  const [esArquitecto, setEsArquitecto] = useState(null)
+
+  useEffect(() => {
+    let vigente = true
+
+    fetch('/backend/data/arquitectos.json')
+      .then((response) => {
+        if (!response.ok) throw new Error('No se pudo verificar el perfil de arquitecto.')
+        return response.json()
+      })
+      .then((arquitectos) => {
+        if (vigente) {
+          setEsArquitecto(arquitectos.some((arquitecto) => String(arquitecto['id-usuario']) === String(usuario.id)))
+        }
+      })
+      .catch(() => {
+        if (vigente) setEsArquitecto(false)
+      })
+
+    return () => { vigente = false }
+  }, [usuario.id])
 
   const handleCerrarSesion = () => {
     localStorage.removeItem('sesion-usuario')
@@ -20,7 +43,7 @@ function LayoutGestor() {
   }
 
   return (
-    <div className="d-flex flex-column min-vh-100 bg-body-tertiary">
+    <div className="layout-gestor d-flex flex-column min-vh-100 bg-body-tertiary">
       <NavbarGestor usuario={usuario} handleCerrarSesion={handleCerrarSesion} />
 
       <div className="d-flex flex-grow-1">
@@ -47,7 +70,7 @@ function LayoutGestor() {
           <div className="offcanvas-body p-lg-3">
             <nav className="nav nav-pills flex-column w-100 gap-1">
               {ENLACES_GESTOR.map((enlace) =>
-                enlace.disponible ? (
+                enlace.requiereArquitecto && esArquitecto !== true ? null : enlace.disponible ? (
                   <NavLink key={enlace.id} className="nav-link" to={enlace.destino} end>
                     {enlace.texto}
                   </NavLink>
@@ -66,7 +89,7 @@ function LayoutGestor() {
         </aside>
 
         <main className="flex-grow-1 p-3 p-lg-4">
-          <Outlet context={{ usuario }} />
+          <Outlet context={{ usuario, esArquitecto }} />
         </main>
       </div>
 
