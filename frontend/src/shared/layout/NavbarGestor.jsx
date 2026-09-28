@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import logoScrolled from '../../assets/logoAccettaSinMargenes.png'
 import menuIcon from '../../assets/menu.png'
 import '../../styles/Navbar.css'
+import '../../styles/LayoutGestor.css'
 
 function NavbarGestor({ usuario, handleCerrarSesion }) {
 	return (
@@ -22,9 +23,9 @@ function NavbarGestor({ usuario, handleCerrarSesion }) {
 					<img src={menuIcon} alt="" />
 				</button>
 
-				<div className="d-flex align-items-center gap-3 pe-3">
-					<span className="text-light small d-none d-md-inline">Hola, {usuario?.nombre}</span>
-					<button className="btn btn-warning btn-sm" onClick={handleCerrarSesion}>
+				<div className="navbar-gestor__account">
+					<span className="navbar-gestor__greeting d-none d-md-inline">Hola, {usuario?.nombre}</span>
+					<button className="navbar-gestor__logout" onClick={handleCerrarSesion}>
 						Cerrar sesión
 					</button>
 				</div>
