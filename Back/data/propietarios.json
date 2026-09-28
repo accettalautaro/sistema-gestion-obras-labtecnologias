@@ -1,0 +1,12 @@
+[
+    {
+        "id-propietario":1,
+        "nroescritura":1,
+        "nombre": "Juan",
+        "apellido":"Perez",
+        "dni":"123456789",
+        "estadocivil":"Casado",
+        "porcentaje":"100%"
+        
+    }
+]

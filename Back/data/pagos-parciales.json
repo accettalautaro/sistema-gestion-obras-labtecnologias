@@ -1,0 +1,21 @@
+[
+    {
+        "id-pago":1,
+        "id-tarea":"1",
+        "monto":1000000,
+        "descripcion":"pago de la primera etapa"
+    },
+    {
+        "id-pago":2,
+        "id-tarea":"2-1",
+        "monto":2000000,
+        "descripcion":"pago de la segunda etapa"
+    },
+    {
+        "id-pago":3,
+        "id-tarea":"2-1",
+        "monto":2000000,
+        "descripcion":"pago de la segunda etapa"
+    }
+
+]

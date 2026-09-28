@@ -1,0 +1,64 @@
+[
+    {
+        "id-tarea":"1",
+        "id-obra":1,
+        "nombre":"Estructura",
+        "porcentaje":"100%",
+        "duracion-estimada":4,
+        "duracion-real":4,
+        "descripcion":"Construcción de la estructura de la vivienda",
+        "costo-estimado":1000000,
+        "costo-real":1200000
+
+    },
+    {
+        "id-tarea":"2",
+        "id-obra":1,
+        "nombre":"Losa",
+        "porcentaje":"50%",
+        "duracion-estimada":5,
+        "duracion-real":4,
+        "descripcion":"Construcción de la losa de la vivienda",
+        "costo-estimado":200000,
+        "costo-real":230000
+
+    },
+    {
+        "id-tarea":"3",
+        "id-obra":1,
+        "nombre":"Armado de losa",
+        "porcentaje":"100%",
+        "duracion-estimada":4,
+        "duracion-real":4,
+        "descripcion":"armado de la losa",
+        "costo-estimado":100000,
+        "costo-real":120000
+
+    },
+    {
+        "id-tarea":"2-1",
+        "id-obra":1,
+        "nombre":"Instalación Eléctrica",
+        "porcentaje":"100%",
+        "duracion-estimada":4,
+        "duracion-real":4,
+        "descripcion":"Instalación eléctrica de la vivienda",
+        "costo-estimado":100000,
+        "costo-real":120000
+
+    },
+    {
+        "id-tarea":"2-2",
+        "id-obra":1,
+        "nombre":"Montaje de Estructura",
+        "porcentaje":"0%",
+        "duracion-estimada":4,
+        "duracion-real":4,
+        "descripcion":"Montaje de estructura de metal",
+        "costo-estimado":100000,
+        "costo-real":120000
+
+    }
+
+    
+]

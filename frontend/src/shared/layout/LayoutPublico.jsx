@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Outlet, ScrollRestoration, useLocation, useNavigate } from 'react-router-dom'
 import Navbar from './NavBar'
-import NavbarGestor from './NavbarGestor'
 import Footer from './Footer'
 const links = [
 	{ label: 'Inicio', href: '/' },
@@ -28,15 +27,10 @@ function LayoutPublico() {
   // Forzamos el estilo oscuro de la navbar cuando se visite /login
   // También podríamos forzarlo en otras pantallas si hace falta
   const isLoginPage = location.pathname === '/login' || (location.pathname === '/principal' && !sesion)
-  const isPrincipalPage = location.pathname === '/principal' && sesion
 
   return (
     <div className="d-flex flex-column min-vh-100">
-      {isPrincipalPage ? (
-        <NavbarGestor usuario={sesion} handleCerrarSesion={handleCerrarSesion} />
-      ) : (
-        <Navbar forceScrolled={isLoginPage} links={links} />
-      )}
+      <Navbar forceScrolled={isLoginPage} links={links} />
 
       <main className="flex-grow-1">
         <Outlet context={{ sesion, setSesion, handleCerrarSesion }} />

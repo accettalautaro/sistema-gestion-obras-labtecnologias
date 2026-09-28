@@ -2,7 +2,6 @@
   {
     "id": 1,
     "nombre": "Administración",
-    "email": "admin@arquitecto.com",
     "dni":"1234567",
     "password": "admin123",
     "rol": "administrador"
@@ -10,7 +9,6 @@
   {
     "id": 2,
     "nombre": "Cliente",
-    "email": "cliente@prueba.com",
     "dni":"7654321",
     "password": "cliente123",
     "rol": "cliente"
