@@ -3,8 +3,9 @@ import NavbarGestor from './NavbarGestor'
 
 const ENLACES_GESTOR = [
   { id: 1, texto: 'Inicio', destino: '/principal', disponible: true },
-  { id: 2, texto: 'Productos', destino: '/principal/productos', disponible: false },
-  { id: 3, texto: 'Pedidos', destino: '/principal/pedidos', disponible: false },
+  { id: 2, texto: 'Gestión de obras', destino: '/principal/obras', disponible: true, requiereArquitecto: true },
+  { id: 3, texto: 'Productos', destino: '/principal/productos', disponible: false },
+  { id: 4, texto: 'Pedidos', destino: '/principal/pedidos', disponible: false },
 ]
 
 // Doble navegación: NavbarGestor (horizontal) + sidebar (vertical) + <Outlet />.
@@ -12,6 +13,7 @@ function LayoutGestor() {
   // CLASE 3 · React Router: useLoaderData devuelve lo que retornó el loader de
   // esta ruta (protegerRuta en router.jsx), en este caso el usuario logueado.
   const usuario = useLoaderData()
+  const esArquitecto = usuario?.rol === 'administrador' || usuario?.rol === 'arquitecto'
   const navigate = useNavigate()
 
   const handleCerrarSesion = () => {
@@ -47,7 +49,7 @@ function LayoutGestor() {
           <div className="offcanvas-body p-lg-3">
             <nav className="nav nav-pills flex-column w-100 gap-1">
               {ENLACES_GESTOR.map((enlace) =>
-                enlace.disponible ? (
+                enlace.requiereArquitecto && !esArquitecto ? null : enlace.disponible ? (
                   <NavLink key={enlace.id} className="nav-link" to={enlace.destino} end>
                     {enlace.texto}
                   </NavLink>
@@ -66,7 +68,7 @@ function LayoutGestor() {
         </aside>
 
         <main className="flex-grow-1 p-3 p-lg-4">
-          <Outlet context={{ usuario }} />
+          <Outlet context={{ usuario, esArquitecto }} />
         </main>
       </div>
 
