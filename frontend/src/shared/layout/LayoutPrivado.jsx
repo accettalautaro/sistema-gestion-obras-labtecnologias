@@ -7,16 +7,17 @@ const ENLACES_GESTOR = [
   { id: 2, texto: 'Gestión de clientes', destino: '/principal/clientes', disponible: true, requiereArquitecto: true },
   { id: 3, texto: 'Productos', destino: '/principal/productos', disponible: false },
   { id: 4, texto: 'Pedidos', destino: '/principal/pedidos', disponible: false },
+  { id: 5, texto: 'Gestión de pagos', destino: '/principal/pagos', disponible: true },
 ]
 
 function LayoutGestor() {
   // El loader (protegerRuta) ya te devuelve { id, nombre, dni, usuario, rol }
-  const usuario = useLoaderData() 
+  const usuario = useLoaderData()
   const navigate = useNavigate()
 
   // ¡Magia! Leemos el rol directamente de la sesión. 
   // (Si en tu sistema el arquitecto usa la cuenta de administrador, lo validas así):
-  const esArquitecto = usuario?.rol === 'administrador' 
+  const esArquitecto = usuario?.rol === 'administrador'
   // Si luego agregas usuarios con `"rol": "arquitecto"`, simplemente cambias la validación a:
   // const esArquitecto = usuario?.rol === 'administrador' || usuario?.rol === 'arquitecto'
 
