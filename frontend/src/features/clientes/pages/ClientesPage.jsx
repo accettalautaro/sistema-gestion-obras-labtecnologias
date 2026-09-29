@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import { useFetch } from '../../../shared/hooks/useFetch'
 import { useOutletContext } from 'react-router-dom'
 import { actualizarCliente, crearCliente, eliminarCliente, listarClientes } from '../services/clientesService.js'
 import '../../../styles/Clientes.css'
@@ -7,25 +8,15 @@ const FORMULARIO_VACIO = { nombre: '', apellido: '', dni: '', telefono: '', emai
 
 function ClientesPage() {
 	const { esArquitecto } = useOutletContext()
-	const [clientes, setClientes] = useState([])
 	const [busqueda, setBusqueda] = useState('')
 	const [formulario, setFormulario] = useState(FORMULARIO_VACIO)
 	const [clienteEditando, setClienteEditando] = useState(null)
-	const [cargando, setCargando] = useState(true)
 	const [guardando, setGuardando] = useState(false)
-	const [error, setError] = useState('')
+	const [errorMutacion, setErrorMutacion] = useState('')
 	const [exito, setExito] = useState('')
+	const [version, setVersion] = useState(0)
 
-	useEffect(() => {
-		if (esArquitecto !== true) return
-
-		let vigente = true
-		listarClientes()
-			.then((datos) => { if (vigente) setClientes(datos) })
-			.catch((motivo) => { if (vigente) setError(motivo.message) })
-			.finally(() => { if (vigente) setCargando(false) })
-		return () => { vigente = false }
-	}, [esArquitecto])
+	const { datos, cargando, error } = useFetch(listarClientes, version)
 
 	if (esArquitecto === null) {
 		return <p className="clientes-page__estado" role="status">Verificando acceso de arquitecto...</p>
@@ -33,8 +24,16 @@ function ClientesPage() {
 	if (!esArquitecto) {
 		return <div className="alert alert-danger" role="alert">Esta pantalla está disponible únicamente para cuentas vinculadas a un arquitecto.</div>
 	}
+	if (cargando) {
+		return <p className="clientes-page__estado" role="status">Cargando clientes...</p>
+	}
+	if (error) {
+		return <div className="alert alert-danger" role="alert">{error.message}</div>
+	}
 
-	const clientesFiltrados = clientes.filter((cliente) =>
+	const { listaClientes = [] } = datos || {}
+
+	const clientesFiltrados = listaClientes.filter((cliente) =>
 		[cliente.nombre, cliente.apellido, cliente.dni, cliente.telefono, cliente.email]
 			.some((valor) => String(valor).toLowerCase().includes(busqueda.trim().toLowerCase())),
 	)
@@ -42,7 +41,7 @@ function ClientesPage() {
 	const editar = (cliente) => {
 		setClienteEditando(cliente['id-cliente'])
 		setFormulario({ ...cliente, password: '' })
-		setError('')
+		setErrorMutacion('')
 		setExito('')
 	}
 
@@ -54,21 +53,21 @@ function ClientesPage() {
 	const guardar = async (event) => {
 		event.preventDefault()
 		setGuardando(true)
-		setError('')
+		setErrorMutacion('')
 		setExito('')
 		try {
-			const cliente = clienteEditando === null
-				? await crearCliente(formulario)
-				: await actualizarCliente(clienteEditando, formulario)
-			setClientes((actuales) => clienteEditando === null
-				? [...actuales, cliente]
-				: actuales.map((item) => String(item['id-cliente']) === String(clienteEditando) ? cliente : item))
+			if (clienteEditando === null) {
+				await crearCliente(formulario)
+			} else {
+				await actualizarCliente(clienteEditando, formulario)
+			}
 			setExito(clienteEditando === null
 				? 'Perfil y cuenta simulada creados solo en este navegador. El login actual no reconocerá esta cuenta.'
 				: 'Perfil y datos compartidos de la cuenta local actualizados en este navegador.')
 			cancelarEdicion()
+			setVersion(v => v + 1) // Forzar refetch
 		} catch (motivo) {
-			setError(motivo.message || 'No se pudieron guardar los cambios.')
+			setErrorMutacion(motivo.message || 'No se pudieron guardar los cambios.')
 		} finally {
 			setGuardando(false)
 		}
@@ -78,15 +77,15 @@ function ClientesPage() {
 		const nombre = `${cliente.nombre} ${cliente.apellido}`
 		if (!window.confirm(`¿Eliminar el perfil local de ${nombre}? Esta acción no modifica archivos JSON.`)) return
 
-		setError('')
+		setErrorMutacion('')
 		setExito('')
 		try {
 			await eliminarCliente(cliente['id-cliente'])
-			setClientes((actuales) => actuales.filter((item) => String(item['id-cliente']) !== String(cliente['id-cliente'])))
 			if (String(clienteEditando) === String(cliente['id-cliente'])) cancelarEdicion()
 			setExito(`Se eliminó el perfil local de ${nombre}.`)
+			setVersion(v => v + 1) // Forzar refetch
 		} catch (motivo) {
-			setError(motivo.message || 'No se pudo eliminar el perfil.')
+			setErrorMutacion(motivo.message || 'No se pudo eliminar el perfil.')
 		}
 	}
 
@@ -98,14 +97,14 @@ function ClientesPage() {
 					<h1>Gestión de clientes</h1>
 					<p>Perfiles de clientes y sus cuentas vinculadas.</p>
 				</div>
-				<span className="clientes-page__count">{clientes.length} {clientes.length === 1 ? 'perfil' : 'perfiles'}</span>
+				<span className="clientes-page__count">{listaClientes.length} {listaClientes.length === 1 ? 'perfil' : 'perfiles'}</span>
 			</header>
 
 			<div className="alert alert-warning clientes-page__persistencia" role="note">
 				<strong>Persistencia temporal:</strong> perfiles y cuentas vinculadas se guardan solo en el almacenamiento local de este navegador; no modifican los JSON. El login sigue leyendo <code>usuarios.json</code> estático, así que no reconocerá las cuentas creadas desde esta pantalla.
 			</div>
 
-			{error && <div className="alert alert-danger" role="alert">{error}</div>}
+			{errorMutacion && <div className="alert alert-danger" role="alert">{errorMutacion}</div>}
 			{exito && <div className="alert alert-success" role="status">{exito}</div>}
 
 			<div className="clientes-page__workspace">

@@ -1,39 +1,68 @@
-import react from '@vitejs/plugin-react'
+import fs from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+import react, { reactCompilerPreset } from '@vitejs/plugin-react'
+import babel from '@rolldown/plugin-babel'
 import { defineConfig } from 'vite'
-import fs from 'fs'
-import path from 'path'
-import { fileURLToPath } from 'url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
+// 1. Adaptado a tu carpeta "Back"
+const CARPETA_BACKEND = path.resolve(__dirname, '../Back') 
 
-// Plugin de Vite para servir los archivos JSON simulando un backend
-const servirBackend = () => ({
-  name: 'servir-backend',
-  configureServer(server) {
-    server.middlewares.use((req, res, next) => {
-      if (req.url.startsWith('/backend/data/')) {
-        const fileName = req.url.replace('/backend/data/', '')
-        const filePath = path.join(__dirname, '..', 'Back', 'data', fileName)
-        
-        if (fs.existsSync(filePath)) {
-          const content = fs.readFileSync(filePath, 'utf-8')
-          res.setHeader('Content-Type', 'application/json')
-          res.end(content)
-          return
-        } else {
-          res.statusCode = 404
-          res.end(JSON.stringify({ error: 'Not found' }))
-          return
-        }
-      }
-      next()
-    })
+function servirBackend() {
+  let configuracion
+
+  function middleware(req, res, next) {
+    let url
+    try {
+      url = decodeURIComponent((req.url ?? '').split('?')[0])
+    } catch {
+      return next()
+    }
+    
+    // 2. Adaptado a la URL que usas en tus fetch ('/Back/')
+    if (!url.startsWith('/Back/')) return next() 
+
+    const archivo = path.resolve(CARPETA_BACKEND, '.' + url.slice('/Back'.length))
+    const esValido =
+      archivo.startsWith(CARPETA_BACKEND + path.sep) && 
+      archivo.endsWith('.json') &&
+      fs.existsSync(archivo)
+
+    res.setHeader('Content-Type', 'application/json; charset=utf-8')
+    if (!esValido) {
+      res.statusCode = 404
+      return res.end(JSON.stringify({ error: 'Recurso no encontrado' }))
+    }
+    fs.createReadStream(archivo).pipe(res)
   }
-})
 
-// https://vite.dev/config/
+  return {
+    name: 'servir-backend',
+    configResolved(config) {
+      configuracion = config
+    },
+    configureServer(server) {
+      server.middlewares.use(middleware) 
+    },
+    configurePreviewServer(server) {
+      server.middlewares.use(middleware) 
+    },
+    closeBundle() {
+      if (configuracion.command !== 'build') return
+      // 3. Adaptado para que al compilar se copie a dist/Back/data
+      const destino = path.resolve(configuracion.root, configuracion.build.outDir, 'Back/data')
+      fs.cpSync(path.join(CARPETA_BACKEND, 'data'), destino, { recursive: true })
+    },
+  }
+}
+
 export default defineConfig({
-  plugins: [react(), servirBackend()],
+  plugins: [
+    react(),
+    babel({ presets: [reactCompilerPreset()] }),
+    servirBackend(),
+  ],
   server: {
     watch: {
       usePolling: true, 

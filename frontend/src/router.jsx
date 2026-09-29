@@ -1,21 +1,13 @@
 import { createBrowserRouter, redirect } from 'react-router-dom'
-import LayoutPublico from './shared/layout/LayoutPublico.jsx'
-import LayoutPrivado from './shared/layout/LayoutPrivado.jsx'
-import HomePage from './features/home/pages/HomePage.jsx'
-import ContactoPage from './features/contacto/pages/ContactoPage.jsx'
-import LoginPage from './features/login/pages/LoginPage.jsx'
-import ProyectosPage from './features/home/pages/ProyectosPage.jsx'
-import ProyectoPage from './features/home/pages/ProyectoPage.jsx'
-import PrincipalPage from './features/principal/pages/PrincipalPage.jsx'
-import ClientesPage from './features/clientes/pages/ClientesPage.jsx'
+import LayoutPublico from './shared/layout/LayoutPublico'
+import LayoutPrivado from './shared/layout/LayoutPrivado'
+import NoEncontradaPage from './shared/pages/NoEncontradaPage'
+import { HomePage, ProyectosPage, ProyectoPage } from './features/home'
+import { ContactoPage } from './features/contacto'
+import { PrincipalPage } from './features/principal'
+import { ClientesPage } from './features/clientes'
+import { LoginPage, protegerRuta, redirigirSiHaySesion } from './features/login'
 
-const loaderProtegido = () => {
-  const sessionString = localStorage.getItem('sesion-usuario')
-  if (!sessionString) {
-    return redirect('/login')
-  }
-  return JSON.parse(sessionString)
-}
 
 export const router = createBrowserRouter([
   {
@@ -24,18 +16,23 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <HomePage /> },
       { path: 'contacto', element: <ContactoPage /> },
-      { path: 'login', element: <LoginPage /> },
+      { path: 'login', element: <LoginPage />,
+        loader: redirigirSiHaySesion,
+
+      },
       { path: 'proyectos', element: <ProyectosPage /> },
       { path: 'proyecto/:id', element: <ProyectoPage /> },
+      { path: '*', element: <NoEncontradaPage /> },
     ],
   },
   {
     path: '/principal',
     element: <LayoutPrivado />,
-    loader: loaderProtegido,
+    loader: protegerRuta,
     children: [
       { index: true, element: <PrincipalPage /> },
       { path: 'clientes', element: <ClientesPage /> },
     ]
-  }
+  },
+  { path: '*', element: <NoEncontradaPage /> },
 ])

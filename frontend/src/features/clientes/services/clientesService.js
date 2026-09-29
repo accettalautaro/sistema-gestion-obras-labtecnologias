@@ -60,15 +60,15 @@ function siguienteId(registros, campo) {
 }
 
 async function leerObras() {
-	const response = await fetch('/backend/data/obras.json')
+	const response = await fetch('/Back/data/obras.json')
 	if (!response.ok) throw new Error('No se pudieron verificar las obras asociadas.')
 	const data = await response.json()
 	return Array.isArray(data) ? data : (data.obras ?? [])
 }
 
 export async function listarClientes() {
-	const clientes = await leerColeccion(CLIENTES_KEY, '/backend/data/clientes.json')
-	return clientes.map((cliente) => ({
+	const clientes = await leerColeccion(CLIENTES_KEY, '/Back/data/clientes.json')
+	const listaClientes = clientes.map((cliente) => ({
 		'id-cliente': cliente['id-cliente'],
 		'id-usuario': cliente['id-usuario'],
 		nombre: cliente.nombre,
@@ -77,13 +77,14 @@ export async function listarClientes() {
 		telefono: cliente.telefono,
 		email: cliente.email,
 	}))
+	return { listaClientes }
 }
 
 export async function crearCliente(datos) {
 	const perfil = validarPerfil(datos, true)
 	const [clientes, usuarios] = await Promise.all([
-		leerColeccion(CLIENTES_KEY, '/backend/data/clientes.json'),
-		leerColeccion(USUARIOS_KEY, '/backend/data/usuarios.json'),
+		leerColeccion(CLIENTES_KEY, '/Back/data/clientes.json'),
+		leerColeccion(USUARIOS_KEY, '/Back/data/usuarios.json'),
 	])
 	validarDniDisponible(perfil, clientes, usuarios)
 
@@ -104,8 +105,8 @@ export async function crearCliente(datos) {
 export async function actualizarCliente(id, datos) {
 	const perfil = validarPerfil(datos)
 	const [clientes, usuarios] = await Promise.all([
-		leerColeccion(CLIENTES_KEY, '/backend/data/clientes.json'),
-		leerColeccion(USUARIOS_KEY, '/backend/data/usuarios.json'),
+		leerColeccion(CLIENTES_KEY, '/Back/data/clientes.json'),
+		leerColeccion(USUARIOS_KEY, '/Back/data/usuarios.json'),
 	])
 	const cliente = clientes.find((item) => String(item['id-cliente']) === String(id))
 	if (!cliente) throw new Error('No se encontró el perfil de cliente.')
@@ -125,8 +126,8 @@ export async function actualizarCliente(id, datos) {
 
 export async function eliminarCliente(id) {
 	const [clientes, usuarios, obras] = await Promise.all([
-		leerColeccion(CLIENTES_KEY, '/backend/data/clientes.json'),
-		leerColeccion(USUARIOS_KEY, '/backend/data/usuarios.json'),
+		leerColeccion(CLIENTES_KEY, '/Back/data/clientes.json'),
+		leerColeccion(USUARIOS_KEY, '/Back/data/usuarios.json'),
 		leerObras(),
 	])
 	const cliente = clientes.find((item) => String(item['id-cliente']) === String(id))
