@@ -1,30 +1,35 @@
 import { NavLink, Outlet, ScrollRestoration, useLoaderData, useNavigate } from 'react-router-dom'
 import NavbarGestor from './NavbarGestor'
+import { cerrarSesion } from '../../features/login'
 
 const ENLACES_GESTOR = [
   { id: 1, texto: 'Inicio', destino: '/principal', disponible: true },
-  { id: 2, texto: 'Productos', destino: '/principal/productos', disponible: false },
-  { id: 3, texto: 'Pedidos', destino: '/principal/pedidos', disponible: false },
+  { id: 2, texto: 'Gestión de clientes', destino: '/principal/clientes', disponible: true, requiereArquitecto: true },
+  { id: 3, texto: 'Productos', destino: '/principal/productos', disponible: false },
+  { id: 4, texto: 'Pedidos', destino: '/principal/pedidos', disponible: false },
 ]
 
-// Doble navegación: NavbarGestor (horizontal) + sidebar (vertical) + <Outlet />.
 function LayoutGestor() {
-  // CLASE 3 · React Router: useLoaderData devuelve lo que retornó el loader de
-  // esta ruta (protegerRuta en router.jsx), en este caso el usuario logueado.
-  const usuario = useLoaderData()
+  // El loader (protegerRuta) ya te devuelve { id, nombre, dni, usuario, rol }
+  const usuario = useLoaderData() 
   const navigate = useNavigate()
 
+  // ¡Magia! Leemos el rol directamente de la sesión. 
+  // (Si en tu sistema el arquitecto usa la cuenta de administrador, lo validas así):
+  const esArquitecto = usuario?.rol === 'administrador' 
+  // Si luego agregas usuarios con `"rol": "arquitecto"`, simplemente cambias la validación a:
+  // const esArquitecto = usuario?.rol === 'administrador' || usuario?.rol === 'arquitecto'
+
   const handleCerrarSesion = () => {
-    localStorage.removeItem('sesion-usuario')
+    cerrarSesion()
     navigate('/login', { replace: true })
   }
 
   return (
-    <div className="d-flex flex-column min-vh-100 bg-body-tertiary">
+    <div className="layout-gestor d-flex flex-column min-vh-100 bg-body-tertiary">
       <NavbarGestor usuario={usuario} handleCerrarSesion={handleCerrarSesion} />
 
       <div className="d-flex flex-grow-1">
-        {/* offcanvas-lg: en escritorio es una columna fija; en móvil, un panel deslizable */}
         <aside
           className="offcanvas-lg offcanvas-start sidebar-gestor bg-white border-end"
           tabIndex="-1"
@@ -47,7 +52,7 @@ function LayoutGestor() {
           <div className="offcanvas-body p-lg-3">
             <nav className="nav nav-pills flex-column w-100 gap-1">
               {ENLACES_GESTOR.map((enlace) =>
-                enlace.disponible ? (
+                enlace.requiereArquitecto && !esArquitecto ? null : enlace.disponible ? (
                   <NavLink key={enlace.id} className="nav-link" to={enlace.destino} end>
                     {enlace.texto}
                   </NavLink>
@@ -66,7 +71,7 @@ function LayoutGestor() {
         </aside>
 
         <main className="flex-grow-1 p-3 p-lg-4">
-          <Outlet context={{ usuario }} />
+          <Outlet context={{ usuario, esArquitecto }} />
         </main>
       </div>
 

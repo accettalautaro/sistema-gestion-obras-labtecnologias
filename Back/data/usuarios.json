@@ -3,14 +3,14 @@
     "id": 1,
     "nombre": "Administración",
     "dni":"1234567",
-    "password": "admin123",
+    "usuario": "admin",
     "rol": "administrador"
   },
   {
     "id": 2,
     "nombre": "Cliente",
     "dni":"7654321",
-    "password": "cliente123",
+    "usuario": "cliente123",
     "rol": "cliente"
   }
 ]
