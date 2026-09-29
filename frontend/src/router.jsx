@@ -1,7 +1,8 @@
 import { createBrowserRouter, redirect } from 'react-router-dom'
 import LayoutPublico from './shared/layout/LayoutPublico'
-import LayoutPrivado from './shared/layout/LayoutPrivado'
+import LayoutGestor from './shared/layout/LayoutGestor'
 import NoEncontradaPage from './shared/pages/NoEncontradaPage'
+import Spinner from './shared/components/Spinner'
 import { HomePage, ProyectosPage, ProyectoPage } from './features/home'
 import { ContactoPage } from './features/contacto'
 import { PrincipalPage } from './features/principal'
@@ -18,6 +19,7 @@ export const router = createBrowserRouter([
       { path: 'contacto', element: <ContactoPage /> },
       { path: 'login', element: <LoginPage />,
         loader: redirigirSiHaySesion,
+        hydrateFallbackElement: <Spinner />
 
       },
       { path: 'proyectos', element: <ProyectosPage /> },
@@ -27,12 +29,14 @@ export const router = createBrowserRouter([
   },
   {
     path: '/principal',
-    element: <LayoutPrivado />,
+    element: <LayoutGestor />,
     loader: protegerRuta,
+    hydrateFallbackElement: <Spinner />,
+    errorElement: <NoEncontradaPage />,
     children: [
       { index: true, element: <PrincipalPage /> },
       { path: 'clientes', element: <ClientesPage /> },
     ]
   },
-  { path: '*', element: <NoEncontradaPage /> },
+  
 ])
