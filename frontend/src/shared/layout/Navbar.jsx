@@ -31,7 +31,7 @@ function Navbar({ forceScrolled = false , links}) {
 	const closeMobileMenu = () => setIsMobileMenuOpen(false)
 
 	return (
-		<header className={(isScrolled || forceScrolled) ? 'header-scrolled' : ''}>
+		<header className={`navbar-site${(isScrolled || forceScrolled) ? ' header-scrolled' : ''}`}>
 			<nav className={`navegacion${(isScrolled || forceScrolled) ? ' scrolled' : ''}`}>
 				<Link to="/" className="imagen-izquierda-link" aria-label="Ir al inicio">
 					<img src={(isScrolled || forceScrolled) ? logoScrolled : logo} alt="logo empresa" className="imagen-izquierda" />
