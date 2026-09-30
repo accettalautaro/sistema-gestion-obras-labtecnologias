@@ -1,0 +1,125 @@
+.contacto-page {
+	background: var(--color-seccionclaro);
+}
+
+.contacto-hero {
+	align-items: center;
+	background-position: center;
+	background-size: cover;
+	display: flex;
+	filter: brightness(0.72);
+	height: min(55vh, 34rem);
+	justify-content: center;
+}
+
+.contacto-hero h1 {
+	color: var(--color-primario);
+	filter: brightness(1.4);
+	font-size: clamp(2.25rem, 5vw, 4rem);
+	font-weight: 300;
+	margin: 0;
+	text-shadow: 2px 2px 10px rgb(0 0 0 / 70%);
+	text-transform: uppercase;
+}
+
+.contacto-page__info {
+	padding-bottom: 4rem;
+	padding-top: 4rem;
+}
+
+.contacto-page__info .contacto-card {
+	background: var(--color-primario);
+}
+
+.contacto-page__info .contacto-datos h2 {
+	color: var(--color-texto1);
+	font-size: clamp(1.75rem, 3vw, 2.5rem);
+	font-weight: 500;
+	margin: 0 0 1rem;
+}
+
+.contacto-formulario {
+	padding: 0 1rem 6rem;
+}
+
+.contacto-formulario form {
+	background: var(--color-primario);
+	border: 1px solid rgb(0 0 0 / 8%);
+	margin: 0 auto;
+	max-width: 48rem;
+	padding: clamp(1.5rem, 4vw, 3rem);
+}
+
+.contacto-formulario h2 {
+	color: var(--color-seccion);
+	font-size: 1.75rem;
+	font-weight: 400;
+	margin: 0 0 2rem;
+}
+
+.contacto-formulario__campo {
+	display: flex;
+	flex-direction: column;
+	gap: 0.45rem;
+	margin-bottom: 1.25rem;
+}
+
+.contacto-formulario label {
+	color: var(--color-texto3);
+	font-weight: 600;
+}
+
+.contacto-formulario input,
+.contacto-formulario select,
+.contacto-formulario textarea {
+	border: 1px solid #c8c8c8;
+	border-radius: 0;
+	font: inherit;
+	padding: 0.8rem 0.9rem;
+	width: 100%;
+}
+
+.contacto-formulario textarea {
+	min-height: 8rem;
+	resize: vertical;
+}
+
+.contacto-formulario input:focus,
+.contacto-formulario select:focus,
+.contacto-formulario textarea:focus {
+	border-color: var(--color-texto3);
+	outline: 2px solid rgb(51 51 51 / 18%);
+	outline-offset: 1px;
+}
+
+.contacto-formulario button {
+	background: var(--color-seccion);
+	border: 1px solid var(--color-seccion);
+	color: var(--color-primario);
+	cursor: pointer;
+	font: inherit;
+	padding: 0.8rem 1.5rem;
+	transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.contacto-formulario button:hover,
+.contacto-formulario button:focus-visible {
+	background: var(--color-primario);
+	color: var(--color-seccion);
+}
+
+.contacto-formulario__exito {
+	color: #236b3a;
+	margin: 1rem 0 0;
+}
+
+@media (max-width: 700px) {
+	.contacto-hero {
+		height: 16rem;
+	}
+
+	.contacto-page__info {
+		padding-bottom: 2rem;
+		padding-top: 2rem;
+	}
+}

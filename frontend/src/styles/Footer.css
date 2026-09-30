@@ -1,0 +1,21 @@
+.site-footer {
+	background-color: #f4f4f4;
+	color: #898989;
+	font-size: 0.875rem;
+	padding: 1.25rem;
+	text-align: center;
+}
+
+.site-footer__instagram-logo {
+	height: 60px;
+	object-fit: contain;
+	width: 60px;
+}
+
+.site-footer__instagram-logo:hover {
+	content: url('../assets/instragramhover.png');
+}
+
+.site-footer p {
+	margin: 0;
+}

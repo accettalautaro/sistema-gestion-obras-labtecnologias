@@ -1,0 +1,10 @@
+[
+    {
+        "id-obra":1,
+        "id-cliente":1,
+        "id-arquitecto":1,
+        "nrolote":450,  
+        "Estado":"En ejecución",
+        "porcentaje":"50%"
+    }
+]

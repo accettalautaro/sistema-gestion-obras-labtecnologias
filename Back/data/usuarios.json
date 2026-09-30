@@ -1,0 +1,17 @@
+[
+  {
+    "id": 1,
+    "nombre": "Administración",
+    "dni":"1234567",
+    "usuario": "admin",
+    "rol": "administrador"
+  },
+  {
+    "id": 2,
+    "nombre": "Cliente",
+    "dni":"7654321",
+    "usuario": "cliente123",
+    "rol": "cliente"
+  }
+]
+

@@ -1,0 +1,11 @@
+[
+    {
+        "id-cliente":1,
+        "id-usuario":2,
+        "nombre":"Juan",
+        "apellido":"Perez",
+        "dni":"123456789",
+        "telefono":"2664404040",
+        "email":"juanperez@gmail.com"
+    }
+]
