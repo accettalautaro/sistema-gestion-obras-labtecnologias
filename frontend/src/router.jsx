@@ -1,4 +1,4 @@
-import { createBrowserRouter, redirect } from 'react-router-dom'
+import { createBrowserRouter } from 'react-router-dom'
 import LayoutPublico from './shared/layout/LayoutPublico'
 import LayoutPrivado from './shared/layout/LayoutPrivado'
 import NoEncontradaPage from './shared/pages/NoEncontradaPage'
