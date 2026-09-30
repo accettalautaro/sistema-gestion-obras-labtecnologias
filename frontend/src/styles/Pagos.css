@@ -152,3 +152,28 @@
 	border-color: #a76628;
 	box-shadow: 0 0 0 0.25rem rgba(167, 102, 40, 0.25);
 }
+
+/* Animación de desplegable de lista de pagos */
+.pagos-page__desplegable {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.3s ease-out;
+}
+
+.pagos-page__desplegable.abierto {
+    grid-template-rows: 1fr;
+}
+
+.pagos-page__desplegable-inner {
+    overflow: hidden;
+}
+
+.pagos-page__btn-desplegar {
+    transition: background-color .2s ease, border-color .2s ease, color .2s ease;
+}
+
+.pagos-page__btn-desplegar:hover {
+    background-color: #a76628 !important;
+    border-color: #a76628 !important;
+    color: #fff !important;
+}

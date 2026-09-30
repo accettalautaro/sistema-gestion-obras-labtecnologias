@@ -7,7 +7,7 @@ const ENLACES_GESTOR = [
   { id: 2, texto: 'Gestión de clientes', destino: '/principal/clientes', disponible: true, requiereArquitecto: true },
   { id: 3, texto: 'Productos', destino: '/principal/productos', disponible: false },
   { id: 4, texto: 'Pedidos', destino: '/principal/pedidos', disponible: false },
-  { id: 5, texto: 'Gestión de pagos', destino: '/principal/pagos', disponible: true },
+  { id: 5, texto: 'Gestión de pagos', destino: '/principal/pagos', disponible: true, requiereArquitecto: true },
 ]
 
 function LayoutGestor() {
