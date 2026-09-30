@@ -1,10 +1,11 @@
 const URL_BASE = '/Back/data'
 
 export async function obtenerDatosPanel() {
+  const t = Date.now()
   const [obrasRes, clientesRes, tareasRes] = await Promise.all([
-    fetch(`${URL_BASE}/obras.json`),
-    fetch(`${URL_BASE}/clientes.json`),
-    fetch(`${URL_BASE}/tareas.json`)
+    fetch(`${URL_BASE}/obras.json?t=${t}`),
+    fetch(`${URL_BASE}/clientes.json?t=${t}`),
+    fetch(`${URL_BASE}/tareas.json?t=${t}`)
   ])
 
   if (!obrasRes.ok || !clientesRes.ok || !tareasRes.ok) {

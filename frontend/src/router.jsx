@@ -6,6 +6,7 @@ import { HomePage, ProyectosPage, ProyectoPage } from './features/home'
 import { ContactoPage } from './features/contacto'
 import { PrincipalPage } from './features/principal'
 import { ClientesPage } from './features/clientes'
+import { PagosPage } from './features/pagos'
 import { LoginPage, protegerRuta, redirigirSiHaySesion } from './features/login'
 import { ObrasPage } from './features/obras'
 
@@ -34,6 +35,7 @@ export const router = createBrowserRouter([
       { index: true, element: <PrincipalPage /> },
       { path: 'clientes', element: <ClientesPage /> },
       { path: 'obras', element: <ObrasPage /> },
+      { path: 'pagos', element: <PagosPage /> },
     ]
   },
   { path: '*', element: <NoEncontradaPage /> },
