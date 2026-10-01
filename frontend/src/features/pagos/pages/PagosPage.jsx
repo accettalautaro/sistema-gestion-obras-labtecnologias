@@ -170,8 +170,7 @@ function PagosPage() {
         setErrorMutacion('')
         setExito('')
         try {
-            await crearPago()
-            setVersion((actual) => actual + 1)
+            await crearPago(formulario)
             setExito('Formulario funcional. La conexión a la base de datos se implementará en el futuro.')
             setFormulario(FORMULARIO_VACIO)
         } catch (motivo) {

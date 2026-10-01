@@ -17,7 +17,7 @@ export async function listarPagos() {
     return { pagos, obras }
 }
 
-export async function crearPago() {
+export async function crearPago(datos) {
     // Simulamos un guardado temporal visual. No modifica el .json real.
     // Esta función se conectará al backend (PostgreSQL) en el futuro.
     return new Promise(resolve => setTimeout(resolve, 800))
