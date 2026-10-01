@@ -8,6 +8,8 @@ import { ContactoPage } from './features/contacto'
 import { PrincipalPage } from './features/principal'
 import { ClientesPage } from './features/clientes'
 import { LoginPage, protegerRuta, redirigirSiHaySesion } from './features/login'
+import LayoutCliente from './shared/layout/LayoutClient'
+import ClientePage from './features/dashCliente/pages/clientePage'
 
 
 export const router = createBrowserRouter([
@@ -36,6 +38,16 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <PrincipalPage /> },
       { path: 'clientes', element: <ClientesPage /> },
+    ]
+  },
+  {
+    path: '/cliente',
+    element: <LayoutCliente />,
+    loader: protegerRuta,
+    hydrateFallbackElement: <Spinner />,
+    errorElement: <NoEncontradaPage />,
+    children: [
+      { index: true, element: <ClientePage /> },
     ]
   },
   

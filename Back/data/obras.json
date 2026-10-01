@@ -3,8 +3,40 @@
         "id-obra":1,
         "id-cliente":1,
         "id-arquitecto":1,
-        "nrolote":450,  
+        "nrolote":450,
+        "fecha-inicio":"2026-10-01",
+        "fecha-fin":"",
         "Estado":"En ejecución",
         "porcentaje":"50%"
+    },
+    {
+        "id-obra":2,
+        "id-cliente":1,
+        "id-arquitecto":1,
+        "nrolote":500,
+        "fecha-inicio":"2026-11-01",
+        "fecha-fin":"2027-01-01",
+        "Estado":"Finalizada",
+        "porcentaje":"100%"
+    },
+    {
+        "id-obra":3,
+        "id-cliente":1,
+        "id-arquitecto":1,
+        "nrolote":450,
+        "fecha-inicio":"2026-10-01",
+        "fecha-fin":"",
+        "Estado":"En ejecución",
+        "porcentaje":"50%"
+    },
+    {
+        "id-obra":4,
+        "id-cliente":1,
+        "id-arquitecto":1,
+        "nrolote":500,
+        "fecha-inicio":"2026-11-01",
+        "fecha-fin":"2027-01-01",
+        "Estado":"Finalizada",
+        "porcentaje":"100%"
     }
 ]
