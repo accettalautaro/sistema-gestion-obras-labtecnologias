@@ -6,106 +6,17 @@
         "apellido":"Perez",
         "dni":"123456789",
         "estadocivil":"Casado",
-        "porcentaje":"100%"
+        "porcentaje":"50%"
         
     },
     {
         "id-propietario":2,
         "nroescritura":1,
-        "nombre": "Juan",
-        "apellido":"Perez",
-        "dni":"123456789",
+        "nombre": "Maria",
+        "apellido":"Rios",
+        "dni":"987654321",
         "estadocivil":"Casado",
-        "porcentaje":"100%"
-    },
-    {
-        "id-propietario":3,
-        "nroescritura":1,
-        "nombre": "Juan",
-        "apellido":"Perez",
-        "dni":"123456789",
-        "estadocivil":"Casado",
-        "porcentaje":"100%"
-    },
-    {
-        "id-propietario":4,
-        "nroescritura":1,
-        "nombre": "Juan",
-        "apellido":"Perez",
-        "dni":"123456789",
-        "estadocivil":"Casado",
-        "porcentaje":"100%"
-    },
-    {
-        "id-propietario":5,
-        "nroescritura":1,
-        "nombre": "Juan",
-        "apellido":"Perez",
-        "dni":"123456789",
-        "estadocivil":"Casado",
-        "porcentaje":"100%"
-    },
-    {
-        "id-propietario":6,
-        "nroescritura":1,
-        "nombre": "Juan",
-        "apellido":"Perez",
-        "dni":"123456789",
-        "estadocivil":"Casado",
-        "porcentaje":"100%"
-    },
-    {
-        "id-propietario":7,
-        "nroescritura":1,
-        "nombre": "Juan",
-        "apellido":"Perez",
-        "dni":"123456789",
-        "estadocivil":"Casado",
-        "porcentaje":"100%"
-    },
-    {
-        "id-propietario":8,
-        "nroescritura":1,
-        "nombre": "Juan",
-        "apellido":"Perez",
-        "dni":"123456789",
-        "estadocivil":"Casado",
-        "porcentaje":"100%"
-    },
-    {
-        "id-propietario":9,
-        "nroescritura":1,
-        "nombre": "Juan",
-        "apellido":"Perez",
-        "dni":"123456789",
-        "estadocivil":"Casado",
-        "porcentaje":"100%"
-    },
-    {
-        "id-propietario":10,
-        "nroescritura":1,
-        "nombre": "Juan",
-        "apellido":"Perez",
-        "dni":"123456789",
-        "estadocivil":"Casado",
-        "porcentaje":"100%"
-    },
-    {
-        "id-propietario":11,
-        "nroescritura":1,
-        "nombre": "Juan",
-        "apellido":"Perez",
-        "dni":"123456789",
-        "estadocivil":"Casado",
-        "porcentaje":"100%"
-    },
-    {
-        "id-propietario":12,
-        "nroescritura":1,
-        "nombre": "Juan",
-        "apellido":"Perez",
-        "dni":"123456789",
-        "estadocivil":"Casado",
-        "porcentaje":"100%"
+        "porcentaje":"50%"
     }
+   
 ]

@@ -13,7 +13,6 @@ import { LoginPage, protegerRuta, redirigirSiHaySesion } from './features/login'
 import LayoutCliente from './shared/layout/LayoutClient'
 import ClientePage from './features/dashCliente/pages/clientePage'
 import { ViewObraPage } from './features/viewObra'
-import { ViewLotePage } from './features/viewLote'
 import { ViewPagoPage } from './features/viewPago'
 import { ObrasPage } from './features/obras'
 import { TerrenosPage } from './features/terrenos'
@@ -61,7 +60,7 @@ export const router = createBrowserRouter([
       { index: true, element: <ClientePage /> },
       { path: 'obras/:id', element: <ViewObraPage /> },
       { path: 'obras/:idObra/tareas/:idTarea', element: <ViewPagoPage /> },
-      { path: 'lotes/:nrolote', element: <ViewLotePage /> },
+      { path: 'lotes/:nrolote', element: <TerrenosPage /> },
     ]
   },
   
