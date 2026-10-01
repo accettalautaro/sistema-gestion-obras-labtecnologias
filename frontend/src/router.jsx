@@ -1,7 +1,8 @@
 import { createBrowserRouter } from 'react-router-dom'
 import LayoutPublico from './shared/layout/LayoutPublico'
-import LayoutPrivado from './shared/layout/LayoutPrivado'
+import LayoutGestor from './shared/layout/LayoutGestor'
 import NoEncontradaPage from './shared/pages/NoEncontradaPage'
+import Spinner from './shared/components/Spinner'
 import { HomePage, ProyectosPage, ProyectoPage } from './features/home'
 import { ContactoPage } from './features/contacto'
 import { PrincipalPage } from './features/principal'
@@ -9,6 +10,10 @@ import { ClientesPage } from './features/clientes'
 import { PagosPage } from './features/pagos'
 import { RecordatoriosPage } from './features/recordatorios'
 import { LoginPage, protegerRuta, redirigirSiHaySesion } from './features/login'
+import LayoutCliente from './shared/layout/LayoutClient'
+import ClientePage from './features/dashCliente/pages/clientePage'
+import { ViewObraPage } from './features/viewObra'
+import { ViewPagoPage } from './features/viewPago'
 import { ObrasPage } from './features/obras'
 import { TerrenosPage } from './features/terrenos'
 
@@ -22,6 +27,7 @@ export const router = createBrowserRouter([
       { path: 'contacto', element: <ContactoPage /> },
       { path: 'login', element: <LoginPage />,
         loader: redirigirSiHaySesion,
+        hydrateFallbackElement: <Spinner />
 
       },
       { path: 'proyectos', element: <ProyectosPage /> },
@@ -31,8 +37,10 @@ export const router = createBrowserRouter([
   },
   {
     path: '/principal',
-    element: <LayoutPrivado />,
+    element: <LayoutGestor />,
     loader: protegerRuta,
+    hydrateFallbackElement: <Spinner />,
+    errorElement: <NoEncontradaPage />,
     children: [
       { index: true, element: <PrincipalPage /> },
       { path: 'clientes', element: <ClientesPage /> },
@@ -42,5 +50,18 @@ export const router = createBrowserRouter([
       { path: 'recordatorios', element: <RecordatoriosPage /> },
     ]
   },
-  { path: '*', element: <NoEncontradaPage /> },
+  {
+    path: '/cliente',
+    element: <LayoutCliente />,
+    loader: protegerRuta,
+    hydrateFallbackElement: <Spinner />,
+    errorElement: <NoEncontradaPage />,
+    children: [
+      { index: true, element: <ClientePage /> },
+      { path: 'obras/:id', element: <ViewObraPage /> },
+      { path: 'obras/:idObra/tareas/:idTarea', element: <ViewPagoPage /> },
+      { path: 'lotes/:nrolote', element: <TerrenosPage /> },
+    ]
+  },
+  
 ])
