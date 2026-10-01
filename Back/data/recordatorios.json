@@ -1,0 +1,12 @@
+[
+    {
+        "id": 1,
+        "mensaje": "Reunión con cliente para obra 1",
+        "fecha": "2026-10-02"
+    },
+    {
+        "id": 2,
+        "mensaje": "Revisión de materiales retrasados",
+        "fecha": "2026-09-29"
+    }
+]

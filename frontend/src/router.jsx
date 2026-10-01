@@ -7,6 +7,7 @@ import { ContactoPage } from './features/contacto'
 import { PrincipalPage } from './features/principal'
 import { ClientesPage } from './features/clientes'
 import { PagosPage } from './features/pagos'
+import { RecordatoriosPage } from './features/recordatorios'
 import { LoginPage, protegerRuta, redirigirSiHaySesion } from './features/login'
 
 
@@ -34,6 +35,7 @@ export const router = createBrowserRouter([
       { index: true, element: <PrincipalPage /> },
       { path: 'clientes', element: <ClientesPage /> },
       { path: 'pagos', element: <PagosPage /> },
+      { path: 'recordatorios', element: <RecordatoriosPage /> },
     ]
   },
   { path: '*', element: <NoEncontradaPage /> },
