@@ -6,7 +6,17 @@
         "apellido":"Perez",
         "dni":"123456789",
         "estadocivil":"Casado",
-        "porcentaje":"100%"
+        "porcentaje":"50%"
         
+    },
+    {
+        "id-propietario":2,
+        "nroescritura":1,
+        "nombre": "Maria",
+        "apellido":"Rios",
+        "dni":"987654321",
+        "estadocivil":"Casado",
+        "porcentaje":"50%"
     }
+   
 ]

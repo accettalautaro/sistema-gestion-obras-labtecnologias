@@ -1,12 +1,34 @@
 [
     {
-        "id": 1,
-        "mensaje": "Reunión con cliente para obra 1",
-        "fecha": "2026-10-02"
+        "id-recordatorio":1,
+        "id-cliente":1,
+        "id-obra":1,
+        "fecha": "2026-09-29",
+        "descripcion": "Recordatorio de tarea ejemplo",
+        "estado": "pendiente"
     },
     {
-        "id": 2,
-        "mensaje": "Revisión de materiales retrasados",
-        "fecha": "2026-09-29"
+        "id-recordatorio":2,
+        "id-cliente":1,
+        "id-obra":2,
+        "fecha": "2026-09-29",
+        "descripcion": "Recordatorio de tarea ejemplo",
+        "estado": "pendiente"
+    },
+    {
+        "id-recordatorio":3,
+        "id-cliente":1,
+        "id-obra":2,
+        "fecha": "2026-09-29",
+        "descripcion": "Recordatorio de tarea ejemplo",
+        "estado": "pendiente"
+    },
+    {
+        "id-recordatorio":4,
+        "id-cliente":1,
+        "id-obra":2,
+        "fecha": "2026-09-29",
+        "descripcion": "Recordatorio de tarea ejemplo",
+        "estado": "pendiente"
     }
 ]

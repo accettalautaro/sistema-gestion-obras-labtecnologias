@@ -21,7 +21,11 @@ function LoginPage() {
         }
         
         // 3. Redirigimos
-        navigate('/principal')
+        if (sesionData.rol === 'administrador') {
+            navigate('/principal')
+        } else {
+            navigate('/cliente')
+        }
     }
 
     return (

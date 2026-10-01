@@ -22,7 +22,10 @@ const FORMULARIO_TERRENO_VACIO = {
 }
 
 function TerrenosPage() {
-	const { esArquitecto } = useOutletContext()
+	const contexto = useOutletContext() || {}
+	const esArquitecto = contexto.esArquitecto
+	const esCliente = contexto.esCliente
+	const modoConsulta = esCliente || !esArquitecto
 	const { nrolote } = useParams()
 	const [busqueda, setBusqueda] = useState('')
 	const [mostrarFormulario, setMostrarFormulario] = useState(false)
@@ -30,8 +33,8 @@ function TerrenosPage() {
 	const [formulario, setFormulario] = useState(FORMULARIO_TERRENO_VACIO)
 	const { datos: lotes = [], cargando, error } = useFetch(listarTerrenos)
 
-	if (esArquitecto === null) return <p className="terrenos-page__estado" role="status">Verificando acceso de arquitecto...</p>
-	if (!esArquitecto) return <div className="alert alert-danger" role="alert">Esta pantalla está disponible únicamente para cuentas vinculadas a un arquitecto.</div>
+	if (esArquitecto === undefined && esCliente === undefined) return <p className="terrenos-page__estado" role="status">Verificando acceso...</p>
+	if (!esArquitecto && !esCliente) return <div className="alert alert-danger" role="alert">Esta pantalla está disponible únicamente para cuentas autorizadas.</div>
 	if (cargando) return <p className="terrenos-page__estado" role="status">Cargando terrenos...</p>
 	if (error) return <div className="alert alert-danger" role="alert">{error.message}</div>
 
@@ -41,7 +44,7 @@ function TerrenosPage() {
 		return [lote.nrolote, direccion?.calle, direccion?.altura, direccion?.localidad, direccion?.provincia]
 			.some((valor) => String(valor ?? '').toLowerCase().includes(busqueda.trim().toLowerCase()))
 	})
-	if (nrolote && !terreno) return <section className="terrenos-page"><div className="alert alert-warning">No se encontró el lote {nrolote}.</div><Link className="btn btn-outline-secondary" to="/principal/terrenos">Volver a terrenos</Link></section>
+	if (nrolote && !terreno) return <section className="terrenos-page"><div className="alert alert-warning">No se encontró el lote {nrolote}.</div><Link className="btn btn-outline-secondary" onClick={() => window.history.back()}>Volver</Link></section>
 
 	const cambiarCampo = (event) => setFormulario((actual) => ({ ...actual, [event.target.name]: event.target.value }))
 	const enviarFormulario = (event) => {
@@ -55,7 +58,7 @@ function TerrenosPage() {
 			{!terreno && !mostrarFormulario && <span className="terrenos-page__count">{lotes.length} {lotes.length === 1 ? 'lote' : 'lotes'}</span>}
 		</header>
 		{terreno ? <>
-			<Link className="terrenos-page__volver" to="/principal/terrenos">← Volver al listado</Link>
+			<button className="terrenos-page__volver btn btn-link text-decoration-none p-0" type="button" onClick={() => window.history.back()}>← Volver</button>
 			<div className="terrenos-page__detalle">
 				<section className="terrenos-page__panel"><div className="terrenos-page__panel-titulo"><div><h2>Ubicación</h2><p>Dirección asociada al lote</p></div></div>
 					{terreno.direcciones.length ? terreno.direcciones.map((direccion) => <dl className="terrenos-page__datos" key={direccion['id-direc'] ?? `${direccion.calle}-${direccion.altura}`}>
@@ -68,11 +71,11 @@ function TerrenosPage() {
 				</section>
 				<TarjetaPendiente titulo="Propietarios" detalle="Personas asociadas a la escritura del lote">
 					{terreno.escrituras.some((escritura) => escritura.propietarios.length) ? terreno.escrituras.flatMap((escritura) => escritura.propietarios.map((propietario) => <dl className="terrenos-page__datos terrenos-page__propietario" key={propietario['id-propietario']}><div><dt>Nombre</dt><dd>{[propietario.nombre, propietario.apellido].filter(Boolean).join(' ') || 'Sin información'}</dd></div><div><dt>DNI</dt><dd>{mostrar(propietario.dni)}</dd></div><div><dt>Estado civil</dt><dd>{mostrar(propietario.estadocivil)}</dd></div><div><dt>Porcentaje</dt><dd>{mostrar(propietario.porcentaje)}</dd></div></dl>)) : <p className="terrenos-page__vacio">No hay propietarios asociados en los datos disponibles.</p>}
-					<button className="btn btn-outline-secondary" type="button" disabled title="Disponible cuando se implemente el backend">Gestionar propietarios</button>
+					{!modoConsulta && <button className="btn btn-outline-secondary" type="button" disabled title="Disponible cuando se implemente el backend">Gestionar propietarios</button>}
 				</TarjetaPendiente>
 				<TarjetaPendiente titulo="Documentos" detalle="Escrituras registradas para el lote">
 					{terreno.escrituras.length ? <ul className="terrenos-page__documentos">{terreno.escrituras.map((escritura) => <li key={escritura.nroescritura}>Escritura N.º {mostrar(escritura.nroescritura)}</li>)}</ul> : <p className="terrenos-page__vacio">No hay escrituras registradas.</p>}
-					<div className="terrenos-page__acciones"><button className="btn btn-outline-secondary" type="button" disabled title="Disponible cuando se implemente el backend">Cargar documento</button><button className="btn btn-outline-danger" type="button" disabled title="Disponible cuando se implemente el backend">Eliminar documento</button></div>
+					{!modoConsulta && <div className="terrenos-page__acciones"><button className="btn btn-outline-secondary" type="button" disabled title="Disponible cuando se implemente el backend">Cargar documento</button><button className="btn btn-outline-danger" type="button" disabled title="Disponible cuando se implemente el backend">Eliminar documento</button></div>}
 				</TarjetaPendiente>
 				{terreno.obras.length > 0 && <section className="terrenos-page__panel"><div className="terrenos-page__panel-titulo"><div><h2>Obras asociadas</h2><p>Obras vinculadas a este lote</p></div></div><ul className="terrenos-page__documentos">{terreno.obras.map((obra) => <li key={obra['id-obra']}>Obra #{obra['id-obra']} · {obra.Estado ?? 'Estado sin información'}</li>)}</ul></section>}
 			</div>
@@ -109,11 +112,11 @@ function TerrenosPage() {
 				{lotesFiltrados.map((lote) => {
 					const direccion = lote.direcciones[0]
 					const ubicacion = direccion ? [direccion.calle, direccion.altura, direccion.localidad, direccion.provincia].filter(Boolean).join(', ') : 'Ubicación sin información'
-					return <article className="terrenos-page__tarjeta" key={lote.nrolote}><div><span className="terrenos-page__etiqueta">Lote</span><h2>{lote.nrolote}</h2><p>{ubicacion}</p><small>{lote.mensuras.length ? `${lote.mensuras[0].ancho ?? '—'} × ${lote.mensuras[0].largo ?? '—'} m` : 'Sin mensura registrada'}</small></div><Link className="btn btn-dark" to={`/principal/terrenos/${lote.nrolote}`}>Consultar terreno</Link></article>
+					return <article className="terrenos-page__tarjeta" key={lote.nrolote}><div><span className="terrenos-page__etiqueta">Lote</span><h2>{lote.nrolote}</h2><p>{ubicacion}</p><small>{lote.mensuras.length ? `${lote.mensuras[0].ancho ?? '—'} × ${lote.mensuras[0].largo ?? '—'} m` : 'Sin mensura registrada'}</small></div><Link className="btn btn-dark" to={`${esCliente ? '/cliente/lotes/' : '/principal/terrenos/'}${lote.nrolote}`}>Consultar terreno</Link></article>
 				})}
 				{!lotesFiltrados.length && <p className="terrenos-page__vacio">{busqueda ? 'No hay terrenos que coincidan con la búsqueda.' : 'Todavía no hay lotes en los archivos JSON.'}</p>}
 			</div>
-			<div className="terrenos-page__carga"><div><h2>¿Necesitás registrar otro terreno?</h2><p>Podés completar los datos; el guardado se habilitará en una próxima etapa.</p></div><button className="btn btn-outline-secondary" type="button" onClick={() => setMostrarFormulario(true)}>Cargar terreno</button></div>
+			{!modoConsulta && <div className="terrenos-page__carga"><div><h2>¿Necesitás registrar otro terreno?</h2><p>Podés completar los datos; el guardado se habilitará en una próxima etapa.</p></div><button className="btn btn-outline-secondary" type="button" onClick={() => setMostrarFormulario(true)}>Cargar terreno</button></div>}
 		</>}
 		{mostrarAvisoCarga && <div className="terrenos-page__modal-fondo" onMouseDown={(event) => { if (event.target === event.currentTarget) setMostrarAvisoCarga(false) }}>
 			<section className="terrenos-page__modal" role="dialog" aria-modal="true" aria-labelledby="terreno-modal-titulo" aria-describedby="terreno-modal-descripcion">

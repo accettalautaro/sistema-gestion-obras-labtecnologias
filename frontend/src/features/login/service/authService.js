@@ -44,7 +44,11 @@ export function protegerRuta() {
   return sesion 
 }
 export function redirigirSiHaySesion() {
-  if (obtenerSesion()) {
+  const sesion = obtenerSesion()
+  if (sesion) {
+    if (sesion.rol === 'cliente') {
+      throw redirect('/cliente')
+    }
     throw redirect('/principal')
   }
   return null

@@ -9,10 +9,6 @@ const ENLACES_GESTOR = [
 
   { id: 3, texto: 'Gestión de obras', destino: '/principal/obras', disponible: true, requiereArquitecto: true },
   { id: 7, texto: 'Gestión de terrenos', destino: '/principal/terrenos', disponible: true, requiereArquitecto: true },
-  { id: 4, texto: 'Productos', destino: '/principal/productos', disponible: false },
-  { id: 5, texto: 'Pedidos', destino: '/principal/pedidos', disponible: false },
-  { id: 6, texto: 'Gestión de pagos', destino: '/principal/pagos', disponible: true, requiereArquitecto: true },
-
   { id: 5, texto: 'Gestión de pagos', destino: '/principal/pagos', disponible: true, requiereArquitecto: true },
   { id: 6, texto: 'Recordatorios', destino: '/principal/recordatorios', disponible: true },
 
