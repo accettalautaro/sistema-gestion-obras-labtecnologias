@@ -115,6 +115,18 @@
 	font-weight: 500;
 }
 
+.sidebar-gestor .nav-link .badge.bg-danger {
+	background: #a34242 !important;
+	color: #ffffff !important;
+	border-color: #923a3a;
+}
+
+.sidebar-gestor .nav-link .badge.bg-warning {
+	background: #a76628 !important;
+	color: #ffffff !important;
+	border-color: #965a22;
+}
+
 .layout-gestor > .d-flex.flex-grow-1 > main {
 	background: #f7f6f3;
 	min-width: 0;

@@ -1,10 +1,18 @@
 [
     {
-        "id-obra":1,
-        "id-cliente":1,
-        "id-arquitecto":1,
-        "nrolote":450,  
-        "Estado":"En ejecución",
-        "porcentaje":"50%"
+        "id-obra": 1,
+        "id-cliente": 1,
+        "id-arquitecto": 1,
+        "nrolote": 450,
+        "Estado": "En ejecución",
+        "porcentaje": "50%"
+    },
+    {
+        "id-obra": 2,
+        "id-cliente": 2,
+        "id-arquitecto": 1,
+        "nrolote": 1024,
+        "Estado": "En ejecución",
+        "porcentaje": "10%"
     }
 ]
