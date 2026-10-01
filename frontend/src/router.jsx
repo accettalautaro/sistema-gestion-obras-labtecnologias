@@ -9,6 +9,7 @@ import { ClientesPage } from './features/clientes'
 import { PagosPage } from './features/pagos'
 import { LoginPage, protegerRuta, redirigirSiHaySesion } from './features/login'
 import { ObrasPage } from './features/obras'
+import { TerrenosPage } from './features/terrenos'
 
 
 export const router = createBrowserRouter([
@@ -35,6 +36,7 @@ export const router = createBrowserRouter([
       { index: true, element: <PrincipalPage /> },
       { path: 'clientes', element: <ClientesPage /> },
       { path: 'obras', element: <ObrasPage /> },
+      { path: 'terrenos/:nrolote?', element: <TerrenosPage /> },
       { path: 'pagos', element: <PagosPage /> },
     ]
   },
