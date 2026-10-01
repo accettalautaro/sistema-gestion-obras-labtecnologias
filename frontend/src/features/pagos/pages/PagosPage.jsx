@@ -31,28 +31,28 @@ function FilaPago({ pago }) {
             <tr>
                 <td>#{pago['id-pago']}</td>
                 <td>
-                    <input 
-                        type="text" 
-                        className="form-control form-control-sm" 
-                        value={datosEdicion['id-tarea']} 
+                    <input
+                        type="text"
+                        className="form-control form-control-sm"
+                        value={datosEdicion['id-tarea']}
                         onChange={e => setDatosEdicion({...datosEdicion, 'id-tarea': e.target.value})}
                     />
                 </td>
                 <td>
-                    <input 
-                        type="text" 
-                        className="form-control form-control-sm" 
-                        value={datosEdicion.descripcion} 
+                    <input
+                        type="text"
+                        className="form-control form-control-sm"
+                        value={datosEdicion.descripcion}
                         onChange={e => setDatosEdicion({...datosEdicion, descripcion: e.target.value})}
                     />
                 </td>
                 <td>
                     <div className="input-group input-group-sm">
                         <span className="input-group-text">$</span>
-                        <input 
-                            type="number" 
-                            className="form-control" 
-                            value={datosEdicion.monto} 
+                        <input
+                            type="number"
+                            className="form-control"
+                            value={datosEdicion.monto}
                             onChange={e => setDatosEdicion({...datosEdicion, monto: e.target.value})}
                         />
                     </div>
@@ -105,8 +105,8 @@ function ObraSeccionPagos({ obra, pagosDeLaObra, totalObra }) {
             <div className="pagos-page__toolbar">
                 <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                     <h2>Obra Lote #{obra.nrolote} (Estado: {obra.Estado})</h2>
-                    <button 
-                        className="btn btn-sm btn-outline-secondary pagos-page__btn-desplegar" 
+                    <button
+                        className="btn btn-sm btn-outline-secondary pagos-page__btn-desplegar"
                         onClick={() => setDesplegado(!desplegado)}
                         aria-expanded={desplegado}
                     >
@@ -146,7 +146,7 @@ function PagosPage() {
 	const { esArquitecto } = useOutletContext()
     const [version, setVersion] = useState(0)
 	const { datos, cargando, error } = useFetch(listarPagos, version)
-    
+
     const [formulario, setFormulario] = useState(FORMULARIO_VACIO)
     const [guardando, setGuardando] = useState(false)
     const [errorMutacion, setErrorMutacion] = useState('')
@@ -170,7 +170,8 @@ function PagosPage() {
         setErrorMutacion('')
         setExito('')
         try {
-            await crearPago(formulario)
+            await crearPago()
+            setVersion((actual) => actual + 1)
             setExito('Formulario funcional. La conexión a la base de datos se implementará en el futuro.')
             setFormulario(FORMULARIO_VACIO)
         } catch (motivo) {
@@ -200,11 +201,11 @@ function PagosPage() {
                     const totalObra = pagosDeLaObra.reduce((acc, curr) => acc + (Number(curr.monto) || 0), 0)
 
                     return (
-                        <ObraSeccionPagos 
-                            key={obra['id-obra']} 
-                            obra={obra} 
-                            pagosDeLaObra={pagosDeLaObra} 
-                            totalObra={totalObra} 
+                        <ObraSeccionPagos
+                            key={obra['id-obra']}
+                            obra={obra}
+                            pagosDeLaObra={pagosDeLaObra}
+                            totalObra={totalObra}
                         />
                     )
                 })}
