@@ -1,4 +1,4 @@
-import { createBrowserRouter, redirect } from 'react-router-dom'
+import { createBrowserRouter } from 'react-router-dom'
 import LayoutPublico from './shared/layout/LayoutPublico'
 import LayoutGestor from './shared/layout/LayoutGestor'
 import NoEncontradaPage from './shared/pages/NoEncontradaPage'
@@ -15,6 +15,8 @@ import ClientePage from './features/dashCliente/pages/clientePage'
 import { ViewObraPage } from './features/viewObra'
 import { ViewLotePage } from './features/viewLote'
 import { ViewPagoPage } from './features/viewPago'
+import { ObrasPage } from './features/obras'
+import { TerrenosPage } from './features/terrenos'
 
 
 export const router = createBrowserRouter([
@@ -43,6 +45,8 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <PrincipalPage /> },
       { path: 'clientes', element: <ClientesPage /> },
+      { path: 'obras', element: <ObrasPage /> },
+      { path: 'terrenos/:nrolote?', element: <TerrenosPage /> },
       { path: 'pagos', element: <PagosPage /> },
       { path: 'recordatorios', element: <RecordatoriosPage /> },
     ]

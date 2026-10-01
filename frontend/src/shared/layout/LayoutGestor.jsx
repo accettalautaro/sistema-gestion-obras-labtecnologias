@@ -6,8 +6,16 @@ import { obtenerDatosRecordatorios } from '../../features/recordatorios/services
 const ENLACES_GESTOR = [
   { id: 1, texto: 'Inicio', destino: '/principal', disponible: true },
   { id: 2, texto: 'Gestión de clientes', destino: '/principal/clientes', disponible: true, requiereArquitecto: true },
+
+  { id: 3, texto: 'Gestión de obras', destino: '/principal/obras', disponible: true, requiereArquitecto: true },
+  { id: 7, texto: 'Gestión de terrenos', destino: '/principal/terrenos', disponible: true, requiereArquitecto: true },
+  { id: 4, texto: 'Productos', destino: '/principal/productos', disponible: false },
+  { id: 5, texto: 'Pedidos', destino: '/principal/pedidos', disponible: false },
+  { id: 6, texto: 'Gestión de pagos', destino: '/principal/pagos', disponible: true, requiereArquitecto: true },
+
   { id: 5, texto: 'Gestión de pagos', destino: '/principal/pagos', disponible: true, requiereArquitecto: true },
   { id: 6, texto: 'Recordatorios', destino: '/principal/recordatorios', disponible: true },
+
 ]
 
 function LayoutGestor() {
@@ -17,9 +25,7 @@ function LayoutGestor() {
 
   // ¡Magia! Leemos el rol directamente de la sesión. 
   // (Si en tu sistema el arquitecto usa la cuenta de administrador, lo validas así):
-  const esArquitecto = usuario?.rol === 'administrador'
-  // Si luego agregas usuarios con `"rol": "arquitecto"`, simplemente cambias la validación a:
-  // const esArquitecto = usuario?.rol === 'administrador' || usuario?.rol === 'arquitecto'
+  const esArquitecto = usuario?.rol === 'administrador' || usuario?.rol === 'arquitecto'
 
   const handleCerrarSesion = () => {
     cerrarSesion()

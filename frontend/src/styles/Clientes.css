@@ -151,6 +151,68 @@
 	margin-top: 1.1rem;
 }
 
+.clientes-page__formulario-header {
+	align-items: flex-start;
+	display: flex;
+	gap: 1rem;
+	justify-content: space-between;
+}
+
+.clientes-page__formulario-header p {
+	color: #65736e;
+	font-size: 0.85rem;
+	margin: 0.35rem 0 0;
+}
+
+.clientes-page__modal-fondo {
+	align-items: center;
+	background: rgba(24, 37, 32, 0.55);
+	display: flex;
+	inset: 0;
+	justify-content: center;
+	padding: 1rem;
+	position: fixed;
+	z-index: 1100;
+}
+
+.clientes-page__modal {
+	background: #fff;
+	border-radius: 0.4rem;
+	box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.2);
+	max-width: 32rem;
+	padding: 1.35rem;
+	width: 100%;
+}
+
+.clientes-page__modal-cabecera {
+	align-items: center;
+	border-bottom: 1px solid #dfe4e1;
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 1rem;
+	padding-bottom: 0.8rem;
+}
+
+.clientes-page__modal-cabecera h2 {
+	color: #263f37;
+	font-size: 1.2rem;
+	margin: 0;
+}
+
+.clientes-page__modal-cerrar {
+	background: none;
+	border: 0;
+	color: #65736e;
+	font-size: 1.7rem;
+	line-height: 1;
+}
+
+.clientes-page__modal-acciones {
+	display: flex;
+	justify-content: flex-end;
+	margin-top: 1rem;
+}
+
 @media (max-width: 1050px) {
 	.clientes-page__workspace {
 		grid-template-columns: 1fr;
@@ -175,5 +237,10 @@
 	.clientes-page__listado,
 	.clientes-page__formulario {
 		padding: 0.85rem;
+	}
+
+	.clientes-page__formulario-header {
+		align-items: stretch;
+		flex-direction: column;
 	}
 }
