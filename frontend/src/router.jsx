@@ -7,6 +7,8 @@ import { HomePage, ProyectosPage, ProyectoPage } from './features/home'
 import { ContactoPage } from './features/contacto'
 import { PrincipalPage } from './features/principal'
 import { ClientesPage } from './features/clientes'
+import { PagosPage } from './features/pagos'
+import { RecordatoriosPage } from './features/recordatorios'
 import { LoginPage, protegerRuta, redirigirSiHaySesion } from './features/login'
 import LayoutCliente from './shared/layout/LayoutClient'
 import ClientePage from './features/dashCliente/pages/clientePage'
@@ -38,6 +40,8 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <PrincipalPage /> },
       { path: 'clientes', element: <ClientesPage /> },
+      { path: 'pagos', element: <PagosPage /> },
+      { path: 'recordatorios', element: <RecordatoriosPage /> },
     ]
   },
   {

@@ -1,0 +1,179 @@
+.pagos-page {
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+	margin: 0 auto;
+	max-width: 1480px;
+	padding: clamp(1.25rem, 3vw, 2.5rem);
+}
+
+.pagos-page__header {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	padding-bottom: 1.5rem;
+	border-bottom: 1px solid var(--bs-border-color);
+}
+
+.pagos-page__eyebrow {
+	font-size: 0.875rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	color: #65736e;
+	margin-bottom: 0.5rem;
+}
+
+.pagos-page__header h1 {
+	font-size: 2rem;
+	font-weight: 700;
+	margin-bottom: 0.25rem;
+}
+
+.pagos-page__header p:last-child {
+	color: #a76628;
+	margin: 0;
+}
+
+.pagos-page__count {
+	background-color: var(--bs-tertiary-bg);
+	color: var(--bs-emphasis-color);
+	padding: 0.5rem 1rem;
+	border-radius: 2rem;
+	font-size: 0.875rem;
+	font-weight: 500;
+}
+
+.pagos-page__workspace {
+	background-color: var(--bs-body-bg);
+	border: 1px solid var(--bs-border-color);
+	border-radius: 0.75rem;
+	overflow: hidden;
+}
+
+.pagos-page__listado {
+	padding: 1.5rem;
+}
+
+.pagos-page__toolbar {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 1.5rem;
+}
+
+.pagos-page__toolbar h2 {
+	font-size: 1.25rem;
+	font-weight: 600;
+	margin: 0;
+}
+
+.pagos-page__tabla {
+	margin: 0;
+}
+
+.pagos-page__tabla th {
+	font-size: 0.875rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	color: var(--bs-secondary);
+	border-bottom-width: 2px;
+	padding-bottom: 1rem;
+}
+
+.pagos-page__tabla td {
+	padding: 1rem 0.5rem;
+}
+
+.pagos-page__monto {
+	font-weight: 600;
+	color: var(--bs-success);
+}
+
+.pagos-page__vacio {
+	text-align: center;
+	padding: 3rem !important;
+	color: var(--bs-secondary);
+	font-style: italic;
+}
+
+/* Formulario */
+.pagos-page__formulario {
+	padding: 1.5rem;
+	background-color: var(--bs-light);
+	border-top: 1px solid var(--bs-border-color);
+}
+
+.pagos-page__campos {
+	display: grid;
+	gap: 1rem;
+	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.pagos-page__campos label {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	font-size: 0.875rem;
+	font-weight: 600;
+	color: var(--bs-heading-color);
+}
+
+.pagos-page__campo-completo {
+	grid-column: 1 / -1;
+}
+
+.pagos-page__form-actions {
+	display: flex;
+	justify-content: flex-end;
+	margin-top: 1.5rem;
+}
+
+.pagos-page__btn-submit {
+	transition: background-color .2s ease, border-color .2s ease, transform .2s ease;
+}
+
+.pagos-page__btn-submit:hover:not(:disabled) {
+	background-color: #a76628 !important;
+	border-color: #a76628 !important;
+	transform: translateY(-1px);
+}
+
+.pagos-page__badge-obra {
+	background-color: #fdfaf6;
+	color: #a76628;
+	border: 1px solid #a76628;
+	font-weight: 600;
+}
+
+.pagos-page__formulario .form-control:focus,
+.pagos-page__formulario .form-select:focus {
+	border-color: #a76628;
+	box-shadow: 0 0 0 0.25rem rgba(167, 102, 40, 0.25);
+}
+
+/* Animación de desplegable de lista de pagos */
+.pagos-page__desplegable {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.3s ease-out;
+}
+
+.pagos-page__desplegable.abierto {
+    grid-template-rows: 1fr;
+}
+
+.pagos-page__desplegable-inner {
+    overflow: hidden;
+}
+
+.pagos-page__btn-desplegar {
+    transition: background-color .2s ease, border-color .2s ease, color .2s ease;
+}
+
+.pagos-page__btn-desplegar:hover {
+    background-color: #a76628 !important;
+    border-color: #a76628 !important;
+    color: #fff !important;
+}
