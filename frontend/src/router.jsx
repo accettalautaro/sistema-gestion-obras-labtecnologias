@@ -48,6 +48,7 @@ export const router = createBrowserRouter([
       { path: 'seguimiento', element: <SeleccionarSeguimientoPage /> },
       { path: 'obras/:id/avance', element: <SeguimientoObraPage /> },
       { path: 'terrenos/:nrolote?', element: <TerrenosPage /> },
+      { path: 'terrenos/:nrolote/propietarios', element: <PropietariosPage /> },
       { path: 'pagos', element: <PagosPage /> },
       { path: 'recordatorios', element: <RecordatoriosPage /> },
     ]

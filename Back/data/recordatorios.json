@@ -1,34 +1,34 @@
 [
     {
-        "id-recordatorio":1,
-        "id-cliente":1,
-        "id-obra":1,
+        "id-recordatorio": 1,
+        "id-cliente": 1,
+        "id-obra": 1,
         "fecha": "2026-09-29",
-        "descripcion": "Recordatorio de tarea ejemplo",
+        "descripcion": "Recordatorio de tarea ejemplo 1",
         "estado": "pendiente"
     },
     {
-        "id-recordatorio":2,
-        "id-cliente":1,
-        "id-obra":2,
+        "id-recordatorio": 2,
+        "id-cliente": 1,
+        "id-obra": 2,
         "fecha": "2026-09-29",
-        "descripcion": "Recordatorio de tarea ejemplo",
+        "descripcion": "Recordatorio de tarea ejemplo 2",
         "estado": "pendiente"
     },
     {
-        "id-recordatorio":3,
-        "id-cliente":1,
-        "id-obra":2,
-        "fecha": "2026-09-29",
-        "descripcion": "Recordatorio de tarea ejemplo",
+        "id-recordatorio": 3,
+        "id-cliente": 1,
+        "id-obra": 2,
+        "fecha": "2026-10-05",
+        "descripcion": "Recordatorio de tarea ejemplo 3",
         "estado": "pendiente"
     },
     {
-        "id-recordatorio":4,
-        "id-cliente":1,
-        "id-obra":2,
-        "fecha": "2026-09-29",
-        "descripcion": "Recordatorio de tarea ejemplo",
+        "id-recordatorio": 4,
+        "id-cliente": 1,
+        "id-obra": 2,
+        "fecha": "2026-10-29",
+        "descripcion": "Recordatorio de tarea ejemplo 4",
         "estado": "pendiente"
     }
 ]

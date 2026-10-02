@@ -71,7 +71,7 @@ function TerrenosPage() {
 				</section>
 				<TarjetaPendiente titulo="Propietarios" detalle="Personas asociadas a la escritura del lote">
 					{terreno.escrituras.some((escritura) => escritura.propietarios.length) ? terreno.escrituras.flatMap((escritura) => escritura.propietarios.map((propietario) => <dl className="terrenos-page__datos terrenos-page__propietario" key={propietario['id-propietario']}><div><dt>Nombre</dt><dd>{[propietario.nombre, propietario.apellido].filter(Boolean).join(' ') || 'Sin información'}</dd></div><div><dt>DNI</dt><dd>{mostrar(propietario.dni)}</dd></div><div><dt>Estado civil</dt><dd>{mostrar(propietario.estadocivil)}</dd></div><div><dt>Porcentaje</dt><dd>{mostrar(propietario.porcentaje)}</dd></div></dl>)) : <p className="terrenos-page__vacio">No hay propietarios asociados en los datos disponibles.</p>}
-					{!modoConsulta && <button className="btn btn-outline-secondary" type="button" disabled title="Disponible cuando se implemente el backend">Gestionar propietarios</button>}
+					{!modoConsulta && <Link className="btn btn-outline-secondary" to={`/principal/terrenos/${terreno.nrolote}/propietarios`}>Gestionar propietarios</Link>}
 				</TarjetaPendiente>
 				<TarjetaPendiente titulo="Documentos" detalle="Escrituras registradas para el lote">
 					{terreno.escrituras.length ? <ul className="terrenos-page__documentos">{terreno.escrituras.map((escritura) => <li key={escritura.nroescritura}>Escritura N.º {mostrar(escritura.nroescritura)}</li>)}</ul> : <p className="terrenos-page__vacio">No hay escrituras registradas.</p>}

@@ -35,30 +35,38 @@ function LayoutGestor() {
   let recordatoriosProximos = 0;
 
   if (datosRec) {
-      const hoy = new Date('2026-09-30T00:00:00');
-      const calcularDiff = (fechaStr) => {
-          if (!fechaStr) return null;
-          const fecha = new Date(fechaStr + 'T00:00:00');
-          return Math.ceil((fecha.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24));
-      };
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    const calcularDiff = (fechaStr) => {
+      if (!fechaStr) return null;
+      const partes = fechaStr.split('-');
+      const fecha = new Date(partes[0], partes[1] - 1, partes[2]);
+      return Math.round((fecha.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24));
+    };
 
-      const { tareas = [], recordatorios = [] } = datosRec;
+    const { tareas = [], recordatorios = [] } = datosRec;
 
-      tareas.forEach(tarea => {
-          const diffInicio = calcularDiff(tarea.fechaInicio);
-          const diffFin = calcularDiff(tarea.fechaFin);
-          const estado = (tarea.estado || '').toLowerCase();
+    tareas.forEach(tarea => {
+      const diffInicio = calcularDiff(tarea['fecha-inicio']);
+      const diffFin = calcularDiff(tarea['fecha-fin']);
+      const estado = (tarea.estado || '').toLowerCase();
 
-          if (estado === 'sin comenzar') {
-              if (diffInicio < 0) recordatoriosAtrasados++;
-              else if (diffInicio <= 7) recordatoriosProximos++;
-          } else if (estado === 'en ejecucion') {
-              if (diffFin < 0) recordatoriosAtrasados++;
-              else if (diffFin <= 7) recordatoriosProximos++;
-          }
-      });
-      // Los recordatorios personalizados (json) se manejan dentro de la página,
-      // para el badge principal solo contamos las alertas de plazos de tareas.
+      if (estado === 'sin comenzar') {
+        if (diffInicio < 0) recordatoriosAtrasados++;
+        else if (diffInicio <= 15) recordatoriosProximos++;
+      } else if (estado === 'en ejecucion') {
+        if (diffFin < 0) recordatoriosAtrasados++;
+        else if (diffFin <= 15) recordatoriosProximos++;
+      }
+    });
+
+    recordatorios.forEach(rec => {
+      const diff = calcularDiff(rec.fecha);
+      if (diff !== null) {
+        if (diff < 0) recordatoriosAtrasados++;
+        else if (diff <= 15) recordatoriosProximos++;
+      }
+    });
   }
 
   return (
@@ -105,10 +113,10 @@ function LayoutGestor() {
                 const mostrarBadge = esRecordatorios && (recordatoriosAtrasados > 0 || recordatoriosProximos > 0);
 
                 return (
-                  <NavLink 
-                    key={enlace.id} 
-                    className={`nav-link ${mostrarBadge ? 'd-flex justify-content-between align-items-center' : ''}`} 
-                    to={enlace.destino} 
+                  <NavLink
+                    key={enlace.id}
+                    className={`nav-link ${mostrarBadge ? 'd-flex justify-content-between align-items-center' : ''}`}
+                    to={enlace.destino}
                     end
                   >
                     {enlace.texto}
