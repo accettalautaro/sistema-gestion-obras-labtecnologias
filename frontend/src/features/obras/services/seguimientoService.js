@@ -1,4 +1,6 @@
 import { resumirAvanceTareas, porcentajeTarea } from '../../../shared/utils/avanceObra.js'
+import { listarTareas } from './tareasService.js'
+import { listarPagosParciales } from '../../pagos/services/pagosService.js'
 
 const URL_BASE = '/Back/data'
 
@@ -37,18 +39,19 @@ function construirCronograma(etapas) {
 }
 
 export async function obtenerSeguimientoObra(idObra) {
-	const [obras, clientes, arquitectos, direcciones, tareas] = await Promise.all([
+	const [obras, clientes, arquitectos, direcciones, tareas, pagos] = await Promise.all([
 		leerJson('obras'),
 		leerJson('clientes'),
 		leerJson('arquitectos'),
 		leerJson('direcciones'),
-		leerJson('tareas'),
+		listarTareas(),
+		listarPagosParciales(),
 	])
 	const obra = obras.find((item) => String(item['id-obra']) === String(idObra))
 	if (!obra) throw new Error(`No se encontró la obra #${idObra}.`)
 
 	const tareasObra = tareas.filter((tarea) => String(tarea['id-obra']) === String(obra['id-obra']))
-	const { etapas, completadas, total, avance } = resumirAvanceTareas(tareasObra)
+	const { etapas, completadas, total, avance } = resumirAvanceTareas(tareasObra, pagos)
 	const cliente = clientes.find((item) => String(item['id-cliente']) === String(obra['id-cliente']))
 	const arquitecto = arquitectos.find((item) => String(item['id-arquitecto']) === String(obra['id-arquitecto']))
 	const direccion = direcciones.find((item) => String(item.nrolote) === String(obra.nrolote))

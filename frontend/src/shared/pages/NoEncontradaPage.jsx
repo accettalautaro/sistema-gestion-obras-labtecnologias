@@ -1,4 +1,5 @@
-import { isRouteErrorResponse, Link, useRouteError } from 'react-router'
+import { isRouteErrorResponse, useRouteError } from 'react-router'
+import Volver from '../components/Volver.jsx'
 
 // CLASE 3 · React Router: se usa en dos lugares de router.jsx
 //  - path: '*'      → la URL no coincide con ninguna ruta (404)
@@ -16,9 +17,7 @@ function NoEncontradaPage() {
           ? 'Ocurrió un error inesperado. Probá volver al inicio.'
           : 'La dirección que buscás no existe o fue movida.'}
       </p>
-      <Link to="/" className="btn btn-dark">
-        Volver al inicio
-      </Link>
+      <Volver to="/">Volver al inicio</Volver>
     </div>
   )
 }

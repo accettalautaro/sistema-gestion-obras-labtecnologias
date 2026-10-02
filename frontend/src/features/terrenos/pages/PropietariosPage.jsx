@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
-import { Link, useParams, useOutletContext } from 'react-router-dom'
+import { useParams, useOutletContext } from 'react-router-dom'
 import { listarDatosPropietarios } from '../services/propietariosService.js'
+import Volver from '../../../shared/components/Volver.jsx'
 
 const FORMULARIO_VACIO = { dniUnico: '', nombre: '', apellido: '', dni: '', estadocivil: '', porcentaje: '', nroescritura: '' }
 
@@ -110,7 +111,7 @@ function PropietariosPage() {
 					<p>Administrá las personas asociadas a las escrituras de este lote.</p>
 				</div>
 				<div className="obras-page__header-acciones">
-					<Link className="btn btn-sm btn-outline-secondary" to={`/principal/terrenos/${lote.nrolote}`}>Volver al terreno</Link>
+					<Volver to={`/principal/terrenos/${lote.nrolote}`}>Volver al terreno</Volver>
 				</div>
 			</header>
 			

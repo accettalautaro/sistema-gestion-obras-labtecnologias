@@ -60,11 +60,7 @@ function TarjetaObra({ obra }) {
   return (
     <Link 
       to={`/cliente/obras/${obra.idObra}`}
-      className="card h-100 rounded-3 shadow-sm border-0 text-decoration-none text-body"
-      style={{ transition: 'transform 0.1s ease-in-out', cursor: 'pointer' }}
-      onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.97)'}
-      onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
-      onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+      className="card cliente-obra-card h-100 text-decoration-none text-body"
     >
       <div className="card-body p-4 d-flex flex-column">
         <div className="d-flex justify-content-between align-items-center mb-3 gap-2">
@@ -269,16 +265,17 @@ function ClientePage() {
   const cambiarRec = (campo) => (e) => setFiltrosRec((f) => ({ ...f, [campo]: e.target.value }))
 
   return (
-    <div className="container-fluid px-0">
-      <div className="mb-4">
-        <h4 className="fw-normal mb-1">Bienvenido, {cliente.nombre}</h4>
+    <div className="container-fluid px-0 cliente-dashboard">
+      <header className="cliente-dashboard__bienvenida">
+        <p className="cliente-dashboard__eyebrow">Área de cliente</p>
+        <h1>Bienvenido, {cliente.nombre}</h1>
         <p className="text-muted mb-0 small">Este es el estado actual de tus obras.</p>
-      </div>
+      </header>
 
       <div className="row g-4">
         {/* ================= Buscar obra ================= */}
         <div className="col-12 col-xl-8">
-          <h6 className="text-muted mb-3">TUS OBRAS</h6>
+          <h2 className="cliente-dashboard__titulo-seccion">Tus obras</h2>
 
           <div className="card rounded-3 shadow-sm border-0 mb-3">
             <div className="card-body p-3">
@@ -352,7 +349,7 @@ function ClientePage() {
 
         {/* ================= Visualizar recordatorios ================= */}
         <div className="col-12 col-xl-4">
-          <h6 className="text-muted mb-3">RECORDATORIOS</h6>
+          <h2 className="cliente-dashboard__titulo-seccion">Recordatorios</h2>
 
           <div className="card rounded-3 shadow-sm border-0 mb-3">
             <div className="card-body p-3">

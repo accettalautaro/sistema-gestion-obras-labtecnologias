@@ -134,7 +134,7 @@ function ObraSeccionPagos({ obra, pagosDeLaObra, totalObra, tareas }) {
                                     <th className="text-end" style={{ width: '100px' }}>Acciones</th>
                                 </tr>
                             </thead>
-                            <tbody>
+            <tbody>
                                 {pagosDeLaObra.map((pago) => (
                                     <FilaPago key={pago['id-pago']} pago={pago} tareas={tareas} />
                                 ))}
@@ -177,7 +177,8 @@ function PagosPage() {
         setExito('')
         try {
             await crearPago(formulario)
-            setExito('Formulario funcional. La conexión a la base de datos se implementará en el futuro.')
+            setVersion((actual) => actual + 1)
+            setExito('Pago registrado. El costo real de la tarea se actualizó con este pago parcial.')
             setFormulario(FORMULARIO_VACIO)
         } catch (motivo) {
             setErrorMutacion(motivo.message || 'No se pudo registrar el pago.')

@@ -1,0 +1,40 @@
+.gestionar-tareas { margin: 0 auto; max-width: 1320px; }
+.gestionar-tareas__header, .gestionar-tareas__panel-titulo, .gestionar-tareas__etapa-cabecera, .gestionar-tareas__tarea, .gestionar-tareas__acciones { align-items: center; display: flex; gap: .75rem; justify-content: space-between; }
+.gestionar-tareas__header { border-bottom: 1px solid #d9dedb; margin-bottom: 1rem; padding-bottom: 1rem; }
+.gestionar-tareas__header h1 { color: #213c34; font-size: 1.9rem; margin: 0; }
+.gestionar-tareas__header p:last-child { color: #65736e; margin: .35rem 0 0; }
+.gestionar-tareas__eyebrow { color: #557168; font-size: .72rem; font-weight: 700; margin: 0 0 .25rem; text-transform: uppercase; }
+.gestionar-tareas__grid { display: grid; gap: 1rem; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-bottom: 1rem; }
+.gestionar-tareas__panel { background: #fff; border: 1px solid #dfe4e1; min-width: 0; padding: 1.1rem; }
+.gestionar-tareas__panel--alta { grid-column: 1 / -1; }
+.gestionar-tareas__panel-titulo { border-bottom: 1px solid #e8ece9; margin-bottom: .9rem; padding-bottom: .75rem; }
+.gestionar-tareas__panel-titulo h2 { color: #263f37; font-size: 1.12rem; margin: 0; }
+.gestionar-tareas__contador { background: #e8f0ec; border-radius: 99px; color: #315447; font-size: .78rem; padding: .2rem .5rem; vertical-align: middle; }
+.gestionar-tareas__form { display: grid; gap: .75rem; }
+.gestionar-tareas__form label { color: #3b5149; display: grid; font-size: .82rem; font-weight: 600; gap: .35rem; }
+.gestionar-tareas__fechas { display: grid; gap: .75rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.btn.gestionar-tareas__boton { background: #a76628; border-color: #a76628; color: #fff; }
+.btn.gestionar-tareas__boton:hover, .btn.gestionar-tareas__boton:focus-visible { background: #8e5520; border-color: #8e5520; color: #fff; }
+.gestionar-tareas__acciones { justify-content: flex-end; }
+.gestionar-tareas__listado { margin-bottom: 1.5rem; }
+.gestionar-tareas__etapas { display: grid; gap: .75rem; }
+.gestionar-tareas__etapa { border: 1px solid #e3e8e5; }
+.gestionar-tareas__etapa-cabecera { background: #f7f9f7; padding: .65rem .8rem; }
+.gestionar-tareas__desplegable > summary { cursor: pointer; list-style: none; }
+.gestionar-tareas__desplegable > summary::-webkit-details-marker { display: none; }
+.gestionar-tareas__etapa-cabecera > div { align-items: baseline; display: flex; flex-wrap: wrap; gap: .65rem; min-width: 0; }
+.gestionar-tareas__etapa-cabecera small, .gestionar-tareas__indicador { color: #718078; font-size: .75rem; }
+.gestionar-tareas__indicador { flex: 0 0 auto; }
+.gestionar-tareas__desplegable[open] .gestionar-tareas__indicador { color: #315447; }
+.gestionar-tareas__subtareas { padding-left: 1rem; }
+.gestionar-tareas__acciones-etapa { border-top: 1px solid #edf0ee; justify-content: flex-end; padding: .6rem .8rem; }
+.gestionar-tareas__etapa-cabecera > div { align-items: baseline; display: flex; gap: .65rem; min-width: 0; }
+.gestionar-tareas__etapa-cabecera span, .gestionar-tareas__tarea > div:first-child > span { color: #718078; flex: 0 0 auto; font-size: .75rem; font-weight: 700; }
+.gestionar-tareas__etapa-cabecera h3 { color: #315447; font-size: .95rem; margin: 0; }
+.gestionar-tareas__tarea { border-top: 1px solid #edf0ee; padding: .65rem .8rem; }
+.gestionar-tareas__tarea > div:first-child { align-items: baseline; display: flex; flex: 1; flex-wrap: wrap; gap: .55rem; min-width: 0; }
+.gestionar-tareas__tarea strong { color: #4a4037; font-size: .84rem; font-weight: 500; }
+.gestionar-tareas__tarea small { color: #718078; font-size: .75rem; }
+.gestionar-tareas__vacio { color: #65736e; margin: 0; padding: 1rem; text-align: center; }
+@media (max-width: 850px) { .gestionar-tareas__grid { grid-template-columns: 1fr; } }
+@media (max-width: 620px) { .gestionar-tareas__header { align-items: flex-start; flex-direction: column; } .gestionar-tareas__etapa-cabecera { align-items: flex-start; flex-direction: column; } .gestionar-tareas__tarea { align-items: flex-start; flex-direction: column; } .gestionar-tareas__fechas { grid-template-columns: 1fr; } }

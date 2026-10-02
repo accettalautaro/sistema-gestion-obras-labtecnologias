@@ -45,7 +45,7 @@ function PrincipalPage() {
         const avance = obras.length
             ? Math.round(obras.reduce((total, obra) => total + leerPorcentaje(obra.Porcentaje), 0) / obras.length)
             : 0
-        const costoTotal = tareas.reduce((total, tarea) => total + (Number(tarea.CostReal) || 0), 0)
+        const costoTotal = tareas.filter((tarea) => tarea.EsUnidadFinal).reduce((total, tarea) => total + (Number(tarea.CostReal) || 0), 0)
         return { activas, pausadas, terminadas, avance, costoTotal }
     }, [obras, tareas])
 
@@ -134,22 +134,6 @@ function PrincipalPage() {
                     <div className="dashboard-investment__rule" />
                     <div className="dashboard-investment__foot"><span>{tareas.length} tareas registradas</span><span>ARS</span></div>
                 </aside>
-            </section>
-
-            <section className="dashboard-panel dashboard-projects">
-                <div className="dashboard-panel__heading">
-                    <div><p className="dashboard-panel__eyebrow">Vista rápida</p><h2>Obras recientes</h2></div>
-                    <span className="dashboard-panel__count">{obras.length} en total</span>
-                </div>
-                {obras.length === 0 ? <p className="dashboard-empty">Cuando registres una obra, vas a verla acá.</p> : (
-                    <div className="dashboard-projects__list">
-                        {obras.slice(0, 5).map((obra) => <article className="dashboard-project" key={obra.id}>
-                            <div className="dashboard-project__identity"><span className="dashboard-project__mark">{String(obra.id).padStart(2, '0')}</span><div><strong>Obra #{obra.id}</strong><span>{nombreCliente(obra)} · Lote {obra.loteId || '—'}</span></div></div>
-                            <span className={`dashboard-status ${estadoNormalizado(obra.Estado).includes('pausa') ? 'dashboard-status--paused' : estadoNormalizado(obra.Estado).includes('ejecuci') ? 'dashboard-status--active' : 'dashboard-status--done'}`}><i />{mostrarEstado(obra.Estado)}</span>
-                            <div className="dashboard-project__progress"><div className="dashboard-progress__track"><span style={{ width: `${leerPorcentaje(obra.Porcentaje)}%` }} /></div><span>{leerPorcentaje(obra.Porcentaje)}%</span></div>
-                        </article>)}
-                    </div>
-                )}
             </section>
 
             <div className={`dashboard-notice ${necesitaAtencion.length ? 'dashboard-notice--attention' : ''}`}>

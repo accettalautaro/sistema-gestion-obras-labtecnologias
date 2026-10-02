@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import proyectos from '../data/proyectos.js'
+import Volver from '../../../shared/components/Volver.jsx'
 import '../../../styles/Proyecto.css'
 
 function ProyectoPage() {
@@ -13,7 +14,7 @@ function ProyectoPage() {
 			<main className="proyecto-page proyecto-page--error contenido-principal">
 				<h1>Proyecto no encontrado</h1>
 				<p>El proyecto solicitado no existe o el enlace no es válido.</p>
-				<Link className="volver-proyectos" to="/proyectos">Volver a proyectos</Link>
+				<Volver to="/proyectos">Volver a proyectos</Volver>
 			</main>
 		)
 	}
@@ -32,7 +33,7 @@ function ProyectoPage() {
 			</section>
 
 			<div className="proyecto-page__content">
-				<Link className="volver-proyectos" to="/proyectos">&larr; Volver a proyectos</Link>
+				<Volver to="/proyectos">Volver a proyectos</Volver>
 
 				<section className="proyecto-page__section">
 					<h2>Concepto</h2>

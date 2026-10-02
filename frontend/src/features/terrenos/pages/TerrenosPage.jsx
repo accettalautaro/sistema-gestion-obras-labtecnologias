@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { useOutletContext } from 'react-router-dom'
 import { useFetch } from '../../../shared/hooks/useFetch'
 import { listarTerrenos } from '../services/terrenosService.js'
+import Volver from '../../../shared/components/Volver.jsx'
 import '../../../styles/Terrenos.css'
 
 function mostrar(valor, sufijo = '') {
@@ -44,7 +45,10 @@ function TerrenosPage() {
 		return [lote.nrolote, direccion?.calle, direccion?.altura, direccion?.localidad, direccion?.provincia]
 			.some((valor) => String(valor ?? '').toLowerCase().includes(busqueda.trim().toLowerCase()))
 	})
-	if (nrolote && !terreno) return <section className="terrenos-page"><div className="alert alert-warning">No se encontró el lote {nrolote}.</div><Link className="btn btn-outline-secondary" onClick={() => window.history.back()}>Volver</Link></section>
+	const destinoTerrenos = esCliente ? '/cliente' : '/principal/terrenos'
+	const obraVinculada = terreno?.obras?.[0]
+	const destinoVolver = esCliente && obraVinculada ? `/cliente/obras/${obraVinculada['id-obra']}` : destinoTerrenos
+	if (nrolote && !terreno) return <section className="terrenos-page"><div className="alert alert-warning">No se encontró el lote {nrolote}.</div><Volver to={destinoTerrenos}>{esCliente ? 'Volver a mis obras' : 'Volver a terrenos'}</Volver></section>
 
 	const cambiarCampo = (event) => setFormulario((actual) => ({ ...actual, [event.target.name]: event.target.value }))
 	const enviarFormulario = (event) => {
@@ -58,7 +62,7 @@ function TerrenosPage() {
 			{!terreno && !mostrarFormulario && <span className="terrenos-page__count">{lotes.length} {lotes.length === 1 ? 'lote' : 'lotes'}</span>}
 		</header>
 		{terreno ? <>
-			<button className="terrenos-page__volver btn btn-link text-decoration-none p-0" type="button" onClick={() => window.history.back()}>← Volver</button>
+			<Volver to={destinoVolver}>{esCliente ? (obraVinculada ? 'Volver a obra' : 'Volver a mis obras') : 'Volver a terrenos'}</Volver>
 			<div className="terrenos-page__detalle">
 				<section className="terrenos-page__panel"><div className="terrenos-page__panel-titulo"><div><h2>Ubicación</h2><p>Dirección asociada al lote</p></div></div>
 					{terreno.direcciones.length ? terreno.direcciones.map((direccion) => <dl className="terrenos-page__datos" key={direccion['id-direc'] ?? `${direccion.calle}-${direccion.altura}`}>
@@ -80,7 +84,7 @@ function TerrenosPage() {
 				{terreno.obras.length > 0 && <section className="terrenos-page__panel"><div className="terrenos-page__panel-titulo"><div><h2>Obras asociadas</h2><p>Obras vinculadas a este lote</p></div></div><ul className="terrenos-page__documentos">{terreno.obras.map((obra) => <li key={obra['id-obra']}>Obra #{obra['id-obra']} · {obra.Estado ?? 'Estado sin información'}</li>)}</ul></section>}
 			</div>
 		</> : mostrarFormulario ? <>
-			<button className="terrenos-page__volver" type="button" onClick={() => setMostrarFormulario(false)}>← Volver al listado</button>
+			<Volver onClick={() => setMostrarFormulario(false)}>Volver al listado</Volver>
 			<section className="terrenos-page__formulario" aria-labelledby="terreno-form-titulo">
 				<div className="terrenos-page__panel-titulo"><div><h2 id="terreno-form-titulo">Datos del terreno</h2><p>Completá la información para preparar la carga.</p></div><span className="terrenos-page__proximo">Vista previa</span></div>
 				<form onSubmit={enviarFormulario}>

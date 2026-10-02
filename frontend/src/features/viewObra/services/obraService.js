@@ -1,4 +1,6 @@
 import { resumirAvanceTareas } from '../../../shared/utils/avanceObra.js'
+import { listarTareas } from '../../obras/services/tareasService.js'
+import { listarPagosParciales } from '../../pagos/services/pagosService.js'
 
 const URL_BASE = '/Back/data'
 
@@ -11,6 +13,10 @@ async function leerJson(nombre) {
 }
 
 const aNumero = (porcentaje) => parseInt(String(porcentaje), 10) || 0
+const aMonto = (valor) => {
+  const numero = Number(valor)
+  return Number.isFinite(numero) ? numero : 0
+}
 
 export async function obtenerDetalleObra(idObra) {
   idObra = Number(idObra)
@@ -18,8 +24,8 @@ export async function obtenerDetalleObra(idObra) {
     leerJson('obras'),
     leerJson('arquitectos'),
     leerJson('direcciones'),
-    leerJson('tareas'),
-    leerJson('pagos-parciales'),
+    listarTareas(),
+    listarPagosParciales(),
   ])
 
   const obra = obras.find((o) => o['id-obra'] === idObra)
@@ -38,12 +44,15 @@ export async function obtenerDetalleObra(idObra) {
       return dateA - dateB
     })
   const pagosObra = pagos.filter((p) => p['id-obra'] === idObra)
-  const avanceObra = resumirAvanceTareas(tareasObra).avance
+  const resumenTareas = resumirAvanceTareas(tareasObra, pagos)
+  const avanceObra = resumenTareas.avance
 
-  const costoEstimadoTotal = tareasObra.reduce((acc, t) => acc + (t['costo-estimado'] || 0), 0)
-  const montoAbonado = pagosObra.reduce((acc, p) => acc + (p.monto || 0), 0)
+  // Si una etapa tiene subtareas, su costo es un resumen. Sumamos solo las unidades
+  // finales del avance para no contar a la vez el total de la etapa y cada subtarea.
+  const costoEstimadoTotal = resumenTareas.unidades.reduce((total, tarea) => total + aMonto(tarea['costo-estimado']), 0)
+  const montoAbonado = pagosObra.reduce((total, pago) => total + aMonto(pago.monto), 0)
   
-  const diasAtrasoTotal = tareasObra.reduce((acc, t) => {
+  const diasAtrasoTotal = resumenTareas.unidades.reduce((acc, t) => {
     const estimado = t['duracion-estimada'] || 0
     const real = t['duracion-real'] || 0
     if (real > estimado && aNumero(t.porcentaje) < 100) {
@@ -73,7 +82,7 @@ export async function obtenerDetalleObra(idObra) {
     costoEstimadoTotal,
     montoAbonado,
     diasAtrasoTotal,
-    tareas: tareasObra.map(t => ({
+    tareas: resumenTareas.etapas.flatMap(etapa => [etapa, ...etapa.subtareas]).map(t => ({
       idTarea: t['id-tarea'],
       nombre: t.nombre,
       descripcion: t.descripcion,

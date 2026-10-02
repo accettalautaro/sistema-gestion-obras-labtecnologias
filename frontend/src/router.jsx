@@ -14,8 +14,8 @@ import LayoutCliente from './shared/layout/LayoutClient'
 import ClientePage from './features/dashCliente/pages/clientePage'
 import { ViewObraPage } from './features/viewObra'
 import { ViewPagoPage } from './features/viewPago'
-import { ObrasPage, SeguimientoObraPage, SeleccionarSeguimientoPage } from './features/obras'
-import { TerrenosPage } from './features/terrenos'
+import { ObrasPage, SeguimientoObraPage, SeleccionarSeguimientoPage, GestionarTareasPage } from './features/obras'
+import { TerrenosPage, PropietariosPage } from './features/terrenos'
 
 
 export const router = createBrowserRouter([
@@ -45,6 +45,7 @@ export const router = createBrowserRouter([
       { index: true, element: <PrincipalPage /> },
       { path: 'clientes', element: <ClientesPage /> },
       { path: 'obras', element: <ObrasPage /> },
+      { path: 'obras/:id/tareas', element: <GestionarTareasPage /> },
       { path: 'seguimiento', element: <SeleccionarSeguimientoPage /> },
       { path: 'obras/:id/avance', element: <SeguimientoObraPage /> },
       { path: 'terrenos/:nrolote?', element: <TerrenosPage /> },

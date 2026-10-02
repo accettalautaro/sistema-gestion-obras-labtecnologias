@@ -15,7 +15,7 @@
 .seguimiento-obra__avance-card { background: #3b3027; color: #fff; padding: 1.15rem 1.25rem; }
 .seguimiento-obra__avance-cabecera { align-items: center; display: flex; justify-content: space-between; }
 .seguimiento-obra__avance-card .seguimiento-obra__eyebrow { color: #f0c89e; }
-.seguimiento-obra__avance-card h2 { font-size: 2.15rem; font-weight: 650; letter-spacing: -.04em; line-height: 1; margin: 0; }
+.seguimiento-obra__avance-card h2 { color: #edc598; font-size: 2.15rem; font-weight: 650; letter-spacing: -.04em; line-height: 1; margin: 0; }
 .seguimiento-obra__avance-card h2 span { font-size: 1rem; margin-left: .12rem; }
 .seguimiento-obra__circulo { align-items: center; border: 1px solid #9b7a5e; border-radius: 50%; color: #f2d8be; display: inline-flex; font-size: 1rem; height: 2rem; justify-content: center; width: 2rem; }
 .seguimiento-obra__barra { background: #f0ece8; border-radius: 99px; height: .55rem; overflow: hidden; }
@@ -39,6 +39,7 @@
 .seguimiento-obra__gantt-label { display: flex; flex-direction: column; gap: .18rem; min-width: 0; }
 .seguimiento-obra__gantt-label strong { color: #4a3d32; font-size: .78rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .seguimiento-obra__gantt-label span { color: var(--seguimiento-muted); font-size: .69rem; }
+.seguimiento-obra__gantt-label span b { color: #a76628; font-weight: 700; }
 .seguimiento-obra__gantt-pista { background: #f7f4f1; border-radius: 99px; height: .7rem; position: relative; }
 .seguimiento-obra__gantt-barra { background: #ddd5cd; border-radius: inherit; height: 100%; min-width: .35rem; overflow: hidden; position: absolute; top: 0; }
 .seguimiento-obra__gantt-barra > span { background: #a76628; display: block; height: 100%; }
@@ -59,10 +60,15 @@
 .seguimiento-obra__etapa-titulo h3 { color: #3b3027; font-size: .91rem; font-weight: 650; margin: 0; text-transform: uppercase; }
 .seguimiento-obra__etapa-titulo small { color: var(--seguimiento-muted); display: block; font-size: .7rem; margin-top: .15rem; }
 .seguimiento-obra__etapa-avance { align-items: center; display: flex; gap: .6rem; width: min(35%, 12rem); }
-.seguimiento-obra__etapa-avance > strong { color: #8e5520; font-size: .8rem; min-width: 2.5rem; text-align: right; }
+.seguimiento-obra__etapa-avance > strong { color: #a76628; font-size: .8rem; min-width: 2.5rem; text-align: right; }
 .seguimiento-obra__barra--pequena { flex: 1; height: .38rem; }
 .seguimiento-obra__barra--pequena > span { background: #a76628; }
 .seguimiento-obra__subtareas { padding: 0 .9rem; }
+.seguimiento-obra__detalle-cliente { color: #8e5520; display: inline-block; font-size: .78rem; font-weight: 600; margin: .65rem .2rem .35rem; text-decoration: none; }
+.seguimiento-obra__detalle-cliente:hover { color: #a76628; text-decoration: underline; }
+.seguimiento-obra__subtarea--cliente { color: var(--seguimiento-ink); text-decoration: none; }
+.seguimiento-obra__subtarea--cliente:hover { background: #faf7f3; color: var(--seguimiento-ink); }
+.seguimiento-obra__detalle-fila { color: #8e5520; font-size: .75rem; font-weight: 600; white-space: nowrap; }
 .seguimiento-obra__sin-subtareas { color: var(--seguimiento-muted); font-size: .82rem; margin: 0; padding: .9rem .2rem; }
 .seguimiento-obra__subtarea { align-items: center; border-top: 1px solid #efe9e3; display: grid; gap: .75rem; grid-template-columns: minmax(0, 1fr) minmax(7rem, auto) auto; min-height: 3.3rem; padding: .55rem .2rem; }
 .seguimiento-obra__subtarea > div:first-child { align-items: baseline; display: flex; gap: .6rem; min-width: 0; }

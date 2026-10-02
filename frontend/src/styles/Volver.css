@@ -1,0 +1,32 @@
+.boton-volver {
+	align-items: center;
+	background: var(--ui-surface, #fff);
+	border: 1px solid var(--ui-line, #e6e1d9);
+	border-radius: .4rem;
+	color: var(--ui-ink, #282725);
+	display: inline-flex;
+	flex: 0 0 auto;
+	font: 600 .84rem/1.2 var(--ui-font, "Segoe UI", Roboto, Arial, sans-serif);
+	gap: .55rem;
+	min-height: 2.45rem;
+	padding: .55rem .8rem;
+	text-decoration: none;
+	transition: background-color .16s ease, border-color .16s ease, color .16s ease, box-shadow .16s ease;
+}
+
+.boton-volver:hover {
+	background: var(--ui-accent-soft, #f5eee7);
+	border-color: #d7b99d;
+	color: var(--ui-accent-hover, #8e5520);
+}
+
+.boton-volver:focus-visible {
+	box-shadow: 0 0 0 .2rem rgb(167 102 40 / 18%);
+	outline: 0;
+}
+
+.boton-volver__flecha { color: var(--ui-accent, #a76628); font-size: 1.1rem; line-height: .9; }
+
+@media (prefers-reduced-motion: reduce) {
+	.boton-volver { transition: none; }
+}

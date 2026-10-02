@@ -1,4 +1,6 @@
 import { resumirAvanceTareas } from '../../../shared/utils/avanceObra.js'
+import { listarTareas } from '../../obras/services/tareasService.js'
+import { listarPagosParciales } from '../../pagos/services/pagosService.js'
 
 const URL_BASE = '/Back/data'
 
@@ -20,13 +22,14 @@ const aNumero = (porcentaje) => parseInt(String(porcentaje), 10) || 0
  * Cuando exista el backend real, este filtro también tiene que aplicarse del lado del servidor.
  */
 export async function obtenerResumenCliente(idUsuario) {
-  const [clientes, obras, arquitectos, direcciones, recordatorios, tareas] = await Promise.all([
+  const [clientes, obras, arquitectos, direcciones, recordatorios, tareas, pagos] = await Promise.all([
     leerJson('clientes'),
     leerJson('obras'),
     leerJson('arquitectos'),
     leerJson('direcciones'),
     leerJson('recordatorios'),
-    leerJson('tareas'),
+    listarTareas(),
+    listarPagosParciales(),
   ])
 
   const cliente = clientes.find((c) => c['id-usuario'] === idUsuario)
@@ -40,9 +43,10 @@ export async function obtenerResumenCliente(idUsuario) {
       const arquitecto = arquitectos.find((a) => a['id-arquitecto'] === obra['id-arquitecto'])
       const direccion = direcciones.find((d) => d.nrolote === obra.nrolote)
       
-      const tareasObra = tareas.filter((t) => t['id-obra'] === obra['id-obra'])
-      const tieneTareaAtrasada = tareasObra.some((t) => t['duracion-real'] > t['duracion-estimada'] && aNumero(t.porcentaje) < 100)
-      const avanceObra = resumirAvanceTareas(tareasObra).avance
+      const tareasObra = tareas.filter((t) => String(t['id-obra']) === String(obra['id-obra']))
+      const resumen = resumirAvanceTareas(tareasObra, pagos)
+      const tieneTareaAtrasada = resumen.unidades.some((t) => Number(t['duracion-real']) > Number(t['duracion-estimada']) && aNumero(t.porcentaje) < 100)
+      const avanceObra = resumen.avance
       
       let estadoObra = obra.Estado
       if (estadoObra === 'En ejecución' && tieneTareaAtrasada) {

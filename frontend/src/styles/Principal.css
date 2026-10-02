@@ -96,7 +96,7 @@
 .dashboard-progress__meta strong { font-size: .86rem; font-weight: 600; }
 .dashboard-progress__meta span,
 .dashboard-progress__foot { color: var(--dashboard-muted); font-size: .74rem; }
-.dashboard-progress__meta b { font-size: .85rem; font-weight: 600; }
+.dashboard-progress__meta b { color: var(--dashboard-accent); font-size: .85rem; font-weight: 600; }
 .dashboard-progress__track { background: #efeeeb; border-radius: 99px; height: 7px; overflow: hidden; }
 .dashboard-progress__track span { background: var(--dashboard-accent); border-radius: inherit; display: block; height: 100%; transition: width .35s ease; }
 .dashboard-progress__foot { margin-top: .45rem; }

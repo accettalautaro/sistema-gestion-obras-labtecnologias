@@ -1,4 +1,5 @@
 import { resumirAvanceTareas } from '../../../shared/utils/avanceObra.js'
+import { listarTareas } from './tareasService.js'
 
 async function leerJson(ruta, mensajeError) {
 	const respuesta = await fetch(ruta)
@@ -13,7 +14,7 @@ export async function listarObras() {
 		leerJson('/Back/data/clientes.json', 'No se pudieron cargar los clientes.'),
 		leerJson('/Back/data/arquitectos.json', 'No se pudieron cargar los arquitectos.'),
 		leerJson('/Back/data/lotes.json', 'No se pudieron cargar los lotes.'),
-		leerJson('/Back/data/tareas.json', 'No se pudieron cargar las tareas.'),
+		listarTareas(),
 	])
 	const obrasConAvance = obras.map((obra) => {
 		const tareasObra = tareas.filter((tarea) => String(tarea['id-obra']) === String(obra['id-obra']))

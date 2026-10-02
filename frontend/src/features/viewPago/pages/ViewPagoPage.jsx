@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { obtenerDetalleTareaYPagos } from '../services/viewPagoService'
+import Volver from '../../../shared/components/Volver.jsx'
 
 const ESTADO_TAREA_BADGE = {
   'finalizada': 'text-bg-secondary',
@@ -14,7 +15,6 @@ const formatMoneda = (valor) => {
 
 function ViewPagoPage() {
   const { idObra, idTarea } = useParams()
-  const navigate = useNavigate()
   const [data, setData] = useState(null)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -63,11 +63,9 @@ function ViewPagoPage() {
   }
 
   return (
-    <div className="container-fluid px-0 pb-5">
-      <div className="mb-4 d-flex align-items-center gap-3">
-        <button onClick={() => navigate(-1)} className="btn btn-sm btn-outline-secondary rounded-circle" style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <i className="bi bi-arrow-left"></i>
-        </button>
+    <div className="container-fluid px-0 pb-5 cliente-detalle cliente-detalle-tarea">
+      <header className="cliente-detalle__encabezado mb-4 d-flex align-items-center gap-3">
+        <Volver to={`/cliente/obras/${idObra}`}>Volver a la obra</Volver>
         <div>
           <h4 className="fw-bold mb-1">Tarea: {tarea.nombre}</h4>
           <p className="text-muted mb-0 small">Obra N.º {obra.idObra} - Lote {obra.nroLote}</p>
@@ -77,7 +75,7 @@ function ViewPagoPage() {
             {tarea.estado}
           </span>
         </div>
-      </div>
+      </header>
 
       <div className="row g-4 mb-4">
         {/* Información general de la tarea */}

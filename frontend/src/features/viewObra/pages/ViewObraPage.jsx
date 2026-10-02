@@ -1,6 +1,9 @@
 import { useEffect, useState, useMemo } from 'react'
-import { useParams, Link, useNavigate } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import { obtenerDetalleObra } from '../services/obraService'
+import { construirEtapas } from '../../../shared/utils/avanceObra.js'
+import Volver from '../../../shared/components/Volver.jsx'
+import '../../../styles/SeguimientoObra.css'
 
 const ESTADO_OBRA_BADGE = {
   'En ejecución': 'text-bg-success',
@@ -9,11 +12,14 @@ const ESTADO_OBRA_BADGE = {
   Finalizada: 'text-bg-secondary',
 }
 
-const ESTADO_TAREA_BADGE = {
-  'finalizada': 'text-bg-secondary',
-  'en ejecucion': 'text-bg-primary',
-  'sin comenzar': 'text-bg-light text-dark border',
+function fechaCorta(valor) {
+  if (!valor) return 'Sin fecha'
+  const [anio, mes, dia] = String(valor).split('-').map(Number)
+  if (!anio || !mes || !dia) return 'Sin fecha'
+  return new Intl.DateTimeFormat('es-AR', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(anio, mes - 1, dia))
 }
+
+function codigoVisible(id) { return String(id ?? '').replaceAll('-', '.').replaceAll('_', '.').replaceAll(',', '.') }
 
 const formatMoneda = (valor) => {
   return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(valor || 0)
@@ -21,7 +27,6 @@ const formatMoneda = (valor) => {
 
 function ViewObraPage() {
   const { id } = useParams()
-  const navigate = useNavigate()
   const [obra, setObra] = useState(null)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -45,48 +50,39 @@ function ViewObraPage() {
     return () => { activo = false }
   }, [id])
 
-  // Gantt logic...
+  const etapas = useMemo(() => {
+    if (!obra?.tareas) return []
+    return construirEtapas(obra.tareas.map((tarea) => ({ ...tarea, 'id-tarea': tarea.idTarea })))
+      .map((etapa) => ({
+        ...etapa,
+        idTarea: etapa['id-tarea'],
+        subtareas: etapa.subtareas.map((tarea) => ({ ...tarea, idTarea: tarea['id-tarea'] })),
+      }))
+  }, [obra])
+
   const ganttDatos = useMemo(() => {
-    if (!obra || !obra.tareas || obra.tareas.length === 0) return null;
-    
-    // Find min date and max date across all tasks
     const parseFecha = (iso) => {
-      if (!iso) return null;
+      if (!iso) return null
       const [y, m, d] = iso.split('-').map(Number)
       return new Date(y, m - 1, d)
     }
-    
-    let minDate = new Date(8640000000000000);
-    let maxDate = new Date(-8640000000000000);
-    
-    const validTareas = obra.tareas.filter(t => t.fechaInicio && t.fechaFin);
-    
-    if (validTareas.length === 0) return null;
-    
-    validTareas.forEach(t => {
-      const start = parseFecha(t.fechaInicio);
-      const end = parseFecha(t.fechaFin);
-      if (start && start < minDate) minDate = start;
-      if (end && end > maxDate) maxDate = end;
-    });
-    
-    const totalDays = Math.max(1, (maxDate - minDate) / (1000 * 60 * 60 * 24));
-    
-    const tasks = validTareas.map(t => {
-      const start = parseFecha(t.fechaInicio);
-      const end = parseFecha(t.fechaFin);
-      const startOffset = (start - minDate) / (1000 * 60 * 60 * 24);
-      const duration = (end - start) / (1000 * 60 * 60 * 24);
-      
-      return {
-        ...t,
-        leftPercent: (startOffset / totalDays) * 100,
-        widthPercent: Math.max(0.5, (duration / totalDays) * 100), // Min 0.5% width
-      }
-    })
-    
-    return { minDate, maxDate, totalDays, tasks }
-  }, [obra])
+    const conFechas = etapas.map((tarea) => ({ tarea, inicio: parseFecha(tarea.fechaInicio), fin: parseFecha(tarea.fechaFin) }))
+      .filter(({ inicio, fin }) => inicio && fin && fin >= inicio)
+    if (!conFechas.length) return null
+    const minDate = new Date(Math.min(...conFechas.map(({ inicio }) => inicio.getTime())))
+    const maxDate = new Date(Math.max(...conFechas.map(({ fin }) => fin.getTime())))
+    const totalDays = Math.max(1, (maxDate - minDate) / 86400000)
+    return {
+      minDate,
+      maxDate,
+      tasks: conFechas.map(({ tarea, inicio, fin }) => ({
+        ...tarea,
+        estado: tarea.avance >= 100 ? 'finalizada' : tarea.avance > 0 ? 'en ejecucion' : 'sin comenzar',
+        leftPercent: ((inicio - minDate) / 86400000 / totalDays) * 100,
+        widthPercent: Math.max(.5, ((fin - inicio) / 86400000 / totalDays) * 100),
+      })),
+    }
+  }, [etapas])
 
   if (loading) return <div className="p-4 text-muted">Cargando detalles de la obra...</div>
   if (error) return <div className="p-4 alert alert-danger">Error: {error}</div>
@@ -111,11 +107,9 @@ function ViewObraPage() {
   }
 
   return (
-    <div className="container-fluid px-0 pb-5">
-      <div className="mb-4 d-flex align-items-center gap-3">
-        <Link to="/cliente" className="btn btn-sm btn-outline-secondary rounded-circle" style={{ width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <i className="bi bi-arrow-left"></i>
-        </Link>
+    <div className="container-fluid px-0 pb-5 cliente-detalle cliente-detalle-obra seguimiento-obra">
+      <header className="cliente-detalle__encabezado mb-4 d-flex align-items-center gap-3">
+        <Volver to="/cliente">Volver a mis obras</Volver>
         <div>
           <h4 className="fw-bold mb-1">Obra N.º {obra.idObra}</h4>
           <p className="text-muted mb-0 small">{obra.direccionCompleta}</p>
@@ -125,7 +119,7 @@ function ViewObraPage() {
             {obra.estado}
           </span>
         </div>
-      </div>
+      </header>
 
       <div className="row g-4 mb-4">
         <div className="col-12 col-md-4">
@@ -233,149 +227,26 @@ function ViewObraPage() {
         </div>
       </div>
 
-      <div className="card border-0 shadow-sm rounded-3 mb-4">
-        <div className="card-body p-4">
-          <h6 className="text-muted mb-4 fw-bold">CRONOGRAMA DE TAREAS (GANTT)</h6>
-          
-          {!ganttDatos ? (
-            <div className="alert alert-light text-center py-4 text-muted border">No hay tareas con fechas asignadas para mostrar en el cronograma.</div>
-          ) : (
-            <div className="gantt-container" style={{ overflowX: 'auto' }}>
-              <div style={{ minWidth: '800px' }}>
-                <div className="d-flex border-bottom pb-2 mb-3 text-muted small fw-bold">
-                  <div style={{ width: '25%' }}>Tarea</div>
-                  <div style={{ width: '75%', position: 'relative' }}>
-                    <span>{ganttDatos.minDate.toLocaleDateString('es-AR')}</span>
-                    <span style={{ position: 'absolute', right: 0 }}>{ganttDatos.maxDate.toLocaleDateString('es-AR')}</span>
-                  </div>
-                </div>
-                
-                {ganttDatos.tasks.map((tarea) => (
-                  <div key={tarea.idTarea} className="d-flex align-items-center mb-3 position-relative">
-                    <div style={{ width: '25%' }} className="pe-3 text-truncate" title={tarea.nombre}>
-                      <span className="fw-semibold d-block text-truncate mb-1">{tarea.nombre}</span>
-                      <span className={`badge ${ESTADO_TAREA_BADGE[tarea.estado?.toLowerCase()] ?? 'text-bg-secondary'} fw-normal`} style={{fontSize: '0.65rem'}}>
-                        {tarea.estado}
-                      </span>
-                      <span className="ms-2 small text-muted fw-bold">{tarea.porcentaje}%</span>
-                    </div>
-                    
-                    <div style={{ width: '75%', position: 'relative', height: '28px', backgroundColor: '#f8f9fa', borderRadius: '6px' }}>
-                      <div 
-                        title={`${tarea.nombre}: ${tarea.fechaInicio} a ${tarea.fechaFin}`}
-                        style={{
-                          position: 'absolute',
-                          left: `${tarea.leftPercent}%`,
-                          width: `${tarea.widthPercent}%`,
-                          height: '100%',
-                          backgroundColor: tarea.estado?.toLowerCase() === 'finalizada' ? '#6c757d' : 
-                                           tarea.estado?.toLowerCase() === 'en ejecucion' ? '#0d6efd' : '#dee2e6',
-                          borderRadius: '6px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          overflow: 'hidden',
-                          boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
-                          transition: 'transform 0.2s',
-                          cursor: 'pointer'
-                        }}
-                        onMouseEnter={(e) => e.currentTarget.style.transform = 'scaleY(1.1)'}
-                        onMouseLeave={(e) => e.currentTarget.style.transform = 'scaleY(1)'}
-                        onClick={() => navigate(`/cliente/obras/${obra.idObra}/tareas/${tarea.idTarea}`)}
-                      >
-                         <div style={{
-                           width: `${tarea.porcentaje}%`,
-                           height: '100%',
-                           backgroundColor: 'rgba(255,255,255,0.25)',
-                           position: 'absolute',
-                           left: 0,
-                           top: 0
-                         }}></div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-      
-      <div className="card border-0 shadow-sm rounded-3">
-        <div className="card-body p-4">
-          <h6 className="text-muted mb-4 fw-bold">LISTADO DETALLADO DE TAREAS</h6>
-          <div className="table-responsive">
-            <table className="table table-hover align-middle">
-              <thead className="table-light">
-                <tr>
-                  <th>Nombre</th>
-                  <th>Estado</th>
-                  <th>Avance</th>
-                  <th>Fechas</th>
-                  <th>Duración (Est/Real)</th>
-                  <th>Costo (Est/Real)</th>
-                </tr>
-              </thead>
-              <tbody>
-                {obra.tareas.map(tarea => (
-                  <tr 
-                    key={tarea.idTarea} 
-                    onClick={() => navigate(`/cliente/obras/${obra.idObra}/tareas/${tarea.idTarea}`)} 
-                    style={{cursor: 'pointer'}}
-                  >
-                    <td>
-                      <span className="fw-semibold text-dark">{tarea.nombre}</span>
-                      {tarea.descripcion && (
-                        <>
-                          <br/>
-                          <small className="text-muted" style={{display:'block', maxWidth:'250px', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis'}} title={tarea.descripcion}>
-                            {tarea.descripcion}
-                          </small>
-                        </>
-                      )}
-                    </td>
-                    <td>
-                      <span className={`badge ${ESTADO_TAREA_BADGE[tarea.estado?.toLowerCase()] ?? 'text-bg-secondary'} fw-normal`}>
-                        {tarea.estado}
-                      </span>
-                    </td>
-                    <td style={{minWidth: '150px'}}>
-                      <div className="d-flex align-items-center gap-2">
-                        <div className="progress flex-grow-1" style={{ height: '6px' }}>
-                          <div className="progress-bar bg-dark" style={{ width: `${tarea.porcentaje}%` }}></div>
-                        </div>
-                        <span className="small fw-bold">{tarea.porcentaje}%</span>
-                      </div>
-                    </td>
-                    <td className="small text-muted">
-                      <div><i className="bi bi-calendar-event me-1"></i> {tarea.fechaInicio || '-'}</div>
-                      <div><i className="bi bi-calendar-check me-1"></i> {tarea.fechaFin || '-'}</div>
-                    </td>
-                    <td className="small">
-                      <div className={tarea.duracionReal > tarea.duracionEstimada ? 'text-danger fw-bold' : ''}>
-                        <span title="Estimada">{tarea.duracionEstimada}d</span> / <span title="Real">{tarea.duracionReal}d</span>
-                        {tarea.duracionReal > tarea.duracionEstimada && (
-                          <i className="bi bi-exclamation-triangle ms-1" title="Atrasada"></i>
-                        )}
-                      </div>
-                    </td>
-                    <td className="small">
-                      <div className="text-muted"><span title="Estimado">E:</span> {formatMoneda(tarea.costoEstimado)}</div>
-                      <div className={tarea.costoReal > tarea.costoEstimado ? 'text-danger fw-bold' : ''}>
-                        <span title="Real">R:</span> {formatMoneda(tarea.costoReal)}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-                {obra.tareas.length === 0 && (
-                  <tr>
-                    <td colSpan="6" className="text-center py-5 text-muted">No hay tareas registradas para esta obra.</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+      <section className="seguimiento-obra__panel" aria-labelledby="cronograma-cliente-titulo">
+        <div className="seguimiento-obra__panel-encabezado"><div><p className="seguimiento-obra__eyebrow">Diagrama de avance</p><h2 id="cronograma-cliente-titulo">Cronograma de tareas</h2></div><p>El cronograma muestra las tareas principales; el avance se calcula a partir de sus subtareas.</p></div>
+        {ganttDatos ? <div className="seguimiento-obra__gantt-scroll"><div className="seguimiento-obra__gantt">
+          <div className="seguimiento-obra__gantt-fechas"><span>Tarea</span><div><span>{fechaCorta(ganttDatos.minDate.toISOString().slice(0, 10))}</span><span>{fechaCorta(ganttDatos.maxDate.toISOString().slice(0, 10))}</span></div></div>
+          {ganttDatos.tasks.map((tarea) => <div className="seguimiento-obra__gantt-fila" key={tarea.idTarea}>
+            <div className="seguimiento-obra__gantt-label"><strong>{codigoVisible(tarea.idTarea)} · {tarea.nombre}</strong><span>{tarea.estado === 'finalizada' ? 'Finalizada' : tarea.estado === 'en ejecucion' ? 'En ejecución' : 'Sin comenzar'} · <b>{tarea.avance}%</b></span></div>
+            <div className="seguimiento-obra__gantt-pista"><Link to={`/cliente/obras/${obra.idObra}/tareas/${tarea.idTarea}`} className={`seguimiento-obra__gantt-barra ${tarea.avance >= 100 ? 'is-completa' : tarea.avance > 0 ? 'is-activa' : ''}`} style={{ left: `${tarea.leftPercent}%`, width: `${tarea.widthPercent}%` }} title={`${tarea.nombre}: ${fechaCorta(tarea.fechaInicio)}–${fechaCorta(tarea.fechaFin)}`} aria-label={`Ver detalle de ${tarea.nombre}`}><span style={{ width: `${tarea.avance}%` }} /></Link></div>
+          </div>)}
+        </div></div> : <div className="seguimiento-obra__sin-cronograma">No hay tareas con fechas de inicio y fin para dibujar el cronograma. Abajo podés consultar las tareas cargadas.</div>}
+      </section>
+
+      <section className="seguimiento-obra__panel" aria-labelledby="etapas-cliente-titulo">
+        <div className="seguimiento-obra__panel-encabezado"><div><p className="seguimiento-obra__eyebrow">Detalle</p><h2 id="etapas-cliente-titulo">Etapas y subtareas</h2></div><span className="seguimiento-obra__contador">{etapas.length} tareas</span></div>
+        {etapas.length ? <div className="seguimiento-obra__etapas">{etapas.map((etapa) => <details className="seguimiento-obra__etapa" key={etapa.idTarea}>
+          <summary className="seguimiento-obra__etapa-cabecera"><div className="seguimiento-obra__etapa-titulo"><span>{codigoVisible(etapa.idTarea)}</span><div><h3>{etapa.nombre}</h3><small>{etapa.subtareas.length ? `${etapa.subtareas.length} subtareas · clic para ver` : 'Sin subtareas · clic para ver'}</small></div></div><div className="seguimiento-obra__etapa-avance"><strong>{etapa.avance}%</strong><div className="seguimiento-obra__barra seguimiento-obra__barra--pequena" role="progressbar" aria-label={`Avance de ${etapa.nombre}`} aria-valuenow={etapa.avance} aria-valuemin="0" aria-valuemax="100"><span style={{ width: `${etapa.avance}%` }} /></div></div></summary>
+          <div className="seguimiento-obra__subtareas"><Link className="seguimiento-obra__detalle-cliente" to={`/cliente/obras/${obra.idObra}/tareas/${etapa.idTarea}`}>Ver detalle de {etapa.nombre} →</Link>
+            {(etapa.subtareas.length ? etapa.subtareas : [etapa]).map((tarea) => { const completa = Number(tarea.porcentaje) >= 100 || ['finalizada', 'completada', 'completado'].includes(String(tarea.estado).toLowerCase()); return <Link className="seguimiento-obra__subtarea seguimiento-obra__subtarea--cliente" key={tarea.idTarea} to={`/cliente/obras/${obra.idObra}/tareas/${tarea.idTarea}`}><div><span className="seguimiento-obra__subtarea-codigo">{codigoVisible(tarea.idTarea)}</span><strong>{tarea.nombre}</strong></div><span className={`seguimiento-obra__estado-tarea ${completa ? 'is-completa' : 'is-pendiente'}`}>{completa ? 'Completada' : 'No completada'}</span><span className="seguimiento-obra__detalle-fila">Ver detalle →</span></Link> })}
           </div>
-        </div>
-      </div>
+        </details>)}</div> : <div className="seguimiento-obra__sin-cronograma">No hay tareas registradas para esta obra.</div>}
+      </section>
     </div>
   )
 }

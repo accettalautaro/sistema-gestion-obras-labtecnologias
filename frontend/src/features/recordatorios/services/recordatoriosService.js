@@ -1,25 +1,27 @@
 const URL_BASE = '/Back/data'
+import { listarTareas } from '../../obras/services/tareasService.js'
+import { listarPagosParciales } from '../../pagos/services/pagosService.js'
+import { resumirAvanceTareas } from '../../../shared/utils/avanceObra.js'
 
 export async function obtenerDatosRecordatorios() {
   const t = Date.now()
-  const [obrasRes, tareasRes, recordatoriosRes, clientesRes] = await Promise.all([
+  const [obrasRes, recordatoriosRes, clientesRes, tareas, pagos] = await Promise.all([
     fetch(`${URL_BASE}/obras.json?t=${t}`),
-    fetch(`${URL_BASE}/tareas.json?t=${t}`),
     fetch(`${URL_BASE}/recordatorios.json?t=${t}`),
-    fetch(`${URL_BASE}/clientes.json?t=${t}`)
+    fetch(`${URL_BASE}/clientes.json?t=${t}`),
+    listarTareas(),
+    listarPagosParciales()
   ])
 
-  if (!obrasRes.ok || !tareasRes.ok || !recordatoriosRes.ok || !clientesRes.ok) {
+  if (!obrasRes.ok || !recordatoriosRes.ok || !clientesRes.ok) {
     throw new Error('No se pudieron obtener los datos de recordatorios.')
   }
 
   const obrasData = await obrasRes.json()
-  const tareasData = await tareasRes.json()
   const recordatoriosData = await recordatoriosRes.json()
   const clientesData = await clientesRes.json()
 
   const obrasRaw = Array.isArray(obrasData) ? obrasData : obrasData.obras || []
-  const tareasRaw = Array.isArray(tareasData) ? tareasData : tareasData.tareas || []
   const recordatoriosRaw = Array.isArray(recordatoriosData) ? recordatoriosData : recordatoriosData.recordatorios || []
   const clientesRaw = Array.isArray(clientesData) ? clientesData : clientesData.clientes || []
 
@@ -31,7 +33,7 @@ export async function obtenerDatosRecordatorios() {
     porcentaje: o.porcentaje || o.Porcentaje,
   }))
 
-  const tareas = tareasRaw.map(t => ({
+  const tareasNormalizadas = tareas.map(t => ({
     ...t,
     id: t['id-tarea'] || t.id,
     obraId: t['id-obra'] || t.obraId,
@@ -48,7 +50,8 @@ export async function obtenerDatosRecordatorios() {
     id: c['id-cliente'] || c.id,
   }))
 
-  return { obras, tareas, recordatorios, clientes }
+  const tareasDerivadas = obras.flatMap((obra) => resumirAvanceTareas(tareasNormalizadas.filter((t) => String(t.obraId) === String(obra.id)), pagos).etapas.flatMap((etapa) => [etapa, ...etapa.subtareas]))
+  return { obras, tareas: tareasDerivadas, recordatorios, clientes }
 }
 
 export async function crearRecordatorio(nuevoRecordatorio) {

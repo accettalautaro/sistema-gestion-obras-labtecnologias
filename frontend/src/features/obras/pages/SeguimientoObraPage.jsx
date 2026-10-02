@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Link, useOutletContext, useParams } from 'react-router-dom'
+import { useOutletContext, useParams } from 'react-router-dom'
+import Volver from '../../../shared/components/Volver.jsx'
 import { useFetch } from '../../../shared/hooks/useFetch'
 import { porcentajeTarea } from '../../../shared/utils/avanceObra.js'
 import { obtenerSeguimientoObra } from '../services/seguimientoService.js'
@@ -63,7 +64,7 @@ function SeguimientoObraPage() {
 
 	return <section className="seguimiento-obra">
 		<header className="seguimiento-obra__header">
-			<Link to="/principal/obras" className="seguimiento-obra__volver" aria-label="Volver a gestión de obras">←</Link>
+			<Volver to="/principal/obras">Volver a gestión de obras</Volver>
 			<div className="seguimiento-obra__encabezado-texto"><p className="seguimiento-obra__eyebrow">Seguimiento de obra</p><h1>Obra #{obra.id} · Lote {obra.nrolote}</h1><p>{obra.direccion}</p></div>
 			<span className={`seguimiento-obra__estado-badge ${obra.estado.toLowerCase().includes('final') ? 'seguimiento-obra__estado-badge--finalizada' : ''}`}>{obra.estado}</span>
 		</header>
@@ -86,7 +87,7 @@ function SeguimientoObraPage() {
 					const barra = obra.cronograma.tareas.find((item) => String(item.tarea['id-tarea']) === String(etapa['id-tarea']))
 					if (!barra) return null
 					const estado = etapa.avance >= 100 ? 'Finalizada' : etapa.avance > 0 ? 'En ejecución' : 'Sin comenzar'
-					return <div className="seguimiento-obra__gantt-fila" key={etapa['id-tarea']}><div className="seguimiento-obra__gantt-label"><strong>{codigoVisible(etapa['id-tarea'])} · {etapa.nombre}</strong><span>{estado} · {etapa.avance}%</span></div><div className="seguimiento-obra__gantt-pista"><span className={`seguimiento-obra__gantt-barra ${etapa.avance >= 100 ? 'is-completa' : etapa.avance > 0 ? 'is-activa' : ''}`} style={{ left: `${barra.izquierda}%`, width: `${barra.ancho}%` }} title={`${etapa.nombre}: ${fechaCorta(etapa['fecha-inicio'])}–${fechaCorta(etapa['fecha-fin'])}`}><span style={{ width: `${etapa.avance}%` }} /></span></div></div>
+					return <div className="seguimiento-obra__gantt-fila" key={etapa['id-tarea']}><div className="seguimiento-obra__gantt-label"><strong>{codigoVisible(etapa['id-tarea'])} · {etapa.nombre}</strong><span>{estado} · <b>{etapa.avance}%</b></span></div><div className="seguimiento-obra__gantt-pista"><span className={`seguimiento-obra__gantt-barra ${etapa.avance >= 100 ? 'is-completa' : etapa.avance > 0 ? 'is-activa' : ''}`} style={{ left: `${barra.izquierda}%`, width: `${barra.ancho}%` }} title={`${etapa.nombre}: ${fechaCorta(etapa['fecha-inicio'])}–${fechaCorta(etapa['fecha-fin'])}`}><span style={{ width: `${etapa.avance}%` }} /></span></div></div>
 				})}
 			</div></div> : <div className="seguimiento-obra__sin-cronograma">No hay tareas con fechas de inicio y fin para dibujar el cronograma. Abajo podés consultar los avances que sí están cargados.</div>}
 		</section>

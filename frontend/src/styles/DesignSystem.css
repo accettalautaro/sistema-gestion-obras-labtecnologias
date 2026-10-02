@@ -1,0 +1,148 @@
+/* Shared visual language for the authenticated manager and client areas. */
+.layout-gestor {
+	--ui-ink: #282725;
+	--ui-accent: #a76628;
+	--ui-accent-hover: #8e5520;
+	--ui-accent-soft: #f5eee7;
+	--ui-muted: #77736d;
+	--ui-line: #e6e1d9;
+	--ui-surface: #fff;
+	--ui-canvas: #f7f6f3;
+	--ui-radius: .5rem;
+	--ui-shadow: 0 3px 14px rgb(40 39 37 / 5%);
+	--ui-font: "Segoe UI", Roboto, Arial, sans-serif;
+	background: var(--ui-canvas) !important;
+	color: var(--ui-ink);
+	font-family: var(--ui-font);
+}
+
+.layout-gestor > .d-flex.flex-grow-1 > main,
+.layout-gestor > .d-flex.flex-grow-1 > div > main {
+	background: var(--ui-canvas);
+	color: var(--ui-ink);
+	font-family: var(--ui-font);
+}
+
+.layout-gestor main h1,
+.layout-gestor main h2,
+.layout-gestor main h3,
+.layout-gestor main h4,
+.layout-gestor main h5,
+.layout-gestor main h6 {
+	color: var(--ui-ink);
+	font-family: var(--ui-font);
+}
+
+.layout-gestor main h1 { font-size: clamp(1.65rem, 2.6vw, 2.15rem); font-weight: 600; letter-spacing: -.035em; }
+.layout-gestor main h2 { font-size: 1.15rem; font-weight: 600; letter-spacing: -.015em; }
+.layout-gestor main h3 { font-size: 1rem; font-weight: 600; }
+.layout-gestor main p { line-height: 1.55; }
+
+.layout-gestor main :is(.dashboard-panel, .dashboard-stat, .obras-page__listado, .obras-page__formulario, .clientes-page__listado, .clientes-page__formulario, .terrenos-page__panel, .terrenos-page__tarjeta, .terrenos-page__formulario, .pagos-page__workspace, .pagos-page__formulario, .recordatorios-page__panel, .seguimiento-obra__panel, .seguimiento-obra__dato, .gestionar-tareas__panel, .view-obra__panel, .card) {
+	background-color: var(--ui-surface);
+	border: 1px solid var(--ui-line);
+	border-radius: var(--ui-radius);
+	box-shadow: var(--ui-shadow);
+}
+
+.layout-gestor main :is(.dashboard-stat--primary, .seguimiento-obra__avance-card) {
+	background: var(--ui-ink);
+	border-color: var(--ui-ink);
+	color: #fff;
+}
+
+.layout-gestor main :is(.obras-page__header, .clientes-page__header, .terrenos-page__header, .pagos-page__header, .recordatorios__header, .seguimiento-obra__header, .gestionar-tareas__header, .dashboard__header) {
+	border-color: var(--ui-line);
+}
+
+.layout-gestor main :is(.obras-page__eyebrow, .clientes-page__eyebrow, .terrenos-page__eyebrow, .pagos-page__eyebrow, .recordatorios__eyebrow, .seguimiento-obra__eyebrow, .gestionar-tareas__eyebrow, .dashboard__eyebrow, .dashboard-panel__eyebrow) {
+	color: var(--ui-accent);
+	font-family: var(--ui-font);
+	font-size: .72rem;
+	font-weight: 700;
+	letter-spacing: .09em;
+}
+
+.layout-gestor main :is(.obras-page__header p:last-child, .clientes-page__header p:last-child, .terrenos-page__header p:last-child, .pagos-page__header p:last-child, .recordatorios__subtitle) { color: var(--ui-muted); }
+.layout-gestor main :is(.obras-page__count, .clientes-page__count, .clientes-page__cuenta, .terrenos-page__count, .pagos-page__count, .gestionar-tareas__contador) { background: var(--ui-accent-soft); border: 1px solid #ead8c7; border-radius: 999px; color: var(--ui-accent-hover); }
+
+.layout-gestor main .btn {
+	border-radius: .4rem;
+	font-family: var(--ui-font);
+	font-weight: 550;
+	transition: background-color .16s ease, border-color .16s ease, color .16s ease, box-shadow .16s ease;
+}
+
+.layout-gestor main .btn-primary,
+.layout-gestor main .btn-dark,
+.layout-gestor main .btn.gestionar-tareas__boton,
+.layout-gestor main .btn.obras-page__boton-seguimiento {
+	background: var(--ui-accent);
+	border-color: var(--ui-accent);
+	color: #fff;
+}
+
+.layout-gestor main .btn-primary:hover,
+.layout-gestor main .btn-dark:hover,
+.layout-gestor main .btn.gestionar-tareas__boton:hover,
+.layout-gestor main .btn.obras-page__boton-seguimiento:hover {
+	background: var(--ui-accent-hover);
+	border-color: var(--ui-accent-hover);
+	color: #fff;
+}
+
+.layout-gestor main .btn-outline-dark {
+	border-color: #cfc8bf;
+	color: var(--ui-ink);
+}
+.layout-gestor main .btn-outline-dark:hover { background: var(--ui-ink); border-color: var(--ui-ink); color: #fff; }
+
+.layout-gestor main :is(.form-control, .form-select) {
+	border-color: #d9d4cc;
+	border-radius: .4rem;
+	color: var(--ui-ink);
+	font-family: var(--ui-font);
+}
+.layout-gestor main :is(.form-control, .form-select):focus {
+	border-color: var(--ui-accent);
+	box-shadow: 0 0 0 .2rem rgb(167 102 40 / 16%);
+}
+.layout-gestor main label { color: #514d47; }
+
+.layout-gestor main .table {
+	--bs-table-color: var(--ui-ink);
+	--bs-table-hover-bg: #faf7f3;
+	margin-bottom: 0;
+}
+.layout-gestor main .table thead th {
+	background: #f7f5f1;
+	border-bottom-color: var(--ui-line);
+	color: var(--ui-muted);
+	font-size: .72rem;
+	font-weight: 700;
+	letter-spacing: .045em;
+	text-transform: uppercase;
+}
+.layout-gestor main .table > :not(caption) > * > * { border-bottom-color: #eeeae4; }
+
+.layout-gestor main .progress { background-color: #eeeae4; border-radius: 999px; }
+.layout-gestor main .progress-bar { background-color: var(--ui-accent); border-radius: inherit; }
+.layout-gestor main :is(.obras-page__estado-badge, .dashboard-status) { border-radius: 999px; }
+.layout-gestor main .alert { border-radius: var(--ui-radius); }
+.layout-gestor main :is(.obras-page__modal, .clientes-page__modal) { border: 1px solid var(--ui-line); border-radius: var(--ui-radius); box-shadow: 0 1rem 3rem rgb(40 39 37 / 16%); }
+
+.layout-gestor main > :is(.pagos-page, .recordatorios-page, .dashboard, .seguimiento-obra, .obras-page, .clientes-page, .terrenos-page) {
+	max-width: 1480px;
+	padding: 0;
+}
+
+.layout-gestor main > .container-fluid { color: var(--ui-ink); font-family: var(--ui-font); }
+.layout-gestor main .card-body { color: inherit; }
+
+@media (max-width: 700px) {
+	.layout-gestor main > :is(.pagos-page, .recordatorios-page, .dashboard, .seguimiento-obra, .obras-page, .clientes-page, .terrenos-page) { padding: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.layout-gestor main .btn { transition: none; }
+}

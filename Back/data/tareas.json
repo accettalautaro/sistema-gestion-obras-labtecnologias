@@ -36,17 +36,8 @@
         "estado": "finalizada",
         "fecha-inicio": "2026-07-03",
         "fecha-fin": "2026-07-06",
-
-        "id-obra": 2,
-        "nombre": "Estructura",
-        "porcentaje": "70%",
-        "estado": "en ejecucion",
-        "fecha-inicio": "2026-10-01",
-        "fecha-fin": "2026-10-02",
-
         "duracion-estimada": 4,
         "duracion-real": 4,
-        "descripcion": "Limpieza y nivelación del terreno",
         "costo-estimado": 117000,
         "costo-real": 124020
     },
