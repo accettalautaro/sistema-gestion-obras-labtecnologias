@@ -1,0 +1,184 @@
+[1mdiff --git a/Back/data/tareas.json b/Back/data/tareas.json[m
+[1mindex 6c16578..9778670 100644[m
+[1m--- a/Back/data/tareas.json[m
+[1m+++ b/Back/data/tareas.json[m
+[36m@@ -2,72 +2,842 @@[m
+     {[m
+         "id-tarea": "1",[m
+         "id-obra": 1,[m
+[31m-        "nombre": "Estructura",[m
+[32m+[m[32m        "nombre": "TRABAJOS PRELIMINARES",[m
+         "porcentaje": "100%",[m
+         "estado": "finalizada",[m
+[31m-        "fecha-inicio": "2026-10-01",[m
+[31m-        "fecha-fin": "2026-10-05",[m
+[32m+[m[32m        "fecha-inicio": "2026-07-01",[m
+[32m+[m[32m        "fecha-fin": "2026-07-15",[m
+[32m+[m[32m        "duracion-estimada": 15,[m
+[32m+[m[32m        "duracion-real": 15,[m
+[32m+[m[32m        "descripcion": "TRABAJOS PRELIMINARES",[m
+[32m+[m[32m        "costo-estimado": 542000,[m
+[32m+[m[32m        "costo-real": 574520[m
+[32m+[m[32m    },[m
+[32m+[m[32m    {[m
+[32m+[m[32m        "id-tarea": "1_1",[m
+[32m+[m[32m        "id-obra": 1,[m
+[32m+[m[32m        "nombre": "Replanteo",[m
+[32m+[m[32m        "porcentaje": "100%",[m
+[32m+[m[32m        "estado": "finalizada",[m
+[32m+[m[32m        "fecha-inicio": "2026-07-01",[m
+[32m+[m[32m        "fecha-fin": "2026-07-02",[m
+[32m+[m[32m        "duracion-estimada": 2,[m
+[32m+[m[32m        "duracion-real": 2,[m
+[32m+[m[32m        "descripcion": "Replanteo",[m
+[32m+[m[32m        "costo-estimado": 80000,[m
+[32m+[m[32m        "costo-real": 84800[m
+[32m+[m[32m    },[m
+[32m+[m[32m    {[m
+[32m+[m[32m        "id-tarea": "1_2",[m
+[32m+[m[32m        "id-obra": 1,[m
+[32m+[m[32m        "nombre": "Limpieza y nivelación del terreno",[m
+[32m+[m[32m        "porcentaje": "100%",[m
+[32m+[m[32m        "estado": "finalizada",[m
+[32m+[m[32m        "fecha-inicio": "2026-07-03",[m
+[32m+[m[32m        "fecha-fin": "2026-07-06",[m
+         "duracion-estimada": 4,[m
+         "duracion-real": 4,[m
+[31m-        "descripcion": "Construcción de la estructura de la vivienda",[m
+[31m-        "costo-estimado": 1000000,[m
+[31m-        "costo-real": 1200000[m
+[32m+[m[32m        "descripcion": "Limpieza y nivelación del terreno",[m
+[32m+[m[32m        "costo-estimado": 117000,[m
+[32m+[m[32m        "costo-real": 124020[m
+[32m+[m[32m    },[m
+[32m+[m[32m    {[m
+[32m+[m[32m        "id-tarea": "1_3",[m
+[32m+[m[32m        "id-obra": 1,[m
+[32m+[m[32m        "nombre": "Relleno y compactación del terreno",[m
+[32m+[m[32m        "porcentaje": "100%",[m
+[32m+[m[32m        "estado": "finalizada",[m
+[32m+[m[32m        "fecha-inicio": "2026-07-07",[m
+[32m+[m[32m        "fecha-fin": "2026-07-12",[m
+[32m+[m[32m        "duracion-estimada": 6,[m
+[32m+[m[32m        "duracion-real": 6,[m
+[32m+[m[32m        "descripcion": "Relleno y compactación del terreno",[m
+[32m+[m[32m        "costo-estimado": 154000,[m
+[32m+[m[32m        "costo-real": 163240[m
+[32m+[m[32m    },[m
+[32m+[m[32m    {[m
+[32m+[m[32m        "id-tarea": "1_4",[m
+[32m+[m[32m        "id-obra": 1,[m
+[32m+[m[32m        "nombre": "Excavaciones para fundaciones",[m
+[32m+[m[32m        "porcentaje": "100%",[m
+[32m+[m[32m        "estado": "finalizada",[m
+[32m+[m[32m        "fecha-inicio": "2026-07-13",[m
+[32m+[m[32m        "fecha-fin": "2026-07-15",[m
+[32m+[m[32m        "duracion-estimada": 3,[m
+[32m+[m[32m        "duracion-real": 3,[m
+[32m+[m[32m        "descripcion": "Excavaciones para fundaciones",[m
+[32m+[m[32m        "costo-estimado": 191000,[m
+[32m+[m[32m        "costo-real": 202460[m
+     },[m
+     {[m
+         "id-tarea": "2",[m
+         "id-obra": 1,[m
+[31m-        "nombre": "Losa",[m
+[31m-        "porcentaje": "50%",[m
+[31m-        "estado": "en ejecucion",[m
+[31m-        "fecha-inicio": "2026-10-05",[m
+[31m-        "fecha-fin": "2026-10-09",[m
+[32m+[m[32m        "nombre": "ESTRUCTURA",[m
+[32m+[m[32m        "porcentaje": "100%",[m
+[32m+[m[32m        "estado": "finalizada",[m
+[32m+[m[32m        "fecha-inicio": "2026-07-16",[m
+[32m+[m[32m        "fecha-fin": "2026-07-26",[m
+[32m+[m[32m        "duracion-estimada": 11,[m
+[32m+[m[32m        "duracion-real": 11,[m
+[32m+[m[32m        "descripcion": "ESTRUCTURA",[m
+[32m+[m[32m        "costo-estimado": 795000,[m
+[32m+[m[32m        "costo-real": 842700[m
+[32m+[m[32m    },[m
+[32m+[m[32m    {[m
+[32m+[m[32m        "id-tarea": "2_1",[m
+[32m+[m[32m        "id-obra": 1,[m
+[32m+[m[32m        "nombre": "Armado de armadura",[m
+[32m+[m[32m        "porcentaje": "100%",[m
+[32m+[m[32m        "estado": "finalizada",[m
+[32m+[m[32m        "fecha-inicio": "2026-07-16",[m
+[32m+[m[32m        "fecha-fin": "2026-07-20",[m
+         "duracion-estimada": 5,[m
+[32m+[m[32m        "duracion-real": 5,[m
+[32m+[m[32m        "descripcion": "Armado de armadura",[m
+[32m+[m[32m        "costo-estimado": 228000,[m
+[32m+[m[32m        "costo-real": 241680[m
+[32m+[m[32m    },[m
+[32m+[m[32m    {[m
+[32m+[m[32m        "id-tarea": "2_2",[m
+[32m+[m[32m        "id-obra": 1,[m
+[32m+[m[32m        "nombre": "Montaje de estructura",[m
+[32m+[m[32m        "porcentaje": "100%",[m
+[32m+[m[32m        "estado": "finalizada",[m
+[32m+[m[32m        "fecha-inicio": "2026-07-21",[m
+[32m+[m[32m        "fecha-fin": "2026-07-22",[m
+[32m+[m[32m        "duracion-estimada": 2,[m
+[32m+[m[32m        "duracion-real": 2,[m
+[32m+[m[32m        "descripcion": "Montaje de estructura",[m
+[32m+[m[32m        "costo-estimado": 265000,[m
+[32m+[m[32m        "costo-real": 280900[m
+[32m+[m[32m    },[m
+[32m+[m[32m    {[m
+[32m+[m[32m        "id-tarea": "2_3",[m
+[32m+[m[32m        "id-obra": 1,[m
+[32m+[m[32m        "nombre": "Colado de hormigón",[m
+[32m+[m[32m        "porcentaje": "100%",[m
+[32m+[m[32m        "estado": "finalizada",[m
+[32m+[m[32m        "fecha-inicio": "2026-07-23",[m
+[32m+[m[32m        "fecha-fin": "2026-07-26",[m
+[32m+[m[32m        "duracion-estimada": 4,[m
+         "duracion-real": 4,[m
+[31m-        "descripcion": "Construcción de la losa de la vivienda",[m
+[31m-        "costo-estimado": 200000,[m
+[31m-        "costo-real": 230000[m
+[32m+[m[32m        "descripcion": "Colado de hormigón",[m
+[32m+[m[32m        "costo-estimado": 302000,[m
+[32m+[m[32m        "costo-real": 320120[m
+     },[m
+     {[m
+         "id-tarea": "3",[m
+         "id-obra": 1,[m
+[32m+[m[32m        "nombre": "LOSA",[m
+[32m+[m[32m        "porcentaje": "100%",[m
+[32m+[m[32m        "estado": "finalizada",[m
+[32m+[m[32m        "fecha-inicio": "2026-07-27",[m
+[32m+[m[32m        "fecha-fin": "2026-08-09",[m
+[32m+[m[32m        "duracion-estimada": 14,[m
+[32m+[m[32m        "duracion-real": 14,[m
+[32m+[m[32m        "descripcion": "LOSA",[m
+[32m+[m[32m        "costo-estimado": 1128000,[m
+[32m+[m[32m        "costo-real": 1195680[m
+[32m+[m[32m    },[m
+[32m+[m[32m    {[m
+[32m+[m[32m        "id-tarea": "3_1",[m
+[32m+[m[32m        "id-obra": 1,[m
+         "nombre": "Armado de losa",[m
+         "porcentaje": "100%",[m
+         "estado": "finalizada",[m
+[32m+[m[32m        "fecha-inicio": "2026-07-27",[m
+[32m+[m[32m        "fecha-fin": "2026-08-01",[m
+[32m+[m[32m        "duracion-estimada": 6,[m
+[32m+[m[32m        "duracion-real": 6,[m
+[32m+[m[32m        "descripcion": "Armado de losa",[m
+[32m+[m[32m        "costo-estimado": 339000,[m
+[32m+[m[32m        "costo-real": 359340[m
+[32m+[m[32m    },[m
+[32m+[m[32m    {[m
+[32m+[m[32m        "id-tarea": "3_2",[m
+[32m+[m[32m        "id-obra": 1,[m
+[32m+[m[32m        "nombre": "Colado de hormigón para losa",[m
+[32m+[m[32m        "porcentaje": "100%",[m
+[32m+[m[32m        "estado": "finalizada",[m
+[32m+[m[32m        "fecha-inicio": "2026-08-02",[m
+[32m+[m[32m        "fecha-fin": "2026-08-04",[m
+[32m+[m[32m        "duracion-estimada": 3,[m
+[32m+[m[32m        "duracion-real": 3,[m
+[32m+[m[32m   
