@@ -15,7 +15,7 @@
 .seguimiento-obra__avance-card { background: #3b3027; color: #fff; padding: 1.15rem 1.25rem; }
 .seguimiento-obra__avance-cabecera { align-items: center; display: flex; justify-content: space-between; }
 .seguimiento-obra__avance-card .seguimiento-obra__eyebrow { color: #f0c89e; }
-.seguimiento-obra__avance-card h2 { color: #edc598; font-size: 2.15rem; font-weight: 650; letter-spacing: -.04em; line-height: 1; margin: 0; }
+.layout-gestor main .seguimiento-obra__avance-card h2 { color: #edc598; font-size: 2.15rem; font-weight: 650; letter-spacing: -.04em; line-height: 1; margin: 0; }
 .seguimiento-obra__avance-card h2 span { font-size: 1rem; margin-left: .12rem; }
 .seguimiento-obra__circulo { align-items: center; border: 1px solid #9b7a5e; border-radius: 50%; color: #f2d8be; display: inline-flex; font-size: 1rem; height: 2rem; justify-content: center; width: 2rem; }
 .seguimiento-obra__barra { background: #f0ece8; border-radius: 99px; height: .55rem; overflow: hidden; }

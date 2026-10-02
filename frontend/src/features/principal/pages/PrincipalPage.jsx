@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { Link, Navigate, useOutletContext } from 'react-router-dom'
+import { Navigate, useOutletContext } from 'react-router-dom'
 import { useFetch } from '../../../shared/hooks/useFetch'
 import { obtenerDatosPanel } from '../services/principalService'
 import '../../../styles/Principal.css'
@@ -80,7 +80,6 @@ function PrincipalPage() {
                     <h1>Buen día, {usuario.nombre}</h1>
                     <p className="dashboard__subtitle">Este es el estado general de tus obras.</p>
                 </div>
-                <Link className="dashboard__action" to="/principal/clientes">Gestionar clientes <span aria-hidden="true">→</span></Link>
             </header>
 
             <section className="dashboard__stats" aria-label="Resumen de obras">

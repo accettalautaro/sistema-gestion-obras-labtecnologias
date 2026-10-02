@@ -15,6 +15,15 @@ function fechaCorta(valor) {
 
 function codigoVisible(id) { return String(id ?? '').replaceAll('-', '.').replaceAll(',', '.') }
 
+function claseEstadoObra(estado) {
+	const normalizado = String(estado ?? '').toLowerCase()
+	if (normalizado.includes('atras')) return 'seguimiento-obra__estado-badge--atrasada'
+	if (normalizado.includes('pausa') || normalizado.includes('suspend')) return 'seguimiento-obra__estado-badge--pausada'
+	if (normalizado.includes('final') || normalizado.includes('complet')) return 'seguimiento-obra__estado-badge--finalizada'
+	if (normalizado.includes('ejecuci')) return 'seguimiento-obra__estado-badge--activa'
+	return ''
+}
+
 function avanceTarea(tarea) {
 	return porcentajeTarea(tarea)
 }
@@ -66,7 +75,7 @@ function SeguimientoObraPage() {
 		<header className="seguimiento-obra__header">
 			<Volver to="/principal/obras">Volver a gestión de obras</Volver>
 			<div className="seguimiento-obra__encabezado-texto"><p className="seguimiento-obra__eyebrow">Seguimiento de obra</p><h1>Obra #{obra.id} · Lote {obra.nrolote}</h1><p>{obra.direccion}</p></div>
-			<span className={`seguimiento-obra__estado-badge ${obra.estado.toLowerCase().includes('final') ? 'seguimiento-obra__estado-badge--finalizada' : ''}`}>{obra.estado}</span>
+			<span className={`seguimiento-obra__estado-badge ${claseEstadoObra(obra.estado)}`}>{obra.estado}</span>
 		</header>
 
 		<section className="seguimiento-obra__resumen" aria-label="Resumen del avance">
