@@ -8,7 +8,7 @@ const ENLACES_GESTOR = [
   { id: 2, texto: 'Gestión de clientes', destino: '/principal/clientes', disponible: true, requiereArquitecto: true },
 
   { id: 3, texto: 'Gestión de obras', destino: '/principal/obras', disponible: true, requiereArquitecto: true },
-  { id: 7, texto: 'Gestión de terrenos', destino: '/principal/terrenos', disponible: true, requiereArquitecto: true },
+  { id: 4, texto: 'Gestión de terrenos', destino: '/principal/terrenos', disponible: true, requiereArquitecto: true },
   { id: 5, texto: 'Gestión de pagos', destino: '/principal/pagos', disponible: true, requiereArquitecto: true },
   { id: 6, texto: 'Recordatorios', destino: '/principal/recordatorios', disponible: true },
 
@@ -34,30 +34,30 @@ function LayoutGestor() {
   let recordatoriosProximos = 0;
 
   if (datosRec) {
-      const hoy = new Date('2026-09-30T00:00:00');
-      const calcularDiff = (fechaStr) => {
-          if (!fechaStr) return null;
-          const fecha = new Date(fechaStr + 'T00:00:00');
-          return Math.ceil((fecha.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24));
-      };
+    const hoy = new Date('2026-09-30T00:00:00');
+    const calcularDiff = (fechaStr) => {
+      if (!fechaStr) return null;
+      const fecha = new Date(fechaStr + 'T00:00:00');
+      return Math.ceil((fecha.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24));
+    };
 
-      const { tareas = [], recordatorios = [] } = datosRec;
+    const { tareas = [], recordatorios = [] } = datosRec;
 
-      tareas.forEach(tarea => {
-          const diffInicio = calcularDiff(tarea.fechaInicio);
-          const diffFin = calcularDiff(tarea.fechaFin);
-          const estado = (tarea.estado || '').toLowerCase();
+    tareas.forEach(tarea => {
+      const diffInicio = calcularDiff(tarea.fechaInicio);
+      const diffFin = calcularDiff(tarea.fechaFin);
+      const estado = (tarea.estado || '').toLowerCase();
 
-          if (estado === 'sin comenzar') {
-              if (diffInicio < 0) recordatoriosAtrasados++;
-              else if (diffInicio <= 7) recordatoriosProximos++;
-          } else if (estado === 'en ejecucion') {
-              if (diffFin < 0) recordatoriosAtrasados++;
-              else if (diffFin <= 7) recordatoriosProximos++;
-          }
-      });
-      // Los recordatorios personalizados (json) se manejan dentro de la página,
-      // para el badge principal solo contamos las alertas de plazos de tareas.
+      if (estado === 'sin comenzar') {
+        if (diffInicio < 0) recordatoriosAtrasados++;
+        else if (diffInicio <= 7) recordatoriosProximos++;
+      } else if (estado === 'en ejecucion') {
+        if (diffFin < 0) recordatoriosAtrasados++;
+        else if (diffFin <= 7) recordatoriosProximos++;
+      }
+    });
+    // Los recordatorios personalizados (json) se manejan dentro de la página,
+    // para el badge principal solo contamos las alertas de plazos de tareas.
   }
 
   return (
@@ -104,10 +104,10 @@ function LayoutGestor() {
                 const mostrarBadge = esRecordatorios && (recordatoriosAtrasados > 0 || recordatoriosProximos > 0);
 
                 return (
-                  <NavLink 
-                    key={enlace.id} 
-                    className={`nav-link ${mostrarBadge ? 'd-flex justify-content-between align-items-center' : ''}`} 
-                    to={enlace.destino} 
+                  <NavLink
+                    key={enlace.id}
+                    className={`nav-link ${mostrarBadge ? 'd-flex justify-content-between align-items-center' : ''}`}
+                    to={enlace.destino}
                     end
                   >
                     {enlace.texto}
