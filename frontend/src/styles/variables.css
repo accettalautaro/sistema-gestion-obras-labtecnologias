@@ -1,0 +1,59 @@
+:root {
+	/* Paleta general */
+	--color-sombra: rgb(0 0 0 / 12%);
+	--color-seccion: #232323;
+	--color-primario: #fff;
+	--color-texto1: #000;
+	--color-seccionclaro: #f4f4f4;
+	--color-texto2: #999;
+	--color-texto2-resaltado: #666;
+	--color-texto3: #333;
+	--color-texto-footer: #898989;
+	--fuente-principal: "Roboto", "Helvetica Neue", sans-serif;
+	--fuente-secundaria: "Open Sans", "Helvetica Neue", sans-serif;
+
+	/* Interfaz de gestión y clientes */
+	--ui-ink: #282725;
+	--ui-accent: #a76628;
+	--ui-accent-hover: #8e5520;
+	--ui-accent-soft: #f5eee7;
+	--ui-muted: #77736d;
+	--ui-line: #e6e1d9;
+	--ui-surface: #fff;
+	--ui-canvas: #f7f6f3;
+	--ui-radius: .5rem;
+	--ui-shadow: 0 3px 14px rgb(40 39 37 / 5%);
+	--ui-font: "Segoe UI", Roboto, Arial, sans-serif;
+	--color-superficie-hover: #faf7f3;
+	--color-borde-suave: #eeeae4;
+	--color-acento-borde: #d7b99d;
+	--color-fondo-tabla: #f7f5f1;
+
+	/* Paleta verde de obras, terrenos y clientes */
+	--color-borde-verde: #d9dedb;
+	--color-borde-verde-claro: #dfe4e1;
+	--color-verde-secundario: #557168;
+	--color-verde-oscuro: #213c34;
+	--color-verde-acento: #315447;
+	--color-verde-suave: #e8f0ec;
+	--color-verde-titulo: #263f37;
+	--color-verde-muted: #65736e;
+	--color-verde-codigo: #718078;
+	--color-verde-label: #3b5149;
+
+	/* Dashboard */
+	--dashboard-ink: #252525;
+	--dashboard-muted: #777;
+	--dashboard-line: #ecebe8;
+	--dashboard-accent: var(--ui-accent);
+	--dashboard-green: #43856a;
+	--dashboard-blue: #647e9e;
+	--dashboard-amber: #b48643;
+
+	/* Seguimiento de obra */
+	--seguimiento-ink: #3b3027;
+	--seguimiento-muted: #7a7169;
+	--seguimiento-line: #e9e2dc;
+	--seguimiento-acento: var(--ui-accent);
+	--color-seguimiento-ink: var(--seguimiento-ink);
+}

@@ -1,13 +1,13 @@
 .layout-gestor {
-	--gestor-ink: #282725;
-	--gestor-accent: #a76628;
+	--gestor-ink: var(--ui-ink);
+	--gestor-accent: var(--ui-accent);
 	--gestor-muted: #77736d;
 	--gestor-line: #e9e5df;
 	--gestor-surface: #faf9f7;
 }
 
 .navbar-site.header-scrolled:has(.navbar-gestor__account) {
-	background: #fff !important;
+	background: var(--color-primario) !important;
 	box-shadow: 0 2px 12px rgb(40 39 37 / 8%);
 }
 
@@ -31,7 +31,7 @@
 	background: var(--gestor-ink);
 	border: 1px solid var(--gestor-ink);
 	border-radius: 4px;
-	color: #fff;
+	color: var(--color-primario);
 	cursor: pointer;
 	font: inherit;
 	font-size: .82rem;
@@ -44,7 +44,7 @@
 .navbar-gestor__logout:focus-visible {
 	background: var(--gestor-accent);
 	border-color: var(--gestor-accent);
-	color: #fff;
+	color: var(--color-primario);
 }
 
 .navbar-gestor__logout:focus-visible {
@@ -108,7 +108,7 @@
 
 .sidebar-gestor .nav-link .badge {
 	background: #f0ede8 !important;
-	border: 1px solid #e6e1d9;
+	border: 1px solid var(--ui-line);
 	border-radius: 99px;
 	color: #8a837a !important;
 	font-size: .63rem;
@@ -117,18 +117,18 @@
 
 .sidebar-gestor .nav-link .badge.bg-danger {
 	background: #a34242 !important;
-	color: #ffffff !important;
+	color: var(--color-primario) !important;
 	border-color: #923a3a;
 }
 
 .sidebar-gestor .nav-link .badge.bg-warning {
-	background: #a76628 !important;
-	color: #ffffff !important;
+	background: var(--ui-accent) !important;
+	color: var(--color-primario) !important;
 	border-color: #965a22;
 }
 
 .layout-gestor > .d-flex.flex-grow-1 > main {
-	background: #f7f6f3;
+	background: var(--ui-canvas);
 	min-width: 0;
 }
 

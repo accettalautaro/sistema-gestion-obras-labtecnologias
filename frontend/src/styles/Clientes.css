@@ -12,13 +12,13 @@
 }
 
 .clientes-page__header {
-	border-bottom: 1px solid #d9dedb;
+	border-bottom: 1px solid var(--color-borde-verde);
 	margin-bottom: 1.25rem;
 	padding-bottom: 1.25rem;
 }
 
 .clientes-page__eyebrow {
-	color: #557168;
+	color: var(--color-verde-secundario);
 	font-size: 0.75rem;
 	font-weight: 700;
 	margin: 0 0 0.35rem;
@@ -26,21 +26,21 @@
 }
 
 .clientes-page__header h1 {
-	color: #213c34;
+	color: var(--color-verde-oscuro);
 	font-size: 1.9rem;
 	font-weight: 600;
 	margin: 0 0 0.35rem;
 }
 
 .clientes-page__header p:last-child {
-	color: #a76628;
+	color: var(--ui-accent);
 	margin: 0;
 }
 
 .clientes-page__count,
 .clientes-page__cuenta {
-	background: #e8f0ec;
-	color: #315447;
+	background: var(--color-verde-suave);
+	color: var(--color-verde-acento);
 	display: inline-block;
 	font-size: 0.8rem;
 	font-weight: 600;
@@ -60,8 +60,8 @@
 
 .clientes-page__listado,
 .clientes-page__formulario {
-	background: #fff;
-	border: 1px solid #dfe4e1;
+	background: var(--color-primario);
+	border: 1px solid var(--color-borde-verde-claro);
 	min-width: 0;
 	padding: 1.2rem;
 }
@@ -73,7 +73,7 @@
 
 .clientes-page__toolbar h2,
 .clientes-page__formulario h2 {
-	color: #263f37;
+	color: var(--color-verde-titulo);
 	font-size: 1.15rem;
 	font-weight: 600;
 	margin: 0;
@@ -159,7 +159,7 @@
 }
 
 .clientes-page__formulario-header p {
-	color: #65736e;
+	color: var(--color-verde-muted);
 	font-size: 0.85rem;
 	margin: 0.35rem 0 0;
 }
@@ -176,7 +176,7 @@
 }
 
 .clientes-page__modal {
-	background: #fff;
+	background: var(--color-primario);
 	border-radius: 0.4rem;
 	box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.2);
 	max-width: 32rem;
@@ -186,7 +186,7 @@
 
 .clientes-page__modal-cabecera {
 	align-items: center;
-	border-bottom: 1px solid #dfe4e1;
+	border-bottom: 1px solid var(--color-borde-verde-claro);
 	display: flex;
 	justify-content: space-between;
 	margin-bottom: 1rem;
@@ -194,7 +194,7 @@
 }
 
 .clientes-page__modal-cabecera h2 {
-	color: #263f37;
+	color: var(--color-verde-titulo);
 	font-size: 1.2rem;
 	margin: 0;
 }
@@ -202,7 +202,7 @@
 .clientes-page__modal-cerrar {
 	background: none;
 	border: 0;
-	color: #65736e;
+	color: var(--color-verde-muted);
 	font-size: 1.7rem;
 	line-height: 1;
 }
