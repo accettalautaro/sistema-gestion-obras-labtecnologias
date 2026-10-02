@@ -20,7 +20,7 @@
 	font-weight: 600;
 	text-transform: uppercase;
 	letter-spacing: 0.05em;
-	color: #65736e;
+	color: var(--color-verde-muted);
 	margin-bottom: 0.5rem;
 }
 
@@ -31,7 +31,7 @@
 }
 
 .pagos-page__header p:last-child {
-	color: #a76628;
+	color: var(--ui-accent);
 	margin: 0;
 }
 
@@ -135,21 +135,21 @@
 }
 
 .pagos-page__btn-submit:hover:not(:disabled) {
-	background-color: #a76628 !important;
-	border-color: #a76628 !important;
+	background-color: var(--ui-accent) !important;
+	border-color: var(--ui-accent) !important;
 	transform: translateY(-1px);
 }
 
 .pagos-page__badge-obra {
 	background-color: #fdfaf6;
-	color: #a76628;
-	border: 1px solid #a76628;
+	color: var(--ui-accent);
+	border: 1px solid var(--ui-accent);
 	font-weight: 600;
 }
 
 .pagos-page__formulario .form-control:focus,
 .pagos-page__formulario .form-select:focus {
-	border-color: #a76628;
+	border-color: var(--ui-accent);
 	box-shadow: 0 0 0 0.25rem rgba(167, 102, 40, 0.25);
 }
 
@@ -173,7 +173,7 @@
 }
 
 .pagos-page__btn-desplegar:hover {
-    background-color: #a76628 !important;
-    border-color: #a76628 !important;
-    color: #fff !important;
+    background-color: var(--ui-accent) !important;
+    border-color: var(--ui-accent) !important;
+    color: var(--color-primario) !important;
 }

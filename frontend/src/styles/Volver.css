@@ -1,9 +1,9 @@
 .boton-volver {
 	align-items: center;
-	background: var(--ui-surface, #fff);
-	border: 1px solid var(--ui-line, #e6e1d9);
+	background: var(--ui-surface, var(--color-primario));
+	border: 1px solid var(--ui-line);
 	border-radius: .4rem;
-	color: var(--ui-ink, #282725);
+	color: var(--ui-ink);
 	display: inline-flex;
 	flex: 0 0 auto;
 	font: 600 .84rem/1.2 var(--ui-font, "Segoe UI", Roboto, Arial, sans-serif);
@@ -15,9 +15,9 @@
 }
 
 .boton-volver:hover {
-	background: var(--ui-accent-soft, #f5eee7);
-	border-color: #d7b99d;
-	color: var(--ui-accent-hover, #8e5520);
+	background: var(--ui-accent-soft);
+	border-color: var(--color-acento-borde);
+	color: var(--ui-accent-hover);
 }
 
 .boton-volver:focus-visible {
@@ -25,7 +25,7 @@
 	outline: 0;
 }
 
-.boton-volver__flecha { color: var(--ui-accent, #a76628); font-size: 1.1rem; line-height: .9; }
+.boton-volver__flecha { color: var(--ui-accent); font-size: 1.1rem; line-height: .9; }
 
 @media (prefers-reduced-motion: reduce) {
 	.boton-volver { transition: none; }

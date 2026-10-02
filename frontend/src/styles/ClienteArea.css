@@ -3,7 +3,7 @@
 }
 
 .layout-cliente .navbar-site.navbar-cliente {
-	background: #fff !important;
+	background: var(--color-primario) !important;
 	box-shadow: 0 2px 12px rgb(40 39 37 / 8%);
 }
 
@@ -62,7 +62,7 @@
 }
 .layout-cliente .cliente-obra-card:hover,
 .layout-cliente .cliente-obra-card:focus-visible {
-	border-color: #d7b99d;
+	border-color: var(--color-acento-borde);
 	box-shadow: 0 8px 22px rgb(40 39 37 / 9%);
 	color: var(--ui-ink);
 	transform: translateY(-2px);
@@ -79,10 +79,10 @@
 .layout-cliente .cliente-detalle__encabezado .badge { font-size: .78rem !important; }
 .layout-cliente .cliente-detalle .badge.text-bg-primary { background-color: var(--ui-accent) !important; }
 .layout-cliente .cliente-detalle .card h6 { color: var(--ui-accent) !important; font-size: .72rem; letter-spacing: .08em; }
-.layout-cliente .cliente-detalle .card .bg-light { background: #f7f5f1 !important; }
+.layout-cliente .cliente-detalle .card .bg-light { background: var(--color-fondo-tabla) !important; }
 .layout-cliente .cliente-detalle .table tbody tr { cursor: pointer; }
-.layout-cliente .cliente-detalle .table tbody tr:hover { --bs-table-bg: #faf7f3; }
-.layout-cliente .cliente-gantt__pista { background: #eeeae4; border-radius: 999px; }
+.layout-cliente .cliente-detalle .table tbody tr:hover { --bs-table-bg: var(--color-superficie-hover); }
+.layout-cliente .cliente-gantt__pista { background: var(--color-borde-suave); border-radius: 999px; }
 .layout-cliente .cliente-gantt__barra { background: #d8d3cc; border-radius: 999px; display: flex; overflow: hidden; transition: filter .16s ease, transform .16s ease; }
 .layout-cliente .cliente-gantt__barra--en-ejecucion { background: var(--ui-accent); }
 .layout-cliente .cliente-gantt__barra--finalizada { background: #786f64; }
@@ -90,12 +90,12 @@
 .layout-cliente .cliente-gantt__barra > span { background: rgb(255 255 255 / 25%); height: 100%; }
 .layout-cliente .cliente-tareas-lista { display: grid; gap: .65rem; }
 .layout-cliente .cliente-tareas-lista__grupo,
-.layout-cliente .cliente-tareas-lista__tarea--simple { background: #fff; border: 1px solid var(--ui-line); border-radius: var(--ui-radius); }
+.layout-cliente .cliente-tareas-lista__tarea--simple { background: var(--color-primario); border: 1px solid var(--ui-line); border-radius: var(--ui-radius); }
 .layout-cliente .cliente-tareas-lista__grupo { overflow: hidden; }
 .layout-cliente .cliente-tareas-lista__tarea { align-items: center; color: var(--ui-ink); cursor: pointer; display: grid; gap: .85rem; grid-template-columns: minmax(180px, 1.3fr) auto minmax(100px, .7fr) auto; list-style: none; min-height: 3.8rem; padding: .7rem .9rem; text-decoration: none; }
 .layout-cliente .cliente-tareas-lista__tarea::-webkit-details-marker { display: none; }
 .layout-cliente .cliente-tareas-lista__tarea--simple { transition: border-color .16s ease, background-color .16s ease; }
-.layout-cliente .cliente-tareas-lista__tarea--simple:hover { background: #faf7f3; border-color: #d7b99d; color: var(--ui-ink); }
+.layout-cliente .cliente-tareas-lista__tarea--simple:hover { background: var(--color-superficie-hover); border-color: var(--color-acento-borde); color: var(--ui-ink); }
 .layout-cliente .cliente-tareas-lista__nombre { align-items: baseline; display: flex; gap: .6rem; min-width: 0; }
 .layout-cliente .cliente-tareas-lista__nombre strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .layout-cliente .cliente-tareas-lista__codigo { color: var(--ui-muted); flex: 0 0 auto; font-size: .74rem; font-weight: 700; }
@@ -108,11 +108,11 @@
 .layout-cliente .cliente-tareas-lista__subtareas { background: #faf9f7; border-top: 1px solid var(--ui-line); padding: .65rem .9rem .75rem 1.5rem; }
 .layout-cliente .cliente-tareas-lista__detalle-principal { color: var(--ui-accent-hover); display: inline-block; font-size: .78rem; font-weight: 600; margin: 0 0 .35rem; text-decoration: none; }
 .layout-cliente .cliente-tareas-lista__detalle-principal:hover { text-decoration: underline; }
-.layout-cliente .cliente-tareas-lista__subtarea { align-items: center; border-top: 1px solid #eeeae4; color: var(--ui-ink); display: grid; gap: .75rem; grid-template-columns: 3rem minmax(0, 1fr) auto 3.2rem; padding: .62rem .15rem; text-decoration: none; }
+.layout-cliente .cliente-tareas-lista__subtarea { align-items: center; border-top: 1px solid var(--color-borde-suave); color: var(--ui-ink); display: grid; gap: .75rem; grid-template-columns: 3rem minmax(0, 1fr) auto 3.2rem; padding: .62rem .15rem; text-decoration: none; }
 .layout-cliente .cliente-tareas-lista__subtarea:hover { color: var(--ui-accent-hover); }
 .layout-cliente .cliente-tareas-lista__subtarea strong { font-size: .86rem; font-weight: 500; }
 .layout-cliente .cliente-tareas-lista__subtarea-avance { text-align: right; }
-.layout-cliente .cliente-tareas-lista__grupo[open] > .cliente-tareas-lista__tarea { background: #faf7f3; }
+.layout-cliente .cliente-tareas-lista__grupo[open] > .cliente-tareas-lista__tarea { background: var(--color-superficie-hover); }
 .layout-cliente .cliente-detalle-tarea .list-group-item { border-color: var(--ui-line); }
 .layout-cliente .cliente-detalle-tarea .modal-content { border: 1px solid var(--ui-line); border-radius: var(--ui-radius); }
 

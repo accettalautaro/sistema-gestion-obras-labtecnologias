@@ -1,47 +1,47 @@
 .terrenos-page { margin: 0 auto; max-width: 1200px; }
 .terrenos-page__header, .terrenos-page__panel-titulo, .terrenos-page__carga, .terrenos-page__tarjeta { align-items: center; display: flex; gap: 1rem; justify-content: space-between; }
-.terrenos-page__header { border-bottom: 1px solid #d9dedb; margin-bottom: 1.25rem; padding-bottom: 1.25rem; }
-.terrenos-page__eyebrow, .terrenos-page__etiqueta { color: #557168; font-size: .75rem; font-weight: 700; margin: 0 0 .35rem; text-transform: uppercase; }
-.terrenos-page__header h1 { color: #213c34; font-size: 1.9rem; font-weight: 600; margin: 0 0 .35rem; }
-.terrenos-page__header p:last-child, .terrenos-page__tarjeta p, .terrenos-page__carga p { color: #65736e; margin: 0; }
-.terrenos-page__count, .terrenos-page__proximo { background: #e8f0ec; color: #315447; display: inline-block; font-size: .78rem; font-weight: 600; padding: .35rem .55rem; white-space: nowrap; }
+.terrenos-page__header { border-bottom: 1px solid var(--color-borde-verde); margin-bottom: 1.25rem; padding-bottom: 1.25rem; }
+.terrenos-page__eyebrow, .terrenos-page__etiqueta { color: var(--color-verde-secundario); font-size: .75rem; font-weight: 700; margin: 0 0 .35rem; text-transform: uppercase; }
+.terrenos-page__header h1 { color: var(--color-verde-oscuro); font-size: 1.9rem; font-weight: 600; margin: 0 0 .35rem; }
+.terrenos-page__header p:last-child, .terrenos-page__tarjeta p, .terrenos-page__carga p { color: var(--color-verde-muted); margin: 0; }
+.terrenos-page__count, .terrenos-page__proximo { background: var(--color-verde-suave); color: var(--color-verde-acento); display: inline-block; font-size: .78rem; font-weight: 600; padding: .35rem .55rem; white-space: nowrap; }
 .terrenos-page__listado, .terrenos-page__detalle { display: grid; gap: 1rem; }
 .terrenos-page__busqueda { display: block; margin-bottom: 1rem; max-width: 30rem; }
-.terrenos-page__tarjeta, .terrenos-page__panel, .terrenos-page__carga { background: #fff; border: 1px solid #dfe4e1; min-width: 0; padding: 1.1rem; }
-.terrenos-page__tarjeta h2 { color: #263f37; font-size: 1.2rem; margin: 0 0 .3rem; }
-.terrenos-page__tarjeta small { color: #65736e; display: inline-block; margin-top: .65rem; }
+.terrenos-page__tarjeta, .terrenos-page__panel, .terrenos-page__carga { background: var(--color-primario); border: 1px solid var(--color-borde-verde-claro); min-width: 0; padding: 1.1rem; }
+.terrenos-page__tarjeta h2 { color: var(--color-verde-titulo); font-size: 1.2rem; margin: 0 0 .3rem; }
+.terrenos-page__tarjeta small { color: var(--color-verde-muted); display: inline-block; margin-top: .65rem; }
 .terrenos-page__tarjeta .btn { flex-shrink: 0; }
 .terrenos-page__detalle { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 1rem; }
-.terrenos-page__panel h2, .terrenos-page__panel h3, .terrenos-page__carga h2 { color: #263f37; font-size: 1.1rem; font-weight: 600; margin: 0; }
+.terrenos-page__panel h2, .terrenos-page__panel h3, .terrenos-page__carga h2 { color: var(--color-verde-titulo); font-size: 1.1rem; font-weight: 600; margin: 0; }
 .terrenos-page__panel-titulo { align-items: flex-start; margin-bottom: .9rem; }
-.terrenos-page__panel-titulo p { color: #65736e; font-size: .85rem; margin: .3rem 0 0; }
+.terrenos-page__panel-titulo p { color: var(--color-verde-muted); font-size: .85rem; margin: .3rem 0 0; }
 .terrenos-page__proximo { background: #f1f2ef; color: #69736e; }
 .terrenos-page__datos { display: grid; gap: .8rem 1rem; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 0; }
 .terrenos-page__datos div { min-width: 0; }
-.terrenos-page__datos dt { color: #65736e; font-size: .75rem; font-weight: 600; }
+.terrenos-page__datos dt { color: var(--color-verde-muted); font-size: .75rem; font-weight: 600; }
 .terrenos-page__datos dd { color: #293d35; margin: .2rem 0 0; overflow-wrap: anywhere; }
 .terrenos-page__propietario { border-bottom: 1px solid #e6eae7; margin-bottom: 1rem; padding-bottom: 1rem; }
 .terrenos-page__documentos { color: #344b42; margin: 0 0 1rem; padding-left: 1.25rem; }
 .terrenos-page__acciones { display: flex; flex-wrap: wrap; gap: .5rem; }
 .terrenos-page__acciones button:disabled { cursor: not-allowed; opacity: .65; }
-.terrenos-page__volver { color: #315447; display: inline-block; font-size: .9rem; text-decoration: none; }
+.terrenos-page__volver { color: var(--color-verde-acento); display: inline-block; font-size: .9rem; text-decoration: none; }
 .terrenos-page__volver:hover { text-decoration: underline; }
 .terrenos-page__carga { margin-top: 1rem; }
 .terrenos-page__carga p { font-size: .88rem; margin-top: .35rem; }
-.terrenos-page__formulario { background: #fff; border: 1px solid #dfe4e1; margin-top: 1rem; padding: 1.2rem; }
+.terrenos-page__formulario { background: var(--color-primario); border: 1px solid var(--color-borde-verde-claro); margin-top: 1rem; padding: 1.2rem; }
 .terrenos-page__grupo-campos { border: 0; margin: 0 0 1.2rem; padding: 0; }
-.terrenos-page__grupo-campos legend { border-bottom: 1px solid #e3e8e5; color: #315447; float: none; font-size: 1rem; font-weight: 600; margin-bottom: .8rem; padding-bottom: .45rem; width: 100%; }
+.terrenos-page__grupo-campos legend { border-bottom: 1px solid #e3e8e5; color: var(--color-verde-acento); float: none; font-size: 1rem; font-weight: 600; margin-bottom: .8rem; padding-bottom: .45rem; width: 100%; }
 .terrenos-page__campos { display: grid; gap: .85rem; grid-template-columns: repeat(3, minmax(0, 1fr)); }
-.terrenos-page__campos label { color: #3b5149; display: grid; font-size: .85rem; font-weight: 600; gap: .35rem; min-width: 0; }
+.terrenos-page__campos label { color: var(--color-verde-label); display: grid; font-size: .85rem; font-weight: 600; gap: .35rem; min-width: 0; }
 .terrenos-page__campos-dos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.terrenos-page__documento-pendiente { background: #f5f7f5; color: #65736e; font-size: .9rem; padding: .8rem 1rem; }
+.terrenos-page__documento-pendiente { background: #f5f7f5; color: var(--color-verde-muted); font-size: .9rem; padding: .8rem 1rem; }
 .terrenos-page__form-acciones { display: flex; gap: .5rem; justify-content: flex-end; margin-top: 1rem; }
-.terrenos-page__vacio, .terrenos-page__estado { color: #65736e; padding: 1rem; text-align: center; }
+.terrenos-page__vacio, .terrenos-page__estado { color: var(--color-verde-muted); padding: 1rem; text-align: center; }
 .terrenos-page__modal-fondo { align-items: center; background: rgba(24, 37, 32, .55); display: flex; inset: 0; justify-content: center; padding: 1rem; position: fixed; z-index: 1100; }
-.terrenos-page__modal { background: #fff; border-radius: .4rem; box-shadow: 0 1rem 3rem rgba(0, 0, 0, .2); max-width: 32rem; padding: 1.35rem; width: 100%; }
-.terrenos-page__modal-cabecera { align-items: center; border-bottom: 1px solid #dfe4e1; display: flex; justify-content: space-between; margin-bottom: 1rem; padding-bottom: .8rem; }
-.terrenos-page__modal-cabecera h2 { color: #263f37; font-size: 1.2rem; margin: 0; }
-.terrenos-page__modal-cerrar { background: none; border: 0; color: #65736e; font-size: 1.7rem; line-height: 1; }
+.terrenos-page__modal { background: var(--color-primario); border-radius: .4rem; box-shadow: 0 1rem 3rem rgba(0, 0, 0, .2); max-width: 32rem; padding: 1.35rem; width: 100%; }
+.terrenos-page__modal-cabecera { align-items: center; border-bottom: 1px solid var(--color-borde-verde-claro); display: flex; justify-content: space-between; margin-bottom: 1rem; padding-bottom: .8rem; }
+.terrenos-page__modal-cabecera h2 { color: var(--color-verde-titulo); font-size: 1.2rem; margin: 0; }
+.terrenos-page__modal-cerrar { background: none; border: 0; color: var(--color-verde-muted); font-size: 1.7rem; line-height: 1; }
 .terrenos-page__modal > p { color: #46574f; line-height: 1.5; }
 .terrenos-page__modal-acciones { display: flex; justify-content: flex-end; margin-top: 1rem; }
 .terrenos-page__detalle > .terrenos-page__panel:nth-child(n + 3) { grid-column: 1 / -1; }

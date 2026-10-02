@@ -1,16 +1,5 @@
 /* Shared visual language for the authenticated manager and client areas. */
 .layout-gestor {
-	--ui-ink: #282725;
-	--ui-accent: #a76628;
-	--ui-accent-hover: #8e5520;
-	--ui-accent-soft: #f5eee7;
-	--ui-muted: #77736d;
-	--ui-line: #e6e1d9;
-	--ui-surface: #fff;
-	--ui-canvas: #f7f6f3;
-	--ui-radius: .5rem;
-	--ui-shadow: 0 3px 14px rgb(40 39 37 / 5%);
-	--ui-font: "Segoe UI", Roboto, Arial, sans-serif;
 	background: var(--ui-canvas) !important;
 	color: var(--ui-ink);
 	font-family: var(--ui-font);
@@ -48,7 +37,7 @@
 .layout-gestor main :is(.dashboard-stat--primary, .seguimiento-obra__avance-card) {
 	background: var(--ui-ink);
 	border-color: var(--ui-ink);
-	color: #fff;
+	color: var(--color-primario);
 }
 
 .layout-gestor main :is(.obras-page__header, .clientes-page__header, .terrenos-page__header, .pagos-page__header, .recordatorios__header, .seguimiento-obra__header, .gestionar-tareas__header, .dashboard__header) {
@@ -79,7 +68,7 @@
 .layout-gestor main .btn.obras-page__boton-seguimiento {
 	background: var(--ui-accent);
 	border-color: var(--ui-accent);
-	color: #fff;
+	color: var(--color-primario);
 }
 
 .layout-gestor main .btn-primary:hover,
@@ -88,14 +77,14 @@
 .layout-gestor main .btn.obras-page__boton-seguimiento:hover {
 	background: var(--ui-accent-hover);
 	border-color: var(--ui-accent-hover);
-	color: #fff;
+	color: var(--color-primario);
 }
 
 .layout-gestor main .btn-outline-dark {
 	border-color: #cfc8bf;
 	color: var(--ui-ink);
 }
-.layout-gestor main .btn-outline-dark:hover { background: var(--ui-ink); border-color: var(--ui-ink); color: #fff; }
+.layout-gestor main .btn-outline-dark:hover { background: var(--ui-ink); border-color: var(--ui-ink); color: var(--color-primario); }
 
 .layout-gestor main :is(.form-control, .form-select) {
 	border-color: #d9d4cc;
@@ -111,11 +100,11 @@
 
 .layout-gestor main .table {
 	--bs-table-color: var(--ui-ink);
-	--bs-table-hover-bg: #faf7f3;
+	--bs-table-hover-bg: var(--color-superficie-hover);
 	margin-bottom: 0;
 }
 .layout-gestor main .table thead th {
-	background: #f7f5f1;
+	background: var(--color-fondo-tabla);
 	border-bottom-color: var(--ui-line);
 	color: var(--ui-muted);
 	font-size: .72rem;
@@ -123,9 +112,9 @@
 	letter-spacing: .045em;
 	text-transform: uppercase;
 }
-.layout-gestor main .table > :not(caption) > * > * { border-bottom-color: #eeeae4; }
+.layout-gestor main .table > :not(caption) > * > * { border-bottom-color: var(--color-borde-suave); }
 
-.layout-gestor main .progress { background-color: #eeeae4; border-radius: 999px; }
+.layout-gestor main .progress { background-color: var(--color-borde-suave); border-radius: 999px; }
 .layout-gestor main .progress-bar { background-color: var(--ui-accent); border-radius: inherit; }
 .layout-gestor main :is(.obras-page__estado-badge, .dashboard-status) { border-radius: 999px; }
 .layout-gestor main .alert { border-radius: var(--ui-radius); }
