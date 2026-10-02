@@ -7,5 +7,15 @@
         "codpos":"5700",
         "calle":"Ejercito de los Andes",
         "altura":"1234"
+    },
+    
+    {
+        "id-direc":2,
+        "nrolote":500,
+        "localidad": "San Luis",
+        "provincia":"San Luis",
+        "codpos":"5700",
+        "calle":"Maipu",
+        "altura":"1234"
     }
 ]

@@ -15,7 +15,7 @@ import ClientePage from './features/dashCliente/pages/clientePage'
 import { ViewObraPage } from './features/viewObra'
 import { ViewPagoPage } from './features/viewPago'
 import { ObrasPage } from './features/obras'
-import { TerrenosPage } from './features/terrenos'
+import { TerrenosPage, PropietariosPage } from './features/terrenos'
 
 
 export const router = createBrowserRouter([
@@ -46,6 +46,7 @@ export const router = createBrowserRouter([
       { path: 'clientes', element: <ClientesPage /> },
       { path: 'obras', element: <ObrasPage /> },
       { path: 'terrenos/:nrolote?', element: <TerrenosPage /> },
+      { path: 'terrenos/:nrolote/propietarios', element: <PropietariosPage /> },
       { path: 'pagos', element: <PagosPage /> },
       { path: 'recordatorios', element: <RecordatoriosPage /> },
     ]

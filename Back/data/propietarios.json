@@ -17,6 +17,15 @@
         "dni":"987654321",
         "estadocivil":"Casado",
         "porcentaje":"50%"
+    },
+    {
+        "id-propietario":2,
+        "nroescritura":2,
+        "nombre": "Maria",
+        "apellido":"Rios",
+        "dni":"987654321",
+        "estadocivil":"Casado",
+        "porcentaje":"100%"
     }
    
 ]
