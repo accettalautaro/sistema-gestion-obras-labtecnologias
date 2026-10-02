@@ -1,0 +1,80 @@
+.seguimiento-obra { --seguimiento-ink: #3b3027; --seguimiento-muted: #7a7169; --seguimiento-line: #e9e2dc; --seguimiento-acento: #a76628; margin: 0 auto; max-width: 1320px; }
+.btn.seguimiento-obra__boton { background: #a76628; border-color: #a76628; color: #fff; }
+.btn.seguimiento-obra__boton:hover, .btn.seguimiento-obra__boton:focus-visible { background: #8e5520; border-color: #8e5520; color: #fff; }
+.seguimiento-obra .progress-bar { background-color: #a76628; }
+.seguimiento-obra__header { align-items: center; border-bottom: 1px solid var(--seguimiento-line); display: flex; gap: 1rem; margin-bottom: 1.25rem; padding-bottom: 1.25rem; }
+.seguimiento-obra__volver { align-items: center; border: 1px solid var(--seguimiento-line); border-radius: 50%; color: var(--seguimiento-ink); display: inline-flex; flex: 0 0 2.5rem; font-size: 1.35rem; height: 2.5rem; justify-content: center; text-decoration: none; }
+.seguimiento-obra__encabezado-texto { min-width: 0; }
+.seguimiento-obra__eyebrow { color: var(--seguimiento-acento); font-size: .72rem; font-weight: 700; letter-spacing: .08em; margin: 0 0 .25rem; text-transform: uppercase; }
+.seguimiento-obra__header h1 { color: var(--seguimiento-ink); font-size: clamp(1.4rem, 3vw, 1.9rem); font-weight: 650; margin: 0; }
+.seguimiento-obra__header p:last-child { color: var(--seguimiento-muted); font-size: .9rem; margin: .3rem 0 0; }
+.seguimiento-obra__estado-badge { background: #f7ebde; border-radius: 99px; color: #8e5520; font-size: .78rem; margin-left: auto; padding: .45rem .8rem; white-space: nowrap; }
+.seguimiento-obra__estado-badge--finalizada { background: #eef0f2; color: #60676e; }
+.seguimiento-obra__resumen { display: grid; gap: .85rem; grid-template-columns: minmax(250px, 1.5fr) repeat(3, minmax(120px, .7fr)); margin-bottom: 1rem; }
+.seguimiento-obra__avance-card, .seguimiento-obra__dato, .seguimiento-obra__panel { background: #fff; border: 1px solid var(--seguimiento-line); border-radius: .45rem; box-shadow: 0 4px 16px rgb(35 45 40 / 3%); }
+.seguimiento-obra__avance-card { background: #3b3027; color: #fff; padding: 1.15rem 1.25rem; }
+.seguimiento-obra__avance-cabecera { align-items: center; display: flex; justify-content: space-between; }
+.seguimiento-obra__avance-card .seguimiento-obra__eyebrow { color: #f0c89e; }
+.seguimiento-obra__avance-card h2 { font-size: 2.15rem; font-weight: 650; letter-spacing: -.04em; line-height: 1; margin: 0; }
+.seguimiento-obra__avance-card h2 span { font-size: 1rem; margin-left: .12rem; }
+.seguimiento-obra__circulo { align-items: center; border: 1px solid #9b7a5e; border-radius: 50%; color: #f2d8be; display: inline-flex; font-size: 1rem; height: 2rem; justify-content: center; width: 2rem; }
+.seguimiento-obra__barra { background: #f0ece8; border-radius: 99px; height: .55rem; overflow: hidden; }
+.seguimiento-obra__avance-card .seguimiento-obra__barra { background: rgb(255 255 255 / 20%); margin-top: 1rem; }
+.seguimiento-obra__barra > span { background: #a76628; border-radius: inherit; display: block; height: 100%; transition: width .3s ease; }
+.seguimiento-obra__avance-card p { color: #ded2c6; font-size: .75rem; margin: .55rem 0 0; }
+.seguimiento-obra__dato { display: flex; flex-direction: column; justify-content: center; min-width: 0; padding: 1rem; }
+.seguimiento-obra__dato span { color: var(--seguimiento-muted); font-size: .73rem; margin-bottom: .45rem; }
+.seguimiento-obra__dato strong { color: var(--seguimiento-ink); font-size: .95rem; overflow-wrap: anywhere; }
+.seguimiento-obra__panel { margin-bottom: 1rem; padding: clamp(1rem, 2.5vw, 1.4rem); }
+.seguimiento-obra__panel-encabezado { align-items: flex-end; display: flex; gap: 1rem; justify-content: space-between; margin-bottom: 1.15rem; }
+.seguimiento-obra__panel-encabezado h2 { color: var(--seguimiento-ink); font-size: 1.15rem; font-weight: 650; margin: 0; }
+.seguimiento-obra__panel-encabezado > p { color: var(--seguimiento-muted); font-size: .77rem; margin: 0; max-width: 29rem; text-align: right; }
+.seguimiento-obra__contador { color: var(--seguimiento-muted); font-size: .78rem; white-space: nowrap; }
+.seguimiento-obra__gantt-scroll { overflow-x: auto; }
+.seguimiento-obra__gantt { min-width: 650px; }
+.seguimiento-obra__gantt-fechas, .seguimiento-obra__gantt-fila { align-items: center; display: grid; gap: 1rem; grid-template-columns: minmax(220px, .85fr) minmax(350px, 1.5fr); }
+.seguimiento-obra__gantt-fechas { border-bottom: 1px solid var(--seguimiento-line); color: var(--seguimiento-muted); font-size: .72rem; font-weight: 650; margin-bottom: .55rem; padding: 0 0 .6rem; }
+.seguimiento-obra__gantt-fechas > div { display: flex; justify-content: space-between; }
+.seguimiento-obra__gantt-fila { min-height: 3rem; }
+.seguimiento-obra__gantt-label { display: flex; flex-direction: column; gap: .18rem; min-width: 0; }
+.seguimiento-obra__gantt-label strong { color: #4a3d32; font-size: .78rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.seguimiento-obra__gantt-label span { color: var(--seguimiento-muted); font-size: .69rem; }
+.seguimiento-obra__gantt-pista { background: #f7f4f1; border-radius: 99px; height: .7rem; position: relative; }
+.seguimiento-obra__gantt-barra { background: #ddd5cd; border-radius: inherit; height: 100%; min-width: .35rem; overflow: hidden; position: absolute; top: 0; }
+.seguimiento-obra__gantt-barra > span { background: #a76628; display: block; height: 100%; }
+.seguimiento-obra__gantt-barra.is-activa { background: #f3dfca; }
+.seguimiento-obra__gantt-barra.is-activa > span { background: #a76628; }
+.seguimiento-obra__gantt-barra.is-completa { background: #e7c6a4; }
+.seguimiento-obra__gantt-barra.is-completa > span { background: #8e5520; }
+.seguimiento-obra__sin-cronograma { background: #f8f6f4; border: 1px dashed #e9e2dc; border-radius: .35rem; color: var(--seguimiento-muted); font-size: .88rem; padding: 1rem; text-align: center; }
+.seguimiento-obra__etapas { display: grid; gap: .75rem; }
+.seguimiento-obra__etapa { border: 1px solid var(--seguimiento-line); border-radius: .35rem; overflow: hidden; }
+.seguimiento-obra__etapa-cabecera { align-items: center; background: #f8f6f4; cursor: pointer; display: flex; gap: 1rem; justify-content: space-between; list-style: none; padding: .85rem 2.75rem .85rem 1rem; position: relative; }
+.seguimiento-obra__etapa-cabecera::-webkit-details-marker { display: none; }
+.seguimiento-obra__etapa-cabecera::after { color: #a76628; content: '+'; font-size: 1.35rem; font-weight: 500; line-height: 1; position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); }
+.seguimiento-obra__etapa[open] > .seguimiento-obra__etapa-cabecera::after { content: '−'; }
+.seguimiento-obra__etapa-cabecera:focus-visible { outline: 2px solid #a76628; outline-offset: -2px; }
+.seguimiento-obra__etapa-titulo { align-items: center; display: flex; gap: .7rem; min-width: 0; }
+.seguimiento-obra__etapa-titulo > span { align-items: center; background: #f7ebde; border-radius: .3rem; color: #8e5520; display: inline-flex; flex: 0 0 2.3rem; font-size: .75rem; font-weight: 700; height: 2rem; justify-content: center; }
+.seguimiento-obra__etapa-titulo h3 { color: #3b3027; font-size: .91rem; font-weight: 650; margin: 0; text-transform: uppercase; }
+.seguimiento-obra__etapa-titulo small { color: var(--seguimiento-muted); display: block; font-size: .7rem; margin-top: .15rem; }
+.seguimiento-obra__etapa-avance { align-items: center; display: flex; gap: .6rem; width: min(35%, 12rem); }
+.seguimiento-obra__etapa-avance > strong { color: #8e5520; font-size: .8rem; min-width: 2.5rem; text-align: right; }
+.seguimiento-obra__barra--pequena { flex: 1; height: .38rem; }
+.seguimiento-obra__barra--pequena > span { background: #a76628; }
+.seguimiento-obra__subtareas { padding: 0 .9rem; }
+.seguimiento-obra__sin-subtareas { color: var(--seguimiento-muted); font-size: .82rem; margin: 0; padding: .9rem .2rem; }
+.seguimiento-obra__subtarea { align-items: center; border-top: 1px solid #efe9e3; display: grid; gap: .75rem; grid-template-columns: minmax(0, 1fr) minmax(7rem, auto) auto; min-height: 3.3rem; padding: .55rem .2rem; }
+.seguimiento-obra__subtarea > div:first-child { align-items: baseline; display: flex; gap: .6rem; min-width: 0; }
+.seguimiento-obra__subtarea-codigo { color: #718078; flex: 0 0 auto; font-size: .72rem; font-weight: 700; }
+.seguimiento-obra__subtarea strong { color: #4a4037; font-size: .8rem; font-weight: 500; }
+.seguimiento-obra__estado-tarea { background: #f0f1ef; border-radius: 99px; color: #6f7771; font-size: .68rem; justify-self: start; padding: .25rem .55rem; white-space: nowrap; }
+.seguimiento-obra__estado-tarea.is-pendiente { background: #f0f1ef; color: #6f7771; }
+.seguimiento-obra__estado-tarea.is-completa { background: #f1e3d5; color: #79502f; }
+.btn.seguimiento-obra__editar-avance { border-color: #a76628; color: #8e5520; white-space: nowrap; }
+.btn.seguimiento-obra__editar-avance:hover, .btn.seguimiento-obra__editar-avance:focus-visible { background: #a76628; color: #fff; }
+.seguimiento-obra__nota, .seguimiento-obra__estado { color: var(--seguimiento-muted); font-size: .8rem; text-align: center; }
+.seguimiento-obra__nota { margin: .25rem 0 1rem; }
+@media (max-width: 950px) { .seguimiento-obra__resumen { grid-template-columns: repeat(3, minmax(0, 1fr)); } .seguimiento-obra__avance-card { grid-column: 1 / -1; } }
+@media (max-width: 650px) { .seguimiento-obra__header { align-items: flex-start; flex-wrap: wrap; } .seguimiento-obra__estado-badge { margin-left: auto; } .seguimiento-obra__resumen { grid-template-columns: repeat(2, minmax(0, 1fr)); } .seguimiento-obra__avance-card { grid-column: 1 / -1; } .seguimiento-obra__panel-encabezado { align-items: flex-start; flex-direction: column; } .seguimiento-obra__panel-encabezado > p { text-align: left; } .seguimiento-obra__etapa-cabecera { align-items: flex-start; flex-direction: column; } .seguimiento-obra__etapa-avance { width: 100%; } .seguimiento-obra__subtarea { align-items: flex-start; grid-template-columns: minmax(0, 1fr) auto; } .seguimiento-obra__editar-avance { grid-column: 1 / -1; justify-self: start; } }
+@media (prefers-reduced-motion: reduce) { .seguimiento-obra__barra > span { transition: none; } }

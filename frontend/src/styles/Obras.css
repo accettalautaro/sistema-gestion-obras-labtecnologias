@@ -17,7 +17,9 @@
 .obras-page__avance { min-width: 5.5rem; }
 .obras-page__avance > span { color: #315447; font-size: .8rem; font-weight: 600; }
 .obras-page__avance .progress { height: .4rem; margin-top: .25rem; }
-.obras-page__avance .progress-bar { background-color: #557168; }
+.obras-page__avance .progress-bar { background-color: #a76628; }
+.btn.obras-page__boton-seguimiento { background: #a76628; border-color: #a76628; color: #fff; margin-top: .35rem; white-space: nowrap; }
+.btn.obras-page__boton-seguimiento:hover, .btn.obras-page__boton-seguimiento:focus-visible { background: #8e5520; border-color: #8e5520; color: #fff; }
 .obras-page__acciones { display: flex; gap: .35rem; }
 .obras-page__header-acciones { align-items: center; display: flex; flex-wrap: wrap; gap: .6rem; }
 .obras-page__form-header { align-items: flex-start; display: flex; gap: 1rem; justify-content: space-between; }

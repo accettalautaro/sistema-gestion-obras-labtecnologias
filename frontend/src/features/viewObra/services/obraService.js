@@ -1,3 +1,5 @@
+import { resumirAvanceTareas } from '../../../shared/utils/avanceObra.js'
+
 const URL_BASE = '/Back/data'
 
 async function leerJson(nombre) {
@@ -36,6 +38,7 @@ export async function obtenerDetalleObra(idObra) {
       return dateA - dateB
     })
   const pagosObra = pagos.filter((p) => p['id-obra'] === idObra)
+  const avanceObra = resumirAvanceTareas(tareasObra).avance
 
   const costoEstimadoTotal = tareasObra.reduce((acc, t) => acc + (t['costo-estimado'] || 0), 0)
   const montoAbonado = pagosObra.reduce((acc, p) => acc + (p.monto || 0), 0)
@@ -58,7 +61,7 @@ export async function obtenerDetalleObra(idObra) {
     idObra: obra['id-obra'],
     nroLote: obra.nrolote,
     estado: estadoObra,
-    porcentaje: aNumero(obra.porcentaje),
+    porcentaje: avanceObra,
     fechaInicio: obra['fecha-inicio'] ?? null,
     fechaFin: obra['fecha-fin'] ?? null,
     direccionCompleta: direccion

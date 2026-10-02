@@ -1,3 +1,5 @@
+import { resumirAvanceTareas } from '../../../shared/utils/avanceObra.js'
+
 const URL_BASE = '/Back/data'
 
 async function leerJson(nombre) {
@@ -40,6 +42,7 @@ export async function obtenerResumenCliente(idUsuario) {
       
       const tareasObra = tareas.filter((t) => t['id-obra'] === obra['id-obra'])
       const tieneTareaAtrasada = tareasObra.some((t) => t['duracion-real'] > t['duracion-estimada'] && aNumero(t.porcentaje) < 100)
+      const avanceObra = resumirAvanceTareas(tareasObra).avance
       
       let estadoObra = obra.Estado
       if (estadoObra === 'En ejecución' && tieneTareaAtrasada) {
@@ -50,7 +53,7 @@ export async function obtenerResumenCliente(idUsuario) {
         idObra: obra['id-obra'],
         nroLote: obra.nrolote,
         estado: estadoObra,
-        porcentaje: aNumero(obra.porcentaje),
+        porcentaje: avanceObra,
         fechaInicio: obra['fecha-inicio'] ?? null,
         fechaFin: obra['fecha-fin'] ?? null,
         direccion: direccion ? `${direccion.calle} ${direccion.altura}, ${direccion.localidad}` : 'Sin dirección cargada',
