@@ -8,6 +8,7 @@ const ENLACES_GESTOR = [
   { id: 2, texto: 'Gestión de clientes', destino: '/principal/clientes', disponible: true, requiereArquitecto: true },
 
   { id: 3, texto: 'Gestión de obras', destino: '/principal/obras', disponible: true, requiereArquitecto: true },
+  { id: 4, texto: 'Seguir avance de obra', destino: '/principal/seguimiento', disponible: true, requiereArquitecto: true },
   { id: 7, texto: 'Gestión de terrenos', destino: '/principal/terrenos', disponible: true, requiereArquitecto: true },
   { id: 5, texto: 'Gestión de pagos', destino: '/principal/pagos', disponible: true, requiereArquitecto: true },
   { id: 6, texto: 'Recordatorios', destino: '/principal/recordatorios', disponible: true },
