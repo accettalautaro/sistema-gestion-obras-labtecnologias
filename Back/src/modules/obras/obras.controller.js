@@ -54,7 +54,7 @@ export const actualizarObra = async (req,res,next) => {
 
     }
     catch(error){
-        next(error)
+        next(error);
 
     }
 }
@@ -66,7 +66,7 @@ export const eliminarObra = async (req,res,next)=>{
         if(!obra){
             return res.status(404).json({error:'Obra no encontrada'});
         }
-        return res.status(204)
+        return res.status(204).send();
 
     }catch(error){
         next(error);

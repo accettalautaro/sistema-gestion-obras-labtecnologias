@@ -15,8 +15,8 @@ export const listarTodos = async ()=>{
 
 export const obtenerObra= async (id)=> {
     try{
-        const query= 'SELECT * FROM obras WHERE obras.id = $1';
-        const res= await pool.query(query,id);
+        const query= 'SELECT * FROM obras WHERE obras.id_obra = $1';
+        const res= await pool.query(query,[id]);
         return res.rows;
     }
     catch(error){
@@ -32,7 +32,7 @@ export const crearObra= async(obra)=>{
         const {id_arquitecto,id_cliente,fecha_inicio,fecha_fin,estado,descripcion}=obra;
         const query= 'INSERT INTO obras (id_cliente,id_arquitecto,fecha_inicio,fecha_fin,estado,descripcion) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *;';
         const values= [id_arquitecto,id_cliente,fecha_inicio,fecha_fin,estado,descripcion];
-        const res= awaitpool.query(query,values);
+        const res= await pool.query(query,values);
         return res.rows;
     }catch(error){
         console.error('Error al intentar crear una obra',error);
@@ -42,13 +42,12 @@ export const crearObra= async(obra)=>{
 
 }
 
-export const actualizarObra= async(id,obra)=>{
+export const actualizarObra= async(id,id_arquitecto,id_cliente,fecha_inicio,fecha_fin,estado,descripcion)=>{
     try{
-        const {id_arquitecto,id_cliente,fecha_inicio,fecha_fin,estado,descripcion}=obra;
-        const query= 'UPDATE obras SET obras.id_arquitecto = $1, obras.id_cliente = $2, obras.fecha_inicio=$3,obras.fecha_fin=$4,obras.estado=$5,obras.descripcion=$6 WHERE obras.id_obra=$7';
+        const query= 'UPDATE obras SET id_arquitecto = $1, id_cliente = $2, fecha_inicio=$3, fecha_fin=$4, estado=$5, descripcion=$6 WHERE id_obra=$7 RETURNING *';
         const values= [id_arquitecto,id_cliente,fecha_inicio,fecha_fin,estado,descripcion,id];
-        const res= awaitpool.query(query,values);
-        return res.rows;
+        const res= await pool.query(query,values);
+        return res.rows[0] ?? null;
     }catch(error){
         console.error('Error al intentar actualizar una obra',error);
         throw new Error('Error al actualizar una obra en la base de datos');
@@ -59,14 +58,14 @@ export const actualizarObra= async(id,obra)=>{
 
 export const eliminar= async (id)=> {
     try{
-        const query= 'DELETE * FROM obras WHERE obras.id = $1';
-        const res= await pool.query(query,id);
+        const query= 'DELETE FROM obras WHERE obras.id_obra = $1';
+        const res= await pool.query(query,[id]);
         return res.rows;
     }
     catch(error){
         console.error('Error al intentar borrar una obra',error);
         throw new Error('Error al borrar una obra en la base de datos');
         
-
+        
     }
 }
