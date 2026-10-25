@@ -2,19 +2,19 @@ import * as repository from './obras.repository';
 
 export const listarObras= async (req)=>{
 
-    const{cliente,estado,lote,arquitecto}= req.query;
+    const{id_cliente,estado,id_lote,id_arquitecto}= req.query;
     const obras = await repository.listarTodos();
-    if(cliente) {
-        return obras.filter(o=> o.cliente=== cliente);
+    if( id_cliente) {
+        return obras.filter(o=> o.id_cliente=== id_cliente);
     }
     if(estado) {
         return obras.filter(o=> o.estado=== estado);
     }
-    if(lote){
-        return obras.filter(o=> o.lote=== lote);      
+    if(id_lote){
+        return obras.filter(o=> o.id_lote=== id_lote);      
     }
-    if(arquitecto){
-        return obras.filter(o=> o.arquitecto=== arquitecto);
+    if(id_arquitecto){
+        return obras.filter(o=> o.id_arquitecto=== id_arquitecto);
 
     }
     return obras;
@@ -30,8 +30,8 @@ export const obtenerObra= async (id)=>{
 }
 
 export const actualizarObra= async(id,req)=>{
-    const {cliente,arquitecto,fechaI,fechaF,estado,descripcion}=req.body;
-    return  await repository.actualizarObra(id,cliente,arquitecto,fechaI,fechaF,estado,descripcion);
+    const {id_arquitecto,id_cliente,fecha_inicio,fecha_fin,estado,descripcion}=req.body;
+    return  await repository.actualizarObra(id,id_arquitecto,id_cliente,fecha_inicio,fecha_fin,estado,descripcion);
 }
 
 export const eliminarObra= async (id)=>{
