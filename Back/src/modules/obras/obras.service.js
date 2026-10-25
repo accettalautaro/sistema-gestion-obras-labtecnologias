@@ -1,4 +1,4 @@
-import * as repository from './obras.repository';
+import * as repository from './obras.repository.js';
 
 export const listarObras= async (req)=>{
 
