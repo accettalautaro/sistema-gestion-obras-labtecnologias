@@ -5,7 +5,7 @@ const { Pool} = pkg;
 
 export const pool = new Pool({
     host : env.PGHOST,
-    porto: env.PGPORT,
+    port: env.PGPORT,
     user : env.PGUSER,
     password: env.PGPASSWORD,
     database: env.PGDATABASE,
