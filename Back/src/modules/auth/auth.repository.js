@@ -17,7 +17,7 @@ export const crearUsuario= async (dni,rol,hash)=>{
 export const obtenerUsuario = async (dni)=>{
 
         try{
-            const query= 'SELECT * FROM usuarios WHERE usuarios.dni = $1';
+            const query= 'SELECT * FROM usuarios WHERE usuarios.dni LIKE $1';
             const res= await pool.query(query,[dni]);
             return res.rows;
         }
