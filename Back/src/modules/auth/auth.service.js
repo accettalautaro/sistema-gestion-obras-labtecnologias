@@ -30,10 +30,20 @@ export const login = async(usuario)=>{
     //FIRMA EL TOKEN con la palabra secreta
     const token = jwt.sign(
         { id: usuarioDb.id , nombre: usuarioDb.nombre, dni: usuarioDb.dni, rol: usuarioDb.rol}, //payload
-        env.JWT_SECRET,// palabra secreta
+        env.JWT_SECRET,// palabra secreta           
         {expiresIn: env.JWT_EXPIRES_IN} // tiempo de expiracion
         
     );
-    return {token};
+    return {token,rol: usuarioDb.rol};
 }
+
+//SUBTARES(CRUD);TAREAS(Endpoint anidado subtareas) yo
+// ;clientes,RECORDATORIOS THiago
+// ,PAGOS,TERRENO, NAcho
+
+//GENERAL
+// conectar front
+//endpoint aninados
+//tablas apis
+//generar justificacion porque la arquitectura
 
