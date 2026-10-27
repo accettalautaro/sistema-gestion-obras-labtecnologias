@@ -1,0 +1,802 @@
+{
+  "info": {
+    "_postman_id": "c07c3f5d-ec68-45b1-b201-91d87c9d7995",
+    "name": "Sistema de gestión de obras - API",
+    "description": "# Cómo usar esta colección\n\n1. Iniciá el backend desde `Back` con `npm run dev`.\n2. Editá las variables `dni` y `contrasena` de la colección con credenciales existentes en la base de datos. En este backend, `contrasena` se envía en el campo `nombre` del login.\n3. Ejecutá primero **Autenticación → Login**. El script guarda automáticamente el JWT en `token`; las demás solicitudes lo envían como `Bearer`.\n4. Ejecutá las solicitudes de creación antes de las de consulta/actualización y las eliminaciones al final. Los IDs devueltos se guardan automáticamente en variables de colección.\n5. Para Pagos, configurá `id_subtarea` con el ID de una subtarea que ya exista. Para Obras, configurá `id_cliente` e `id_arquitecto` con IDs válidos de la base.\n\nLa colección prueba autenticación, CRUD de pagos, lotes y sus relaciones, y CRUD de obras. Las rutas de tareas y subtareas existen en sus módulos, pero actualmente no están montadas en `app.js`, por lo que no se incluyen como endpoints ejecutables. Las operaciones que crean, actualizan o eliminan datos modifican la base real; usá datos de prueba y revisá antes de ejecutar.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000", "type": "string" },
+    { "key": "dni", "value": "CAMBIAR_POR_DNI_EXISTENTE", "type": "string" },
+    { "key": "contrasena", "value": "CAMBIAR_POR_CREDENCIAL_EXISTENTE", "type": "string" },
+    { "key": "token", "value": "", "type": "string" },
+    { "key": "id_subtarea", "value": "1", "type": "string" },
+    { "key": "id_pago", "value": "", "type": "string" },
+    { "key": "id_lote", "value": "", "type": "string" },
+    { "key": "id_direccion", "value": "", "type": "string" },
+    { "key": "id_direccion_crud", "value": "", "type": "string" },
+    { "key": "id_mensura", "value": "", "type": "string" },
+    { "key": "id_mensura_lote", "value": "", "type": "string" },
+    { "key": "id_escritura", "value": "", "type": "string" },
+    { "key": "id_escritura_extra", "value": "", "type": "string" },
+    { "key": "id_propietario", "value": "", "type": "string" },
+    { "key": "id_propietario_extra", "value": "", "type": "string" },
+    { "key": "id_cliente", "value": "1", "type": "string" },
+    { "key": "id_arquitecto", "value": "1", "type": "string" },
+    { "key": "id_obra", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Autenticación",
+      "item": [
+        {
+          "name": "Login - guarda el token",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dni\": \"{{dni}}\",\n  \"nombre\": \"{{contrasena}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            },
+            "description": "Autentica con un usuario ya registrado en PostgreSQL. La API devuelve `{ token, rol }`; el script guarda `token` para las demás solicitudes."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Login correcto', function () { pm.response.to.have.status(200); });",
+                  "if (pm.response.code === 200) {",
+                  "  const data = pm.response.json();",
+                  "  pm.collectionVariables.set('token', data.token);",
+                  "  pm.collectionVariables.set('rol', data.rol);",
+                  "  pm.test('La respuesta contiene un token', function () { pm.expect(data.token).to.be.a('string').and.not.empty; });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "auth": { "type": "noauth" }
+        },
+        {
+          "name": "Perfil - verifica el token",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/perfil",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "perfil"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pagos parciales",
+      "description": "Los pagos pertenecen a una subtarea (`id_subtarea`). Configurá esa variable con un ID existente antes de crear un pago. Requiere el rol arquitecto para escrituras.",
+      "item": [
+        {
+          "name": "Listar pagos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/pagos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "pagos"]
+            }
+          }
+        },
+        {
+          "name": "Crear pago",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_subtarea\": \"{{id_subtarea}}\",\n  \"descripcion\": \"Pago de prueba desde Postman\",\n  \"monto\": 1000\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/pagos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "pagos"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Pago creado', function () { pm.response.to.have.status(201); });",
+                  "if (pm.response.code === 201) { pm.collectionVariables.set('id_pago', String(pm.response.json().id_pago)); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Obtener pago creado",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/pagos/{{id_pago}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "pagos", "{{id_pago}}"]
+            }
+          }
+        },
+        {
+          "name": "Actualizar pago",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_subtarea\": \"{{id_subtarea}}\",\n  \"descripcion\": \"Pago de prueba actualizado desde Postman\",\n  \"monto\": 1250\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/pagos/{{id_pago}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "pagos", "{{id_pago}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Terrenos - lotes",
+      "item": [
+        {
+          "name": "Listar terrenos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/terrenos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "terrenos"]
+            }
+          }
+        },
+        {
+          "name": "Crear lote de prueba con dirección y mensura",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nro_lote\": \"POSTMAN-{{$timestamp}}\",\n  \"direccion\": {\n    \"calle\": \"Calle de prueba Postman\",\n    \"altura\": \"123\",\n    \"localidad\": \"San Luis\",\n    \"provincia\": \"San Luis\",\n    \"codigo_postal\": \"5700\"\n  },\n  \"mensura\": {\n    \"nombre\": \"Mensura de prueba Postman\",\n    \"ancho\": 10,\n    \"largo\": 20,\n    \"mts_cuadrados\": 200\n  }\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/terrenos",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "terrenos"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Lote creado', function () { pm.response.to.have.status(201); });",
+                  "if (pm.response.code === 201) {",
+                  "  const lote = pm.response.json();",
+                  "  pm.collectionVariables.set('id_lote', String(lote.id_lote));",
+                  "  pm.collectionVariables.set('id_direccion', String(lote.id_direccion));",
+                  "  if (lote.mensuras && lote.mensuras.length) pm.collectionVariables.set('id_mensura_lote', String(lote.mensuras[0].id_documento));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Obtener lote creado",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/terrenos/{{id_lote}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "terrenos", "{{id_lote}}"]
+            }
+          }
+        },
+        {
+          "name": "Actualizar lote",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nro_lote\": \"POSTMAN-ACTUALIZADO-{{$timestamp}}\",\n  \"id_direccion\": \"{{id_direccion}}\",\n  \"id_obra\": null\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/terrenos/{{id_lote}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "terrenos", "{{id_lote}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Terrenos - direcciones",
+      "item": [
+        {
+          "name": "Listar direcciones",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/terrenos/direcciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "terrenos", "direcciones"]
+            }
+          }
+        },
+        {
+          "name": "Crear dirección independiente",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"calle\": \"Dirección Postman {{$timestamp}}\",\n  \"altura\": \"456\",\n  \"localidad\": \"San Luis\",\n  \"provincia\": \"San Luis\",\n  \"codigo_postal\": \"5700\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/terrenos/direcciones",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "terrenos", "direcciones"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Dirección creada', function () { pm.response.to.have.status(201); });",
+                  "if (pm.response.code === 201) pm.collectionVariables.set('id_direccion_crud', String(pm.response.json().id_direccion));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Obtener dirección creada",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/terrenos/direcciones/{{id_direccion_crud}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "terrenos", "direcciones", "{{id_direccion_crud}}"]
+            }
+          }
+        },
+        {
+          "name": "Actualizar dirección",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"calle\": \"Dirección Postman actualizada\",\n  \"altura\": \"789\",\n  \"localidad\": \"San Luis\",\n  \"provincia\": \"San Luis\",\n  \"codigo_postal\": \"5700\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/terrenos/direcciones/{{id_direccion_crud}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "terrenos", "direcciones", "{{id_direccion_crud}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Terrenos - mensuras",
+      "item": [
+        {
+          "name": "Listar mensuras",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/terrenos/mensuras",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "terrenos", "mensuras"]
+            }
+          }
+        },
+        {
+          "name": "Crear mensura",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_lote\": \"{{id_lote}}\",\n  \"nombre\": \"Mensura independiente Postman\",\n  \"ancho\": 12,\n  \"largo\": 24,\n  \"mts_cuadrados\": 288\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/terrenos/mensuras",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "terrenos", "mensuras"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Mensura creada', function () { pm.response.to.have.status(201); });",
+                  "if (pm.response.code === 201) pm.collectionVariables.set('id_mensura', String(pm.response.json().id_documento));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Obtener mensura creada",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/terrenos/mensuras/{{id_mensura}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "terrenos", "mensuras", "{{id_mensura}}"]
+            }
+          }
+        },
+        {
+          "name": "Actualizar mensura",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Mensura Postman actualizada\",\n  \"ancho\": 13,\n  \"largo\": 25,\n  \"mts_cuadrados\": 325,\n  \"descripcion\": \"Actualización de prueba\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/terrenos/mensuras/{{id_mensura}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "terrenos", "mensuras", "{{id_mensura}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Terrenos - escrituras y propietarios",
+      "item": [
+        {
+          "name": "Listar escrituras",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/terrenos/escrituras",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "terrenos", "escrituras"]
+            }
+          }
+        },
+        {
+          "name": "Crear escritura principal",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_lote\": \"{{id_lote}}\",\n  \"nombre\": \"Escritura de prueba Postman\",\n  \"nro_escritura\": \"POSTMAN-{{$timestamp}}\",\n  \"descripcion\": \"Registro de prueba\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/terrenos/escrituras",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "terrenos", "escrituras"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Escritura creada', function () { pm.response.to.have.status(201); });",
+                  "if (pm.response.code === 201) pm.collectionVariables.set('id_escritura', String(pm.response.json().id_documento));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Obtener escritura creada",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/terrenos/escrituras/{{id_escritura}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "terrenos", "escrituras", "{{id_escritura}}"]
+            }
+          }
+        },
+        {
+          "name": "Actualizar escritura",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Escritura Postman actualizada\",\n  \"nro_escritura\": \"POSTMAN-ACTUALIZADA-{{$timestamp}}\",\n  \"descripcion\": \"Actualización de prueba\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/terrenos/escrituras/{{id_escritura}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "terrenos", "escrituras", "{{id_escritura}}"]
+            }
+          }
+        },
+        {
+          "name": "Crear propietario vinculado a escritura",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_documento\": \"{{id_escritura}}\",\n  \"nombre\": \"Propietario\",\n  \"apellido\": \"Postman\",\n  \"dni\": \"PM-{{$timestamp}}\",\n  \"estado_civil\": \"Soltero\",\n  \"porcentaje\": 100\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/terrenos/propietarios",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "terrenos", "propietarios"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Propietario creado', function () { pm.response.to.have.status(201); });",
+                  "if (pm.response.code === 201) pm.collectionVariables.set('id_propietario', String(pm.response.json().id_propietario));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar propietarios de una escritura",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/terrenos/propietarios?id_documento={{id_escritura}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "terrenos", "propietarios"],
+              "query": [{ "key": "id_documento", "value": "{{id_escritura}}" }]
+            }
+          }
+        },
+        {
+          "name": "Obtener propietario creado",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/terrenos/propietarios/{{id_propietario}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "terrenos", "propietarios", "{{id_propietario}}"]
+            }
+          }
+        },
+        {
+          "name": "Actualizar propietario",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Propietario actualizado\",\n  \"apellido\": \"Postman\",\n  \"dni\": \"PM-{{$timestamp}}\",\n  \"estado_civil\": \"Casado\",\n  \"porcentaje\": 100\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/terrenos/propietarios/{{id_propietario}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "terrenos", "propietarios", "{{id_propietario}}"]
+            }
+          }
+        },
+        {
+          "name": "Crear segunda escritura para probar asociación",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_lote\": \"{{id_lote}}\",\n  \"nombre\": \"Segunda escritura Postman\",\n  \"nro_escritura\": \"POSTMAN-EXTRA-{{$timestamp}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/terrenos/escrituras",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "terrenos", "escrituras"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Segunda escritura creada', function () { pm.response.to.have.status(201); });",
+                  "if (pm.response.code === 201) pm.collectionVariables.set('id_escritura_extra', String(pm.response.json().id_documento));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Vincular propietario existente a segunda escritura",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/terrenos/escrituras/{{id_escritura_extra}}/propietarios/{{id_propietario}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "terrenos", "escrituras", "{{id_escritura_extra}}", "propietarios", "{{id_propietario}}"]
+            }
+          }
+        },
+        {
+          "name": "Desvincular propietario de segunda escritura",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/terrenos/escrituras/{{id_escritura_extra}}/propietarios/{{id_propietario}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "terrenos", "escrituras", "{{id_escritura_extra}}", "propietarios", "{{id_propietario}}"]
+            }
+          }
+        },
+        {
+          "name": "Eliminar propietario de prueba",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/terrenos/propietarios/{{id_propietario}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "terrenos", "propietarios", "{{id_propietario}}"]
+            }
+          }
+        },
+        {
+          "name": "Eliminar segunda escritura",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/terrenos/escrituras/{{id_escritura_extra}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "terrenos", "escrituras", "{{id_escritura_extra}}"]
+            }
+          }
+        },
+        {
+          "name": "Eliminar escritura principal",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/terrenos/escrituras/{{id_escritura}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "terrenos", "escrituras", "{{id_escritura}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Obras",
+      "description": "Rutas ya montadas en el servidor. Para crear una obra, los IDs de cliente y arquitecto deben existir en PostgreSQL.",
+      "item": [
+        {
+          "name": "Listar obras",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/obras",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "obras"]
+            }
+          }
+        },
+        {
+          "name": "Crear obra de prueba",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_cliente\": \"{{id_cliente}}\",\n  \"id_arquitecto\": \"{{id_arquitecto}}\",\n  \"fecha_inicio\": \"{{$isoTimestamp}}\",\n  \"fecha_fin\": null,\n  \"estado\": \"pendiente\",\n  \"descripcion\": \"Obra de prueba creada desde Postman\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/obras",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "obras"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Obra creada', function () { pm.response.to.have.status(201); });",
+                  "if (pm.response.code === 201) { const data = pm.response.json(); const obra = Array.isArray(data) ? data[0] : data; pm.collectionVariables.set('id_obra', String(obra.id_obra)); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Obtener obra creada",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/obras/{{id_obra}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "obras", "{{id_obra}}"]
+            }
+          }
+        },
+        {
+          "name": "Actualizar obra",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id_cliente\": \"{{id_cliente}}\",\n  \"id_arquitecto\": \"{{id_arquitecto}}\",\n  \"fecha_inicio\": \"2026-01-01\",\n  \"fecha_fin\": null,\n  \"estado\": \"en_progreso\",\n  \"descripcion\": \"Obra de prueba actualizada desde Postman\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/obras/{{id_obra}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "obras", "{{id_obra}}"]
+            }
+          }
+        },
+        {
+          "name": "Eliminar obra de prueba",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/obras/{{id_obra}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "obras", "{{id_obra}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Limpieza de registros de prueba",
+      "description": "Ejecutá estas solicitudes al terminar para borrar los datos creados. Se hace en orden de dependencias: pagos/documentos, lote y, al final, direcciones.",
+      "item": [
+        {
+          "name": "Eliminar pago de prueba",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/pagos/{{id_pago}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "pagos", "{{id_pago}}"]
+            }
+          }
+        },
+        {
+          "name": "Eliminar mensura independiente",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/terrenos/mensuras/{{id_mensura}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "terrenos", "mensuras", "{{id_mensura}}"]
+            }
+          }
+        },
+        {
+          "name": "Eliminar mensura creada junto al lote",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/terrenos/mensuras/{{id_mensura_lote}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "terrenos", "mensuras", "{{id_mensura_lote}}"]
+            }
+          }
+        },
+        {
+          "name": "Eliminar lote de prueba",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/terrenos/{{id_lote}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "terrenos", "{{id_lote}}"]
+            }
+          }
+        },
+        {
+          "name": "Eliminar dirección independiente",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/terrenos/direcciones/{{id_direccion_crud}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "terrenos", "direcciones", "{{id_direccion_crud}}"]
+            }
+          }
+        },
+        {
+          "name": "Eliminar dirección del lote de prueba",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/terrenos/direcciones/{{id_direccion}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "terrenos", "direcciones", "{{id_direccion}}"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -31,7 +31,7 @@ export const crearObra= async(obra)=>{
     try{
         const {id_arquitecto,id_cliente,fecha_inicio,fecha_fin,estado,descripcion}=obra;
         const query= 'INSERT INTO obras (id_cliente,id_arquitecto,fecha_inicio,fecha_fin,estado,descripcion) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *;';
-        const values= [id_arquitecto,id_cliente,fecha_inicio,fecha_fin,estado,descripcion];
+        const values= [id_cliente,id_arquitecto,fecha_inicio,fecha_fin,estado,descripcion];
         const res= await pool.query(query,values);
         return res.rows;
     }catch(error){
