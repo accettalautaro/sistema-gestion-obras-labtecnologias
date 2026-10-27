@@ -6,6 +6,8 @@ import { errorHandler } from './middlewares/errorHandler.js';
 import { badRequest } from './middlewares/badRequest.js';
 import obrasRoutes from './modules/obras/obras.routes.js';
 import authRoutes from './modules/auth/auth.routes.js'
+import clientesRoutes from './modules/clientes/clientes.routes.js';
+import recordatoriosRoutes from './modules/recordatorios/recordatorios.routes.js';
 
 const app = express();
 
@@ -14,6 +16,8 @@ app.use(express.json());
 
 app.use('/api/obras', obrasRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/clientes', clientesRoutes);
+app.use('/api/recordatorios', recordatoriosRoutes);
 
 // Primero la ruta 404 (Pagina no encontrada), después el manejo de errores
 app.use(badRequest);

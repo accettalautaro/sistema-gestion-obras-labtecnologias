@@ -11,7 +11,7 @@ export const env={
     PGHOST: process.env.PGHOST ?? 'localhost',
     PGPORT: process.env.PGPORT ?? 5432,
     PGUSER: process.env.PGUSER ?? 'postgres',
-    PGPASSWORD: process.env.PGPASSWORD ?? 'postgres',
+    PGPASSWORD: process.env.PGPASSWORD ?? 'admin1234',
     PGDATABASE: process.env.PGDATABASE ?? 'accettadb',
       
     JWT_SECRET: process.env.JWT_SECRET, // sin valor por defecto: el secreto NUNCA va en el código
