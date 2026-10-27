@@ -9,7 +9,7 @@ export const registro = async (req,res,next) => {
         if (!nombre || !dni || !rol) {
         return res.status(400).json({ error: 'NOMBRE, ROL y DNI son obligatorios' });
         }
-        const usuario = await service.registro(nombre,dni,rol);
+        const usuario = await service.registro(nombre,rol,dni);
         if(!usuario){
             return res.status(400).json({error:'Peticion invalida'});
         }

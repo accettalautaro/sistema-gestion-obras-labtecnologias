@@ -8,6 +8,10 @@ import obrasRoutes from './modules/obras/obras.routes.js';
 import authRoutes from './modules/auth/auth.routes.js'
 import tareasRoutes  from './modules/tareas/tareas.routes.js';
 import subtareasRoutes from './modules/subtareas/subtareas.routes.js'
+import clientesRoutes from './modules/clientes/clientes.routes.js';
+import recordatoriosRoutes from './modules/recordatorios/recordatorios.routes.js';
+import pagosRoutes from './modules/pagos/pagos.routes.js';
+import terrenosRoutes from './modules/terrenos/terrenos.routes.js';
 
 const app = express();
 
@@ -18,6 +22,13 @@ app.use('/api/obras', obrasRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/tareas', tareasRoutes);
 app.use('/api/subtareas',subtareasRoutes);
+
+app.use('/api/clientes', clientesRoutes);
+app.use('/api/recordatorios', recordatoriosRoutes);
+
+app.use('/api/pagos', pagosRoutes);
+app.use('/api/terrenos', terrenosRoutes);
+
 
 // Primero la ruta 404 (Pagina no encontrada), después el manejo de errores
 app.use(badRequest);

@@ -5,7 +5,7 @@ import * as repository from './auth.repository.js'
 
 const SALT_ROUNDS = 10; // cuánto "trabajo" hace bcrypt: más alto = más seguro y más lento
 
-export const registro = async (nombre,rol,dni)=>{
+export const registro = async (nombre,dni,rol)=>{
         const hash = await bcrypt.hash(nombre,SALT_ROUNDS);
         return repository.crearUsuario(dni,rol,hash);
         
@@ -29,7 +29,7 @@ export const login = async(usuario)=>{
 
     //FIRMA EL TOKEN con la palabra secreta
     const token = jwt.sign(
-        { id: usuarioDb.id , nombre: usuarioDb.nombre, dni: usuarioDb.dni, rol: usuarioDb.rol}, //payload
+        { id_usuario: usuarioDb.id_usuario, dni: usuarioDb.dni, rol: usuarioDb.rol }, //payload
         env.JWT_SECRET,// palabra secreta           
         {expiresIn: env.JWT_EXPIRES_IN} // tiempo de expiracion
         
@@ -46,4 +46,3 @@ export const login = async(usuario)=>{
 //endpoint aninados
 //tablas apis
 //generar justificacion porque la arquitectura
-
