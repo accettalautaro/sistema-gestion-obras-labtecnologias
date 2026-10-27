@@ -38,3 +38,71 @@ export const eliminarObra= async (id)=>{
 
     return await repository.eliminar(id);
 }
+export const  obtenerTareas= async (id)=> {
+    // 1. Traemos los datos planos de la base de datos
+    const filas = await repository.obtenerTareas(id);
+    
+    if (filas.length === 0) {
+
+        throw new Error('Obra no encontrada');
+        
+    }
+
+    // 2. Transformamos el resultado plano a una estructura jerárquica
+    const obra = {
+        id_obra: filas[0].id_obra,
+        id_cliente:filas[0].id_cliente,
+        id_arquitecto:filas[0].id_arquitecto,
+        fecha_inicio_obra:filas[0].fecha_inicio_obra,
+        fecha_fin_obra:filas[0].fecha_fin_obra,
+        estado:filas[0].estado,
+        descripcion_obra:filas[0].descripcion_obra,
+        tareas: []
+    };
+
+    const mapaTareas = new Map();//estructura auxiliar para registrar las tareas que vamos agregando
+
+    for (const row of filas) {
+        // Si la tarea existe y aún no la agregamos al mapa
+        if (row.id_tarea && !mapaTareas.has(row.id_tarea)) {
+            const tarea = {
+                id_tarea: row.id_tarea,
+                nombre_tarea: row.nombre_tarea,
+                duracion_estimada_tarea:row.duracion_estimada_tarea,
+                porcentaje_tarea: row.porcentaje_tarea,
+                descripcion_tarea:row.descripcion_tarea,
+                duracion_real_tarea:row.duracion_real_tarea,
+                costo_estimado_tarea:row.costo_estimado_tarea,
+                costo_real_tarea:row.costo_real_tarea,
+                fecha_inicio_tarea:row.fecha_inicio_tarea,
+                fecha_fin_tarea:row.fecha_fin_tarea ,
+                subtareas: []
+            };
+            mapaTareas.set(row.id_tarea, tarea);//registramos la tarea en nuestra estructura auxiliar
+            obra.tareas.push(tarea);//agregamos la tarea a la obra
+        }
+
+        // Si la fila tiene subtarea, la asociamos a su tarea correspondiente
+        if (row.id_subtarea) {
+            const tareaActual = mapaTareas.get(row.id_tarea);//tomamos la tarea de la fila
+            
+            const existeSubtarea = tareaActual.subtareas.some(s => s.id_subtarea === row.id_subtarea);//chequeamos si la subtarea ya existe en el arreglo subtareas de nuestra tarea
+            if (!existeSubtarea) {//si no existe 
+                tareaActual.subtareas.push({ //agregamos nuestra subtarea al arreglo
+                    id_subtarea: row.id_subtarea,
+                    nombre_subtarea: row.nombre_subtarea,
+                    duracion_estimada_subtarea:row.duracion_estimada_subtarea,
+                    porcentaje_subtarea: row.porcentaje_subtarea,
+                    descripcion_subtarea:row.descripcion_subtarea,
+                    duracion_real_subtarea:row.duracion_real_subtarea,
+                    costo_estimado_subtarea:row.costo_estimado_subtarea,
+                    costo_real_subtarea:row.costo_real_subtarea,
+                    fecha_inicio_subtarea:row.fecha_inicio_subtarea,
+                    fecha_fin_subtarea:row.fecha_fin_subtarea ,
+                });
+            }
+        }
+    }
+
+    return obra;//retornamos la obra ya jerarquizada
+}

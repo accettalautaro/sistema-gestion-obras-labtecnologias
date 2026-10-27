@@ -27,7 +27,7 @@ export const obtenerTarea = async (req,res,next)=>{
     }
 }
 //POST api/tareas
-export const creaTarea = async (req,res,next)=>{
+export const crearTarea = async (req,res,next)=>{
     try{
         const tarea=await service.crearTarea(req.body);
         if(!tarea){

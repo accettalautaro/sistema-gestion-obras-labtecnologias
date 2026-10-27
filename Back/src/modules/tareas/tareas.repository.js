@@ -8,14 +8,14 @@ export const listarTodos = async ()=>{
         return res.rows;
 
     }catch(error){
-        console.error('Error al intentar obtener todas las tareass', error);
+        console.error('Error al intentar obtener todas las tareas', error);
         throw new Error('Error al consultar las tareas en la base de datos.');
     }
 }
 
-export const obtenerObra= async (id)=> {
+export const obtenerTarea= async (id)=> {
     try{
-        const query= 'SELECT * FROM obras WHERE tareas.id_tarea= $1';
+        const query= 'SELECT * FROM tareas WHERE tareas.id_tarea= $1';
         const res= await pool.query(query,[id]);
         return res.rows;
     }
@@ -59,7 +59,7 @@ export const actualizarTarea= async(id,id_obra,nombre,duracion_estimada,porcenta
 
 export const eliminar= async (id)=> {
     try{
-        const query= 'DELETE FROM tareas WHERE obras.id_tarea = $1';
+        const query= 'DELETE FROM tareas WHERE tareas.id_tarea = $1';
         const res= await pool.query(query,[id]);
         return res.rows;
     }

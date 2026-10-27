@@ -7,6 +7,8 @@ const router = Router();
 //publicas
 router.get('/',controller.listarObras);
 router.get('/:id',controller.obtenerObra);
+//protegidas
+router.get('/:id/tareas',verificarToken,controller.obtenerTareas);
 
 //privadas y por rol
 router.post('/',verificarToken,verificarRolArquictecto,controller.crearObra);

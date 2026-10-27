@@ -28,6 +28,21 @@ export const obtenerObra = async (req,res,next)=>{
         next(error);
     }
 }
+//GET api/obras/:id/tareas
+export const obtenerTareas = async (req,res,next)=>{
+    try{
+        const id= req.params.id;
+        const obra = await service.obtenerTareas(id);
+        if(!obra){
+            return res.status(404).json({error:'Obra no encontrada'});
+        }
+        return res.status(200).json(obra);
+
+    }catch(error)
+    {
+        next(error);
+    }
+}
 //POST api/obras
 export const crearObra = async (req,res,next)=>{
     try{
