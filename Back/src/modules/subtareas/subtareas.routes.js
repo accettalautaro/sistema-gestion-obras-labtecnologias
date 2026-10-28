@@ -4,7 +4,7 @@ import {  verificarToken } from '../../middlewares/verificarToken.js';
 import {  verificarRolArquictecto } from '../../middlewares/verificarRolArquitecto.js';
 const router = Router();
 //protegidas
-router.get('/:id/pagos',verificarToken,controller.obtenerPagos);
+router.get('/:id',verificarToken,controller.obtenerSubtarea);
 //solo el arquitecto tiene permisos
 router.post('/',verificarToken,verificarRolArquictecto,controller.crearSubtarea);
 router.put('/:id',verificarToken,verificarRolArquictecto,controller.actualizarSubtarea);

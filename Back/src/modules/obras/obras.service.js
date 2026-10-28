@@ -25,7 +25,6 @@ export const crearObra= async (obra)=>{
 }
 
 export const obtenerObra= async (id)=>{
-
     return await repository.obtenerObra(id);
 }
 
@@ -56,6 +55,19 @@ export const  obtenerTareas= async (id)=> {
         fecha_inicio_obra:filas[0].fecha_inicio_obra,
         fecha_fin_obra:filas[0].fecha_fin_obra,
         estado:filas[0].estado,
+        arquitecto: filas[0].id_arquitecto ? {
+            id_arquitecto: filas[0].id_arquitecto,
+            nombre: filas[0].arquitecto_nombre,
+            apellido: filas[0].arquitecto_apellido,
+            dni: filas[0].arquitecto_dni,
+            email: filas[0].arquitecto_email,
+            telefono: filas[0].arquitecto_telefono,
+            nro_matricula: filas[0].arquitecto_nro_matricula,
+        } : null,
+        lote: filas[0].id_lote ? {
+            id_lote: filas[0].id_lote,
+            nro_lote: filas[0].nro_lote,
+        } : null,
         costo_estimado:0,
         total_abonado:0,
         porcentaje:0,
@@ -76,7 +88,7 @@ export const  obtenerTareas= async (id)=> {
                 porcentaje_tarea: 0,
                 descripcion_tarea:row.descripcion_tarea,
                 duracion_real_tarea:row.duracion_real_tarea,
-                costo_estimado_tarea:0,
+                costo_estimado_tarea:Number(row.costo_estimado_tarea ?? 0),
                 costo_real_tarea:0,
                 fecha_inicio_tarea:row.fecha_inicio_tarea,
                 fecha_fin_tarea:row.fecha_fin_tarea ,
@@ -92,8 +104,7 @@ export const  obtenerTareas= async (id)=> {
             
             const existeSubtarea = tareaActual.subtareas.some(s => s.id_subtarea === row.id_subtarea);//chequeamos si la subtarea ya existe en el arreglo subtareas de nuestra tarea
             if (!existeSubtarea) {//si no existe 
-                const costoEstimadoSubtarea= Number(row.costo_estimado_subtarea)??0;
-                const costoRealSubtarea= Number(row.costo_real_subtarea)??0;
+                const costoRealSubtarea = Number(row.costo_real_subtarea ?? 0);
                 
                 tareaActual.subtareas.push({ //agregamos nuestra subtarea al arreglo
                     id_subtarea: row.id_subtarea,
@@ -103,17 +114,18 @@ export const  obtenerTareas= async (id)=> {
                     descripcion_subtarea:row.descripcion_subtarea,
                     duracion_real_subtarea:row.duracion_real_subtarea,
                     costo_estimado_subtarea:row.costo_estimado_subtarea,
-                    costo_real_subtarea:row.costo_real_subtarea,
+                    costo_real_subtarea:costoRealSubtarea,
                     fecha_inicio_subtarea:row.fecha_inicio_subtarea,
                     fecha_fin_subtarea:row.fecha_fin_subtarea ,
                 });
-                tareaActual.costo_estimado_tarea+=costoEstimadoSubtarea;
                 tareaActual.costo_real_tarea+=costoRealSubtarea;
                 tareaActual.porcentaje_tarea+=Number(row.porcentaje_subtarea);
             }
         }
     }
     for (const tarea of obra.tareas){
+        obra.costo_estimado += tarea.costo_estimado_tarea;
+        obra.total_abonado += tarea.costo_real_tarea;
         if(tarea.subtareas.length>0){
             tarea.porcentaje_tarea=tarea.porcentaje_tarea/tarea.subtareas.length;
         }

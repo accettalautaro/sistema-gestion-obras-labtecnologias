@@ -15,7 +15,27 @@ export const listarTodos = async ()=>{
 
 export const obtenerObra= async (id)=> {
     try{
-        const query= 'SELECT * FROM obras WHERE obras.id_obra = $1';
+        const query= `
+            SELECT
+                o.*,
+                a.nombre AS nombre_arquitecto,
+                a.apellido AS apellido_arquitecto,
+                c.nombre AS nombre_cliente,
+                c.apellido AS apellido_cliente,
+                l.id_lote,
+                l.nro_lote
+            FROM obras o
+            LEFT JOIN arquitectos a ON a.id_arquitecto = o.id_arquitecto
+            JOIN clientes c ON c.id_cliente = o.id_cliente
+            LEFT JOIN LATERAL (
+                SELECT id_lote, nro_lote
+                FROM lotes
+                WHERE id_obra = o.id_obra
+                ORDER BY id_lote
+                LIMIT 1
+            ) l ON TRUE
+            WHERE o.id_obra = $1;
+        `;
         const res= await pool.query(query,[id]);
         return res.rows;
     }
@@ -33,6 +53,14 @@ export const obtenerTareas= async (id)=> {
             o.id_obra,
             o.id_cliente,
             o.id_arquitecto,
+            a.nombre AS arquitecto_nombre,
+            a.apellido AS arquitecto_apellido,
+            a.dni AS arquitecto_dni,
+            a.email AS arquitecto_email,
+            a.telefono AS arquitecto_telefono,
+            a.nro_matricula AS arquitecto_nro_matricula,
+            l.id_lote,
+            l.nro_lote,
             o.fecha_inicio AS fecha_inicio_obra,
             o.fecha_fin AS fecha_fin_obra,
             o.estado,
@@ -56,12 +84,25 @@ export const obtenerTareas= async (id)=> {
             s.descripcion AS descripcion_subtarea,
             s.duracion_real AS duracion_real_subtarea,
             s.costo_estimado AS costo_estimado_subtarea,
-            s.costo_real AS costo_real_subtarea,
+            COALESCE(pagos_subtarea.total_abonado, 0) AS costo_real_subtarea,
             s.fecha_inicio AS fecha_inicio_subtarea,
             s.fecha_fin AS fecha_fin_tarea
         FROM obras o
+        LEFT JOIN arquitectos a ON a.id_arquitecto = o.id_arquitecto
+        LEFT JOIN LATERAL (
+            SELECT id_lote, nro_lote
+            FROM lotes
+            WHERE id_obra = o.id_obra
+            ORDER BY id_lote
+            LIMIT 1
+        ) l ON TRUE
         LEFT JOIN tareas t ON o.id_obra = t.id_obra
         LEFT JOIN subtareas s ON t.id_tarea = s.id_tarea
+        LEFT JOIN (
+            SELECT id_subtarea, SUM(monto) AS total_abonado
+            FROM pagos_parciales
+            GROUP BY id_subtarea
+        ) pagos_subtarea ON pagos_subtarea.id_subtarea = s.id_subtarea
         WHERE o.id_obra = $1;
     `;
         const res= await pool.query(query,[id]);
