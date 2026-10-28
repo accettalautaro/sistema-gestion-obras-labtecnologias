@@ -9,11 +9,11 @@ Luego de esto podra acceder a la pagina desde el navegador mediante "http://loca
 Datos requeridos para iniciar sesion:
 Si usted desea iniciar como Cliente los datos son 
 DNI: 7654321 
-USUARIO: cliente123
+CONTRASEÑA: cliente123
 
 Si usted desea iniciar como arquitecto los datos son:
 DNI:1234567
-USUARIO:admin
+CONTRASEÑA: admin
 
 ## Backend
 
