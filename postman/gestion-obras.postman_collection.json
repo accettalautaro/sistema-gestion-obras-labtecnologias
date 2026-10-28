@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "c07c3f5d-ec68-45b1-b201-91d87c9d7995",
     "name": "Sistema de gestión de obras - API",
-    "description": "# Cómo usar esta colección\n\n1. Iniciá el backend desde `Back` con `npm run dev`.\n2. Editá las variables `dni` y `contrasena` de la colección con credenciales existentes en la base de datos. En este backend, `contrasena` se envía en el campo `nombre` del login.\n3. Ejecutá primero **Autenticación → Login**. El script guarda automáticamente el JWT en `token`; las demás solicitudes lo envían como `Bearer`.\n4. Ejecutá las solicitudes de creación antes de las de consulta/actualización y las eliminaciones al final. Los IDs devueltos se guardan automáticamente en variables de colección.\n5. Para Pagos, configurá `id_subtarea` con el ID de una subtarea que ya exista. Para Obras, configurá `id_cliente` e `id_arquitecto` con IDs válidos de la base.\n\nLa colección prueba autenticación, CRUD de pagos, lotes y sus relaciones, y CRUD de obras. Las rutas de tareas y subtareas existen en sus módulos, pero actualmente no están montadas en `app.js`, por lo que no se incluyen como endpoints ejecutables. Las operaciones que crean, actualizan o eliminan datos modifican la base real; usá datos de prueba y revisá antes de ejecutar.",
+    "description": "# Cómo usar esta colección\n\n1. Iniciá el backend desde `Back` con `npm run dev`.\n2. Editá las variables `dni` y `contrasena` de la colección con credenciales existentes en la base de datos.\n3. Ejecutá primero **Autenticación → Login**. El script guarda automáticamente el JWT en `token`; las demás solicitudes lo envían como `Bearer`.\n4. Ejecutá las solicitudes de creación antes de las de consulta/actualización y las eliminaciones al final. Los IDs devueltos se guardan automáticamente en variables de colección.\n5. Para Pagos, configurá `id_subtarea` con el ID de una subtarea que ya exista. Para Obras, configurá `id_cliente` e `id_arquitecto` con IDs válidos de la base.\n\nLa colección prueba autenticación, CRUD de pagos, lotes y sus relaciones, y CRUD de obras. Las rutas de tareas y subtareas existen en sus módulos, pero actualmente no están montadas en `app.js`, por lo que no se incluyen como endpoints ejecutables. Las operaciones que crean, actualizan o eliminan datos modifican la base real; usá datos de prueba y revisá antes de ejecutar.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -48,7 +48,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"dni\": \"{{dni}}\",\n  \"nombre\": \"{{contrasena}}\"\n}",
+              "raw": "{\n  \"dni\": \"{{dni}}\",\n  \"contrasena\": \"{{contrasena}}\"\n}",
               "options": { "raw": { "language": "json" } }
             },
             "url": {

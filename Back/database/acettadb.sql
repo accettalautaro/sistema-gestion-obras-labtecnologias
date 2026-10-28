@@ -59,6 +59,9 @@ CREATE TABLE lotes (
     UNIQUE (id_direccion, nro_lote)
 );
 
+-- Una obra puede estar vinculada como máximo a un lote; los lotes sin obra siguen permitidos.
+CREATE UNIQUE INDEX lotes_id_obra_unico ON lotes(id_obra) WHERE id_obra IS NOT NULL;
+
 CREATE TABLE tareas (
     id_tarea BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     id_obra BIGINT NOT NULL REFERENCES obras(id_obra),

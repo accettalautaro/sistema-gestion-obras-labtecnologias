@@ -5,7 +5,9 @@ const manejarError = (error, mensaje) => {
     if (error.status) throw error;
     if (error.code === '23505') {
         error.status = 409;
-        error.message = 'Ya existe un registro con uno de los valores únicos indicados.';
+        error.message = error.constraint === 'lotes_id_obra_unico'
+            ? 'Una obra ya tiene un lote asignado. Cada obra puede estar vinculada a un solo lote.'
+            : 'Ya existe un registro con uno de los valores únicos indicados.';
         throw error;
     }
     if (error.code === '23503') {
@@ -73,6 +75,22 @@ const SELECT_TERRENOS = `
     LEFT JOIN obras o ON o.id_obra = l.id_obra
 `;
 
+const validarObraSinLoteAsignado = async (client, idObra, idLoteActual = null) => {
+    if (idObra == null) return;
+    const resultado = await client.query(
+        `SELECT id_lote FROM lotes
+         WHERE id_obra = $1 AND ($2::bigint IS NULL OR id_lote <> $2)
+         LIMIT 1;`,
+        [idObra, idLoteActual],
+    );
+    if (resultado.rowCount) {
+        throw Object.assign(
+            new Error('Una obra ya tiene un lote asignado. Cada obra puede estar vinculada a un solo lote.'),
+            { status: 409 },
+        );
+    }
+};
+
 export const listarTodos = async () => {
     try {
         const resultado = await pool.query(`${SELECT_TERRENOS} ORDER BY l.id_lote;`);
@@ -95,6 +113,7 @@ export const obtenerPorId = async (id) => {
 };
 
 export const crear = async ({ nro_lote, id_obra, direccion, mensura }) => ejecutarTransaccion(async (client) => {
+    await validarObraSinLoteAsignado(client, id_obra);
     let id_direccion = null;
     if (direccion) {
         const nuevaDireccion = await client.query(
@@ -129,18 +148,15 @@ export const crear = async ({ nro_lote, id_obra, direccion, mensura }) => ejecut
     return lote.rows[0];
 }, 'Error al crear el terreno.');
 
-export const actualizar = async (id, { nro_lote, id_direccion, id_obra }) => {
-    try {
-        const resultado = await pool.query(
+export const actualizar = async (id, { nro_lote, id_direccion, id_obra }) => ejecutarTransaccion(async (client) => {
+        await validarObraSinLoteAsignado(client, id_obra, id);
+        const resultado = await client.query(
             `UPDATE lotes SET nro_lote = $1, id_direccion = $2, id_obra = $3
              WHERE id_lote = $4 RETURNING *;`,
             [nro_lote, id_direccion ?? null, id_obra ?? null, id],
         );
         return resultado.rows[0] ?? null;
-    } catch (error) {
-        manejarError(error, 'Error al actualizar el terreno.');
-    }
-};
+}, 'Error al actualizar el terreno.');
 
 export const eliminar = async (id) => {
     try {

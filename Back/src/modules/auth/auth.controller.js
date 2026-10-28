@@ -27,6 +27,9 @@ export const registro = async (req,res,next) => {
 export const login = async (req,res,next)=>{
 
     try {
+        if (!req.body || typeof req.body !== 'object' || Array.isArray(req.body)) {
+            return res.status(400).json({ error: 'DNI y contraseña son obligatorios.' });
+        }
         const usuario= await service.login(req.body);
         if(!usuario){
             return res.status(400).json({error:'Peticion Invalida'});
@@ -47,5 +50,4 @@ export const login = async (req,res,next)=>{
 export const perfil = (req, res) => {
     res.json(req.usuario);
 };
-
 

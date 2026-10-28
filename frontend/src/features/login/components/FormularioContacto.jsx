@@ -1,5 +1,4 @@
 import { useRef, useState } from 'react'
-// Importa tus validaciones reales aquí
 import { esRequerido, esDniValido, tieneLongitudMinima } from '../../../shared/utils/validacion'
 
 function validar(valores) {
@@ -12,11 +11,10 @@ function validar(valores) {
     errores.dni = 'El DNI debe contener entre 7 y 8 números.'
   }
 
-  // Validación del Usuario
-  if (!esRequerido(valores.usuario)) {
-    errores.usuario = 'Ingresá tu usuario.'
-  } else if (!tieneLongitudMinima(valores.usuario, 4)) {
-    errores.usuario = 'El usuario debe tener al menos 4 caracteres.'
+  if (!esRequerido(valores.contrasena)) {
+    errores.contrasena = 'Ingresá tu contraseña.'
+  } else if (!tieneLongitudMinima(valores.contrasena, 4)) {
+    errores.contrasena = 'La contraseña debe tener al menos 4 caracteres.'
   }
 
   return errores
@@ -24,8 +22,7 @@ function validar(valores) {
 
 // Recibimos onIngresar como prop desde la página principal de Login
 function FormularioContacto({ onIngresar }) {
-  // 1. Estado adaptado para DNI y Usuario
-  const [valores, setValores] = useState({ dni: '', usuario: '' })
+  const [valores, setValores] = useState({ dni: '', contrasena: '' })
   const [errores, setErrores] = useState({})
   const [errorServidor, setErrorServidor] = useState('')
   const [enviando, setEnviando] = useState(false)
@@ -55,8 +52,7 @@ function FormularioContacto({ onIngresar }) {
 
     setEnviando(true)
     try {
-      // 2. Pasamos los valores correctos a la función onIngresar
-      await onIngresar(valores.dni, valores.usuario) 
+      await onIngresar(valores.dni, valores.contrasena)
     } catch (error) {
       setErrorServidor(error.message)
       setEnviando(false)
@@ -78,8 +74,10 @@ function FormularioContacto({ onIngresar }) {
         <input 
           id="dni" 
           name="dni" 
-          type="number" 
-          autoComplete='dni' 
+          type="text"
+          inputMode="numeric"
+          autoComplete="username"
+          maxLength={8}
           className={`form-control ${errores.dni ? 'is-invalid' : ''}`}  
           value={valores.dni}
           onChange={handleChange}
@@ -90,17 +88,18 @@ function FormularioContacto({ onIngresar }) {
       </div>
 
       <div className="login-form__field">
-        <label htmlFor="usuario">Usuario</label>
+        <label htmlFor="contrasena">Usuario</label>
         <input 
-          id="usuario" 
-          name="usuario" 
-          type="text" 
-          className={`form-control ${errores.usuario ? 'is-invalid' : ''}`}
-          value={valores.usuario} 
-          onChange={handleChange} 
-          required 
+          id="contrasena"
+          name="contrasena"
+          type="password"
+          autoComplete="current-password"
+          className={`form-control ${errores.contrasena ? 'is-invalid' : ''}`}
+          value={valores.contrasena}
+          onChange={handleChange}
+          required
         />
-        {errores.usuario && <div className="invalid-feedback text-danger">{errores.usuario}</div>}
+        {errores.contrasena && <div className="invalid-feedback text-danger">{errores.contrasena}</div>}
       </div>
 
       <label className="login-form__remember" htmlFor="recordar">
