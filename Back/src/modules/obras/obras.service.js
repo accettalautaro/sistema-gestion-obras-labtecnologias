@@ -1,11 +1,42 @@
 import * as repository from './obras.repository.js';
 
+const errorValidacion = (mensaje) => Object.assign(new Error(mensaje), { status: 400 });
+
+const validarFecha = (fecha, campo) => {
+    if (fecha === null || fecha === undefined || fecha === '') return null;
+    if (typeof fecha !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
+        throw errorValidacion(`${campo} debe tener el formato YYYY-MM-DD.`);
+    }
+    const fechaUtc = new Date(`${fecha}T00:00:00Z`);
+    if (Number.isNaN(fechaUtc.getTime()) || fechaUtc.toISOString().slice(0, 10) !== fecha) {
+        throw errorValidacion(`${campo} no es una fecha válida.`);
+    }
+    return fecha;
+};
+
+const validarDatosObra = (obra) => {
+    if (!obra || typeof obra !== 'object' || Array.isArray(obra)) {
+        throw errorValidacion('Los datos de la obra son obligatorios.');
+    }
+    if (!/^\d{1,19}$/.test(String(obra.id_lote ?? ''))
+        || BigInt(obra.id_lote) <= 0n
+        || BigInt(obra.id_lote) > 9223372036854775807n) {
+        throw errorValidacion('Seleccioná un lote para la obra. Si todavía no existe, primero tenés que crear el lote.');
+    }
+    const fecha_inicio = validarFecha(obra.fecha_inicio, 'La fecha de inicio');
+    const fecha_fin = validarFecha(obra.fecha_fin, 'La fecha de finalización');
+    if (fecha_inicio && fecha_fin && fecha_fin < fecha_inicio) {
+        throw errorValidacion('La fecha de finalización no puede ser anterior a la fecha de inicio.');
+    }
+    return { ...obra, fecha_inicio, fecha_fin };
+};
+
 export const listarObras= async (req)=>{
 
     const{id_cliente,estado,id_lote,id_arquitecto}= req.query;
     const obras = await repository.listarTodos();
     if(id_cliente) {
-        return obras.filter(o=> o.id_cliente=== id_cliente);
+        return obras.filter(o=> String(o.id_cliente) === String(id_cliente));
     }
     if(estado) {
         return obras.filter(o=> o.estado=== estado);
@@ -14,14 +45,14 @@ export const listarObras= async (req)=>{
     //    return obras.filter(o=> o.id_lote=== id_lote);      
     //}
     if(id_arquitecto){
-        return obras.filter(o=> o.id_arquitecto=== id_arquitecto);
+        return obras.filter(o=> String(o.id_arquitecto) === String(id_arquitecto));
 
     }
     return obras;
 
 }
 export const crearObra= async (obra)=>{
-    return await repository.crearObra(obra);
+    return await repository.crearObra(validarDatosObra(obra));
 }
 
 export const obtenerObra= async (id)=>{
@@ -30,8 +61,8 @@ export const obtenerObra= async (id)=>{
 }
 
 export const actualizarObra= async(id,obra)=>{
-    const {id_arquitecto,id_cliente,fecha_inicio,fecha_fin,estado,descripcion}=obra;
-    return await repository.actualizarObra(id,id_arquitecto,id_cliente,fecha_inicio,fecha_fin,estado,descripcion);
+    const {id_arquitecto,id_cliente,id_lote,fecha_inicio,fecha_fin,estado,descripcion}=validarDatosObra(obra);
+    return await repository.actualizarObra(id,id_arquitecto,id_cliente,id_lote,fecha_inicio,fecha_fin,estado,descripcion);
 }
 
 export const eliminarObra= async (id)=>{
@@ -42,11 +73,7 @@ export const  obtenerTareas= async (id)=> {
     // 1. Traemos los datos planos de la base de datos
     const filas = await repository.obtenerTareas(id);
     
-    if (filas.length === 0) {
-
-        throw new Error('Obra no encontrada');
-        
-    }
+    if (filas.length === 0) return null;
 
     // 2. Transformamos el resultado plano a una estructura jerárquica
     const obra = {
