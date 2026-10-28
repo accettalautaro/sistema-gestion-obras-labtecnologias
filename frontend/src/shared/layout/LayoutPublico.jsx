@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Outlet, ScrollRestoration, useLocation, useNavigate } from 'react-router-dom'
 import Navbar from './NavBar'
 import Footer from './Footer'
+import { cerrarSesion, obtenerSesion } from '../../features/login'
 const links = [
 	{ label: 'Inicio', href: '/' },
 	{ label: 'Nosotros', href: '/#Nosotros' },
@@ -13,13 +14,10 @@ function LayoutPublico() {
   const location = useLocation()
   const navigate = useNavigate()
   
-  const [sesion, setSesion] = useState(() => {
-    const storedSession = localStorage.getItem('sesion-usuario')
-    return storedSession ? JSON.parse(storedSession) : null
-  })
+  const [sesion, setSesion] = useState(obtenerSesion)
 
   const handleCerrarSesion = () => {
-    localStorage.removeItem('sesion-usuario')
+    cerrarSesion()
     setSesion(null)
     navigate('/login')
   }

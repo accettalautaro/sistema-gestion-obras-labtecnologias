@@ -12,19 +12,22 @@ export const registro = async (nombre,dni,rol)=>{
 }
 
 export const login = async(usuario)=>{
-    
-    const{nombre,dni}= usuario; //DEBERIAMOS CONTROLAR EL ROL TAMBIEN?
+    const contrasena = usuario?.contrasena ?? usuario?.nombre;
+    if (typeof contrasena !== 'string' || !contrasena
+        || typeof usuario.dni !== 'string' || !usuario.dni.trim()) {
+        throw Object.assign(new Error('DNI y contraseña son obligatorios.'), { status: 400 });
+    }
+    const { dni } = usuario;
 
     //pide el usuario asociado a el dni
-    const arreglousuarioDB= await repository.obtenerUsuario(dni);
+    const arreglousuarioDB= await repository.obtenerUsuario(dni.trim());
     const usuarioDb=arreglousuarioDB[0];
     // 2. Comparar la contraseña recibida con el hash guardado
-    const usuarioOK = usuarioDb && (await bcrypt.compare(nombre,usuarioDb.nombre));
+    const usuarioOK= usuarioDb && (await bcrypt.compare(contrasena,usuarioDb.nombre));
 
     //si esta mal
     if(!usuarioOK){
-        console.error('Credencial del usuario invalida');
-        throw new Error('Credenciales invalidas');      
+        throw Object.assign(new Error('Credenciales inválidas.'), { status: 401 });
     }
 
     //FIRMA EL TOKEN con la palabra secreta

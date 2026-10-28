@@ -3,10 +3,11 @@ SET client_encoding TO 'UTF8';
 BEGIN;
 
 
--- Usuarios (el login usa DNI y este nombre, sin contraseña)
+-- Cuentas de prueba (solo desarrollo): DNI 1234567/admin y 7654321/cliente123.
+-- El campo nombre almacena el hash bcrypt que valida la contraseña.
 INSERT INTO usuarios (id_usuario, nombre, dni, rol) OVERRIDING SYSTEM VALUE VALUES
-  (1, 'admin', '1234567', 'arquitecto'),
-  (2, 'Cliente', '7654321', 'cliente'),
+  (1, '$2b$10$hh59rhhtaWGvJgJhpAf04ul.PL6rquGxM.H6I2ZcAu.oKb5cgHLyi', '1234567', 'arquitecto'), --Contraseña: admin
+  (2, '$2b$10$nEl/yE1w/FmROeRYaStY1u8tzILb1jayE0wKqrF1AcfPTd1o0GaPW', '7654321', 'cliente'), --Contraseña: cliente123
   (3, '$2b$10$NOJ4NuXKOJNYsiwtqJoUrOLLd6tYCDb2PUQkLXteffO255fdOYUHG', '1234', 'arquitecto')
 ON CONFLICT (id_usuario) DO UPDATE SET nombre=EXCLUDED.nombre, dni=EXCLUDED.dni, rol=EXCLUDED.rol;
 
