@@ -5,12 +5,6 @@ import * as repository from './auth.repository.js'
 
 const SALT_ROUNDS = 10; // cuánto "trabajo" hace bcrypt: más alto = más seguro y más lento
 
-export const registro = async (nombre,dni,rol)=>{
-        const hash = await bcrypt.hash(nombre,SALT_ROUNDS);
-        return repository.crearUsuario(dni,rol,hash);
-        
-}
-
 export const crearUsuarioCliente = async (idCliente, usuario) => {
     if (typeof usuario !== 'string' || !usuario.trim() || Buffer.byteLength(usuario, 'utf8') > 72) {
         throw Object.assign(new Error('El usuario/contraseña es obligatorio y no puede superar 72 bytes.'), { status: 400 });
