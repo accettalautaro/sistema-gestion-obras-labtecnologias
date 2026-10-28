@@ -1,0 +1,11 @@
+$kind: http-request
+name: http://localhost:3000/api/clientes
+description: ""
+url: http://localhost:3000/api/clientes?nombre=Ana
+method: GET
+queryParams:
+  - key: nombre
+    value: Ana
+    disabled: false
+    description: ""
+order: 1000
