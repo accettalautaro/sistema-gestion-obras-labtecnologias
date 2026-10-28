@@ -9,7 +9,8 @@ export const registro = async (req,res,next) => {
         if (!nombre || !dni || !rol) {
         return res.status(400).json({ error: 'NOMBRE, ROL y DNI son obligatorios' });
         }
-        const usuario = await service.registro(nombre,rol,dni);
+
+        const usuario = await service.registro(nombre,dni,rol);
         if(!usuario){
             return res.status(400).json({error:'Peticion invalida'});
         }
@@ -21,6 +22,15 @@ export const registro = async (req,res,next) => {
 
     }
 }
+
+export const crearUsuarioCliente = async (req, res, next) => {
+    try {
+        const usuario = await service.crearUsuarioCliente(req.params.id, req.body?.usuario);
+        return res.status(201).json(usuario);
+    } catch (error) {
+        next(error);
+    }
+};
 
 //POST api/auth/login
 
@@ -50,4 +60,3 @@ export const login = async (req,res,next)=>{
 export const perfil = (req, res) => {
     res.json(req.usuario);
 };
-

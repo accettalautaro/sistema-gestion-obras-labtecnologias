@@ -28,6 +28,8 @@ Los módulos siguen el recorrido **ruta → controller → service → repositor
 - El service valida los datos y aplica reglas de negocio.
 - El repository ejecuta consultas parametrizadas usando el pool de PostgreSQL.
 
+La gestión de clientes utiliza `GET`, `POST`, `PUT` y `DELETE /api/clientes`; la cuenta se crea y vincula con `POST /api/auth/clientes/:id/usuario`. Estas operaciones requieren una sesión de arquitecto.
+
 Las rutas privadas requieren `Authorization: Bearer <token>`. El token se obtiene con
 `POST /api/auth/login`; `verificarToken` valida firma y vencimiento, y deja los datos
 del usuario en `req.usuario`. Las escrituras de pagos y terrenos requieren además el

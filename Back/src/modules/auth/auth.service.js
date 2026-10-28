@@ -11,6 +11,18 @@ export const registro = async (nombre,dni,rol)=>{
         
 }
 
+export const crearUsuarioCliente = async (idCliente, usuario) => {
+    if (typeof usuario !== 'string' || !usuario.trim() || Buffer.byteLength(usuario, 'utf8') > 72) {
+        throw Object.assign(new Error('El usuario/contraseña es obligatorio y no puede superar 72 bytes.'), { status: 400 });
+    }
+    const id = String(idCliente ?? '');
+    if (!/^\d{1,19}$/.test(id) || BigInt(id) < 1n || BigInt(id) > 9223372036854775807n) {
+        throw Object.assign(new Error('El identificador del cliente no es válido.'), { status: 400 });
+    }
+    const hash = await bcrypt.hash(usuario, SALT_ROUNDS);
+    return repository.crearUsuarioCliente(id, hash);
+};
+
 export const login = async(usuario)=>{
     const contrasena = usuario?.contrasena ?? usuario?.nombre;
     if (typeof contrasena !== 'string' || !contrasena
