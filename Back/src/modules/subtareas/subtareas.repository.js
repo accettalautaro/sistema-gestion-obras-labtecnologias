@@ -7,7 +7,7 @@ export const crearSubtarea= async(subtarea)=>{
         const query= 'INSERT INTO subtareas (id_tarea,nombre,duracion_estimada,porcentaje,descripcion,duracion_real,costo_estimado,costo_real,fecha_inicio,fecha_fin) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *;';
         const values= [id_tarea,nombre,duracion_estimada,porcentaje,descripcion,duracion_real,costo_estimado,costo_real,fecha_inicio,fecha_fin];
         const res= await pool.query(query,values);
-        return res.rows;
+        return res.rows[0] ?? null;
     }catch(error){
         console.error('Error al intentar crear una subtarea',error);
         throw new Error('Error al crear una subtarea en la base de datos');
@@ -32,9 +32,9 @@ export const actualizarSubtarea= async(id,id_tarea,nombre,duracion_estimada,porc
 
 export const eliminar= async (id)=> {
     try{
-        const query= 'DELETE FROM subtareas WHERE subtareas.id_subtarea = $1';
+        const query= 'DELETE FROM subtareas WHERE subtareas.id_subtarea = $1 RETURNING id_subtarea';
         const res= await pool.query(query,[id]);
-        return res.rows;
+        return res.rowCount > 0;
     }
     catch(error){
         console.error('Error al intentar borrar una subtarea',error);

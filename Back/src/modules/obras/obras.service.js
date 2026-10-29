@@ -3,7 +3,9 @@ import * as repository from './obras.repository.js';
 const errorValidacion = (mensaje) => Object.assign(new Error(mensaje), { status: 400 });
 
 const validarFecha = (fecha, campo) => {
-    if (fecha === null || fecha === undefined || fecha === '') return null;
+    if (fecha === null || fecha === undefined || fecha === '') {
+        throw errorValidacion(`${campo} es obligatoria.`);
+    }
     if (typeof fecha !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
         throw errorValidacion(`${campo} debe tener el formato YYYY-MM-DD.`);
     }
@@ -25,7 +27,7 @@ const validarDatosObra = (obra) => {
     }
     const fecha_inicio = validarFecha(obra.fecha_inicio, 'La fecha de inicio');
     const fecha_fin = validarFecha(obra.fecha_fin, 'La fecha de finalización');
-    if (fecha_inicio && fecha_fin && fecha_fin < fecha_inicio) {
+    if (fecha_fin < fecha_inicio) {
         throw errorValidacion('La fecha de finalización no puede ser anterior a la fecha de inicio.');
     }
     return { ...obra, fecha_inicio, fecha_fin };
@@ -34,6 +36,16 @@ const validarDatosObra = (obra) => {
 export const listarObras= async (req)=>{
 
     const{id_cliente,estado,id_lote,id_arquitecto}= req.query;
+    const parametrosPermitidos = new Set(['id_cliente', 'estado', 'id_lote', 'id_arquitecto']);
+    if (Object.keys(req.query).some((parametro) => !parametrosPermitidos.has(parametro))) {
+        throw errorValidacion('El filtro de obras indicado no es válido.');
+    }
+    for (const [nombre, valor] of Object.entries({ id_cliente, id_lote, id_arquitecto })) {
+        if (valor !== undefined && (!/^\d{1,19}$/.test(valor)
+            || BigInt(valor) < 1n || BigInt(valor) > 9223372036854775807n)) {
+            throw errorValidacion(`${nombre} debe ser un identificador válido.`);
+        }
+    }
     const obras = await repository.listarTodos();
     if(id_cliente) {
         return obras.filter(o=> String(o.id_cliente) === String(id_cliente));
@@ -41,9 +53,9 @@ export const listarObras= async (req)=>{
     if(estado) {
         return obras.filter(o=> o.estado=== estado);
     }
-    //if(id_lote){
-    //    return obras.filter(o=> o.id_lote=== id_lote);      
-    //}
+    if(id_lote) {
+        return obras.filter(o => String(o.id_lote) === String(id_lote));
+    }
     if(id_arquitecto){
         return obras.filter(o=> String(o.id_arquitecto) === String(id_arquitecto));
 

@@ -7,15 +7,13 @@ BEGIN;
 -- El campo nombre almacena el hash bcrypt que valida la contraseña.
 INSERT INTO usuarios (id_usuario, nombre, dni, rol) OVERRIDING SYSTEM VALUE VALUES
   (1, '$2b$10$/UzaTeo.TgGKdMK43Azxc.7ql84Lt.6qvlb/doS33IDAqynRlFpdS', '1234567', 'arquitecto'), --Contraseña: admin
-  (2, '$2b$10$4g83Tb5CgsV3FB5nqU3b1ulmQVqeL3yQn4RzgfHRrI0cQaumY0IZ6', '7654321', 'cliente'), --Contraseña: cliente123
-  (3, '$2b$10$NOJ4NuXKOJNYsiwtqJoUrOLLd6tYCDb2PUQkLXteffO255fdOYUHG', '1234', 'arquitecto')
+  (2, '$2b$10$4g83Tb5CgsV3FB5nqU3b1ulmQVqeL3yQn4RzgfHRrI0cQaumY0IZ6', '7654321', 'cliente') --Contraseña: cliente123
 ON CONFLICT (id_usuario) DO UPDATE SET nombre=EXCLUDED.nombre, dni=EXCLUDED.dni, rol=EXCLUDED.rol;
 
 
 -- Arquitectos
 INSERT INTO arquitectos (id_arquitecto, nombre, apellido, dni, telefono, email, nro_matricula, id_usuario) OVERRIDING SYSTEM VALUE VALUES
-  (1, 'Marcelo', 'Accetta', '1234567', '2657353535', NULL, 7884566, 1),
-  (2, 'Lautaro', 'Accetta', '2424244', '2664202020', NULL, 1234567, 3)
+  (1, 'Marcelo', 'Accetta', '1234567', '2657353535', NULL, 7884566, 1)
 ON CONFLICT (id_arquitecto) DO UPDATE SET nombre=EXCLUDED.nombre, apellido=EXCLUDED.apellido, dni=EXCLUDED.dni, telefono=EXCLUDED.telefono, email=EXCLUDED.email, nro_matricula=EXCLUDED.nro_matricula, id_usuario=EXCLUDED.id_usuario;
 
 

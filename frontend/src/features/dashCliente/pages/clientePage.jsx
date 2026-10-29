@@ -2,9 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { obtenerResumenCliente } from '../services/clienteservice'
 
-// TODO: tomar el id del usuario que inició sesión (en usuarios.json el cliente tiene id 2)
-const ID_USUARIO_ACTUAL = 2
-
 // ---------- Constantes ----------
 // Color del badge según el estado que figure en obras.json (cualquier otro valor usa el gris)
 const ESTADO_OBRA_BADGE = {
@@ -20,7 +17,6 @@ const FILTROS_REC_VACIOS = { texto: '', estado: '', mesAnio: '' }
 // ---------- Helpers ----------
 const normalizar = (texto) => texto.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
 const capitalizar = (t) => t.charAt(0).toUpperCase() + t.slice(1)
-const valoresUnicos = (lista) => [...new Set(lista)]
 
 // "2026-10-02" -> Date local (new Date('2026-10-02') corre un día atrás en Argentina por UTC)
 const parseFecha = (iso) => {
@@ -213,7 +209,7 @@ function ClientePage() {
 
   useEffect(() => {
     let activo = true
-    obtenerResumenCliente(ID_USUARIO_ACTUAL)
+    obtenerResumenCliente()
       .then((resumen) => activo && setDatos(resumen))
       .catch((e) => activo && setError(e.message))
     return () => {

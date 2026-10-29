@@ -30,9 +30,9 @@ app.use('/api/pagos', pagosRoutes);
 app.use('/api/terrenos', terrenosRoutes);
 
 
-// Primero la ruta 404 (Pagina no encontrada), después el manejo de errores
-app.use(badRequest);
+// Las rutas inexistentes se distinguen de los errores de procesamiento de la solicitud.
 app.use(notFound);
+app.use(badRequest);
 app.use(errorHandler);
 
 export default app;

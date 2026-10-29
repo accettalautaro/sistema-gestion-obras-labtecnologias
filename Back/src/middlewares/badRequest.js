@@ -1,4 +1,7 @@
-//en caso de que la solicitud posee datos o formato invalido
-export const badRequest=(req,res)=>{
-    res.status(400).json({error:'Solicitud invalida'});
-}
+export const badRequest = (error, req, res, next) => {
+    if (error.type === 'entity.parse.failed') {
+        return res.status(400).json({ error: 'El cuerpo de la solicitud debe contener JSON válido.' });
+    }
+
+    return next(error);
+};

@@ -1,26 +1,13 @@
 import * as service from './auth.service.js';
 
-//POST api/auth/registro
-
-export const registro = async (req,res,next) => {
-    try{
-        
-        const {nombre,dni,rol}=req.body
-        if (!nombre || !dni || !rol) {
-        return res.status(400).json({ error: 'NOMBRE, ROL y DNI son obligatorios' });
-        }
-        const usuario = await service.registro(nombre,rol,dni);
-        if(!usuario){
-            return res.status(400).json({error:'Peticion invalida'});
-        }
-        return res.status(201).send();//CONSULTA DEBERIAMOS RETORNAR .json(usuario)?
-
-    }catch(error){
-
+export const crearUsuarioCliente = async (req, res, next) => {
+    try {
+        const usuario = await service.crearUsuarioCliente(req.params.id, req.body?.usuario);
+        return res.status(201).json(usuario);
+    } catch (error) {
         next(error);
-
     }
-}
+};
 
 //POST api/auth/login
 
@@ -50,4 +37,3 @@ export const login = async (req,res,next)=>{
 export const perfil = (req, res) => {
     res.json(req.usuario);
 };
-

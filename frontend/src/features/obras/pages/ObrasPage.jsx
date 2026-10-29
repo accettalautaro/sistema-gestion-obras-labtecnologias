@@ -54,8 +54,11 @@ function ObrasPage() {
 			setAviso({ titulo: 'Falta seleccionar un lote', mensaje: 'Toda obra debe tener un lote asociado. Si todavía no existe, primero tenés que crear el lote.' })
 			return
 		}
-		if (formulario['fecha-inicio'] && formulario['fecha-fin']
-			&& formulario['fecha-fin'] < formulario['fecha-inicio']) {
+		if (!formulario['fecha-inicio'] || !formulario['fecha-fin']) {
+			setAviso({ titulo: 'Faltan fechas', mensaje: 'Tenés que completar la fecha de inicio y la fecha de finalización de la obra.' })
+			return
+		}
+		if (formulario['fecha-fin'] < formulario['fecha-inicio']) {
 			setAviso({ titulo: 'Revisá las fechas', mensaje: 'La fecha de finalización no puede ser anterior a la fecha de inicio.' })
 			return
 		}
@@ -103,8 +106,8 @@ function ObrasPage() {
 					<label>Arquitecto<select className="form-select" value={formulario['id-arquitecto']} onChange={(event) => setFormulario({ ...formulario, 'id-arquitecto': event.target.value })} required><option value="">Seleccioná un arquitecto</option>{arquitectos.map((arquitecto) => <option key={arquitecto['id-arquitecto']} value={arquitecto['id-arquitecto']}>{nombrePersona(arquitecto) || `Arquitecto #${arquitecto['id-arquitecto']}`}</option>)}</select></label>
 					<label>Lote<select className="form-select" value={formulario['id-lote']} onChange={(event) => setFormulario({ ...formulario, 'id-lote': event.target.value })} required><option value="" disabled>Seleccioná un lote</option>{lotes.filter((lote) => !lote.idObra || String(lote.idObra) === String(obraEditando)).map((lote) => <option key={lote['id-lote']} value={lote['id-lote']}>Lote {lote.nrolote}</option>)}</select></label>
 					<label>Estado<select className="form-select" value={formulario.Estado} onChange={(event) => setFormulario({ ...formulario, Estado: event.target.value })} required><option>Planificada</option><option>En ejecución</option><option>Finalizada</option><option>Suspendida</option></select></label>
-					<label>Fecha de inicio<input className="form-control" type="date" value={formulario['fecha-inicio']} onChange={(event) => setFormulario({ ...formulario, 'fecha-inicio': event.target.value })} /></label>
-					<label>Fecha de fin<input className="form-control" type="date" min={formulario['fecha-inicio'] || undefined} value={formulario['fecha-fin']} onChange={(event) => setFormulario({ ...formulario, 'fecha-fin': event.target.value })} /></label>
+					<label>Fecha de inicio<input className="form-control" type="date" value={formulario['fecha-inicio']} onChange={(event) => setFormulario({ ...formulario, 'fecha-inicio': event.target.value })} required /></label>
+					<label>Fecha de fin<input className="form-control" type="date" min={formulario['fecha-inicio'] || undefined} value={formulario['fecha-fin']} onChange={(event) => setFormulario({ ...formulario, 'fecha-fin': event.target.value })} required /></label>
 					<label>Descripción<input className="form-control" value={formulario.descripcion} onChange={(event) => setFormulario({ ...formulario, descripcion: event.target.value })} maxLength={500} /></label>
 				</div><div className="obras-page__form-actions">{obraEditando !== null && <button className="btn btn-outline-secondary" type="button" onClick={cancelarEdicion}>Cancelar</button>}<button className="btn btn-dark" type="submit" disabled={guardando}>{guardando ? 'Guardando...' : obraEditando === null ? 'Crear obra' : 'Guardar cambios'}</button></div></form>
 			</section>
