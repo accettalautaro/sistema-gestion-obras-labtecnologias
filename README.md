@@ -11,17 +11,8 @@ CONTRASEÑA: admin
 
 El esquema y la base de datos son pasos distintos. `Back/database/acettadb.sql` crea las tablas en la base a la que ya está conectado `psql`; no crea ni selecciona una base por sí solo. Para preparar una base nueva, desde la raíz del repositorio:
 
-```powershell
-createdb -U postgres accettadb
-psql -U postgres -d accettadb -f Back/database/acettadb.sql
-psql -U postgres -d accettadb -f Back/database/semilla_datos.sql
-```
 
-Si la base ya estaba creada, aplicá las actualizaciones del esquema con:
 
-```powershell
-psql -U postgres -d accettadb -f Back/database/updates.sql
-```
 
 En `.env` dentro de `Back`, configurá `PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD` y `PGDATABASE=accettadb` para que el pool de Node se conecte a esa misma base. También son necesarios `JWT_SECRET` y, opcionalmente, `JWT_EXPIRES_IN`, `PORT` y `CORS_ORIGIN`. No subas el `.env` al repositorio ni compartas sus secretos.
 
