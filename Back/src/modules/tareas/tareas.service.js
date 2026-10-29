@@ -1,9 +1,51 @@
 import * as repository from './tareas.repository.js';
 
 export const listarTareas= async ()=>{
+    const filas = await repository.listarTodos();
+    const tareasPorId = new Map();
 
-    const tareas = await repository.listarTodos();
-    return tareas;
+    for (const fila of filas) {
+        let tarea = tareasPorId.get(fila.id_tarea);
+        if (!tarea) {
+            const {
+                subtarea_id,
+                subtarea_duracion_estimada,
+                subtarea_porcentaje,
+                subtarea_costo_estimado,
+                subtarea_costo_real,
+                subtarea_duracion_real,
+                ...datosTarea
+            } = fila;
+
+            tarea = {
+                ...datosTarea,
+                duracion_estimada: 0,
+                duracion_real: 0,
+                costo_estimado: 0,
+                costo_real: 0,
+                porcentaje: 0,
+                _cantidadSubtareas: 0,
+            };
+            tareasPorId.set(fila.id_tarea, tarea);
+        }
+
+        if (fila.subtarea_id !== null) {
+            tarea.duracion_estimada += Number(fila.subtarea_duracion_estimada ?? 0);
+            tarea.duracion_real += Number(fila.subtarea_duracion_real ?? 0);
+            tarea.costo_estimado += Number(fila.subtarea_costo_estimado ?? 0);
+            tarea.costo_real += Number(fila.subtarea_costo_real ?? 0);
+            tarea.porcentaje += Number(fila.subtarea_porcentaje ?? 0);
+            tarea._cantidadSubtareas += 1;
+        }
+    }
+
+    return Array.from(tareasPorId.values(), (tarea) => {
+        if (tarea._cantidadSubtareas > 0) {
+            tarea.porcentaje /= tarea._cantidadSubtareas;
+        }
+        delete tarea._cantidadSubtareas;
+        return tarea;
+    });
 
 }
 export const crearTarea= async (tarea)=>{

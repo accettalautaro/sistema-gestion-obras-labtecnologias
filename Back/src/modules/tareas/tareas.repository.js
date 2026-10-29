@@ -2,7 +2,28 @@ import {pool} from '../../config/db.js';
 
 export const listarTodos = async ()=>{
     try{
-        const query='SELECT * FROM tareas ;';
+        const query = `
+            SELECT
+                t.*,
+                s.id_subtarea AS subtarea_id,
+                s.duracion_estimada AS subtarea_duracion_estimada,
+                s.porcentaje AS subtarea_porcentaje,
+                s.costo_estimado AS subtarea_costo_estimado,
+                COALESCE(pagos.total, 0) AS subtarea_costo_real,
+                CASE
+                    WHEN s.fecha_inicio IS NOT NULL AND s.fecha_fin IS NOT NULL
+                    THEN s.fecha_fin - s.fecha_inicio
+                    ELSE 0
+                END AS subtarea_duracion_real
+            FROM tareas t
+            LEFT JOIN subtareas s ON s.id_tarea = t.id_tarea
+            LEFT JOIN (
+                SELECT id_subtarea, SUM(monto) AS total
+                FROM pagos_parciales
+                GROUP BY id_subtarea
+            ) pagos ON pagos.id_subtarea = s.id_subtarea
+            ORDER BY t.id_tarea;
+        `;
         const res= await pool.query(query);
 
         return res.rows;
