@@ -60,7 +60,7 @@ export const obtenerTarea= async (id)=> {
             WHERE t.id_tarea = $1;
         `;
         const res= await pool.query(query,[id]);
-        return res.rows[0] ?? null;
+        return res.rows;
     }
     catch(error){
         console.error('Error al intentar obtener una tarea',error);
