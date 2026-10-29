@@ -57,12 +57,17 @@ function convertirTareas(obraApi) {
 
 function convertirObra(obra, tareas = []) {
 	const avance = resumirAvanceTareas(tareas).avance
+	const fechaParaFormulario = (fecha) => {
+		if (!fecha) return ''
+		const valor = fecha instanceof Date ? fecha.toISOString() : String(fecha)
+		return valor.slice(0, 10)
+	}
 	return {
 		'id-obra': String(obra.id_obra), 'id-cliente': String(obra.id_cliente),
 		'id-arquitecto': obra.id_arquitecto == null ? '' : String(obra.id_arquitecto),
 		'id-lote': obra.id_lote == null ? '' : String(obra.id_lote),
-		nrolote: obra.nro_lote ?? '', 'fecha-inicio': obra.fecha_inicio ?? '',
-		'fecha-fin': obra.fecha_fin ?? '', Estado: obra.estado ?? 'pendiente',
+		nrolote: obra.nro_lote ?? '', 'fecha-inicio': fechaParaFormulario(obra.fecha_inicio),
+		'fecha-fin': fechaParaFormulario(obra.fecha_fin), Estado: obra.estado ?? 'pendiente',
 		descripcion: obra.descripcion ?? '', porcentaje: `${avance}%`,
 		clienteNombre: [obra.cliente_nombre, obra.cliente_apellido].filter(Boolean).join(' '),
 		arquitectoNombre: [obra.arquitecto_nombre, obra.arquitecto_apellido].filter(Boolean).join(' '),
@@ -82,7 +87,7 @@ async function obtenerTareasObra(idObra, token) {
 export async function listarObras() {
 	const token = tokenActual()
 	const [obrasApi, clientesApi, terrenosApi] = await Promise.all([
-		solicitar('/obras'), solicitar('/clientes'), solicitar('/terrenos', { token }),
+		solicitar('/obras'), solicitar('/clientes', { token }), solicitar('/terrenos', { token }),
 	])
 	const obras = await Promise.all(obrasApi.map(async (obra) => convertirObra(obra, await obtenerTareasObra(obra.id_obra, token))))
 	const clientes = clientesApi.map((cliente) => ({
