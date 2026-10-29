@@ -3,7 +3,9 @@ import * as repository from './obras.repository.js';
 const errorValidacion = (mensaje) => Object.assign(new Error(mensaje), { status: 400 });
 
 const validarFecha = (fecha, campo) => {
-    if (fecha === null || fecha === undefined || fecha === '') return null;
+    if (fecha === null || fecha === undefined || fecha === '') {
+        throw errorValidacion(`${campo} es obligatoria.`);
+    }
     if (typeof fecha !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
         throw errorValidacion(`${campo} debe tener el formato YYYY-MM-DD.`);
     }
@@ -25,7 +27,7 @@ const validarDatosObra = (obra) => {
     }
     const fecha_inicio = validarFecha(obra.fecha_inicio, 'La fecha de inicio');
     const fecha_fin = validarFecha(obra.fecha_fin, 'La fecha de finalización');
-    if (fecha_inicio && fecha_fin && fecha_fin < fecha_inicio) {
+    if (fecha_fin < fecha_inicio) {
         throw errorValidacion('La fecha de finalización no puede ser anterior a la fecha de inicio.');
     }
     return { ...obra, fecha_inicio, fecha_fin };
