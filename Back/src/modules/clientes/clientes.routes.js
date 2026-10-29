@@ -7,6 +7,7 @@ const router = Router();
 // Todas las rutas requieren autenticación.
 router.use(verificarToken);
 
+router.get('/perfil',controller.obtenerPerfilUsuario);
 router.get('/',controller.listarClientes);
 router.get('/:id',controller.obtenerCliente);
 
