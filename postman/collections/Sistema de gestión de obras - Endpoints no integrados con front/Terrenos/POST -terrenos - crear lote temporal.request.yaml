@@ -1,0 +1,24 @@
+$kind: http-request
+name: POST /terrenos - crear lote temporal
+url: "{{baseUrl}}/api/terrenos"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "nro_lote": "PM-{{$timestamp}}",
+      "id_obra": null
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{tokenArquitecto}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('HTTP 201', () => pm.response.to.have.status(201));
+      if ([200, 201].includes(pm.response.code)) { const d = pm.response.json(); pm.collectionVariables.set('idNuevoLote', String(d.id_lote)); }
+    language: text/javascript
+order: 2000

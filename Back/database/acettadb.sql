@@ -63,7 +63,7 @@ CREATE UNIQUE INDEX lotes_id_obra_unico ON lotes(id_obra) WHERE id_obra IS NOT N
 
 CREATE TABLE tareas (
     id_tarea BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    id_obra BIGINT NOT NULL REFERENCES obras(id_obra),
+    id_obra BIGINT NOT NULL REFERENCES obras(id_obra) ON DELETE CASCADE,
     nombre VARCHAR(150) NOT NULL,
     duracion_estimada NUMERIC(10,2),
     porcentaje NUMERIC(5,2) NOT NULL DEFAULT 0,
@@ -85,7 +85,7 @@ CREATE TABLE tareas (
 
 CREATE TABLE subtareas (
     id_subtarea BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    id_tarea BIGINT NOT NULL REFERENCES tareas(id_tarea),
+    id_tarea BIGINT NOT NULL REFERENCES tareas(id_tarea) ON DELETE CASCADE,
     nombre VARCHAR(150) NOT NULL,
     duracion_estimada NUMERIC(10,2),
     porcentaje NUMERIC(5,2) NOT NULL DEFAULT 0,
@@ -107,28 +107,28 @@ CREATE TABLE subtareas (
 
 CREATE TABLE pagos_parciales (
     id_pago BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    id_subtarea BIGINT NOT NULL REFERENCES subtareas(id_subtarea),
+    id_subtarea BIGINT NOT NULL REFERENCES subtareas(id_subtarea) ON DELETE CASCADE,
     descripcion TEXT,
     monto NUMERIC(14,2) NOT NULL CHECK (monto >= 0)
 );
 
 CREATE TABLE recordatorios (
     id_recordatorio BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    id_obra BIGINT NOT NULL REFERENCES obras(id_obra),
+    id_obra BIGINT NOT NULL REFERENCES obras(id_obra) ON DELETE CASCADE,
     fecha TIMESTAMP WITH TIME ZONE NOT NULL,
     descripcion TEXT NOT NULL
 );
 
 CREATE TABLE documentos (
     id_documento BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    id_lote BIGINT NOT NULL REFERENCES lotes(id_lote),
+    id_lote BIGINT NOT NULL REFERENCES lotes(id_lote) ON DELETE CASCADE,
     nombre VARCHAR(150) NOT NULL,
     descripcion TEXT,
     archivo TEXT
 );
 
 CREATE TABLE mensuras (
-    id_documento BIGINT PRIMARY KEY REFERENCES documentos(id_documento),
+    id_documento BIGINT PRIMARY KEY REFERENCES documentos(id_documento) ON DELETE CASCADE,
     largo NUMERIC(10,2),
     mts_cuadrados NUMERIC(12,2),
     ancho NUMERIC(10,2),
@@ -139,7 +139,7 @@ CREATE TABLE mensuras (
 );
 
 CREATE TABLE escrituras (
-    id_documento BIGINT PRIMARY KEY REFERENCES documentos(id_documento),
+    id_documento BIGINT PRIMARY KEY REFERENCES documentos(id_documento) ON DELETE CASCADE,
     nro_escritura VARCHAR(50) UNIQUE NOT NULL
 );
 
@@ -153,7 +153,7 @@ CREATE TABLE propietarios (
 );
 
 CREATE TABLE escritura_propietarios (
-    id_documento BIGINT NOT NULL REFERENCES escrituras(id_documento),
+    id_documento BIGINT NOT NULL REFERENCES escrituras(id_documento) ON DELETE CASCADE,
     id_propietario BIGINT NOT NULL REFERENCES propietarios(id_propietario),
     PRIMARY KEY (id_documento, id_propietario)
 );

@@ -1,0 +1,15 @@
+$kind: http-request
+name: GET /recordatorios?id_obra={{idObraSemilla}} - filtrar por obra 1
+url: "{{baseUrl}}/api/recordatorios?id_obra={{idObraSemilla}}"
+method: GET
+queryParams:
+  id_obra: "{{idObraSemilla}}"
+auth:
+  type: bearer
+  credentials:
+    token: "{{tokenArquitecto}}"
+scripts:
+  - type: afterResponse
+    code: pm.test('HTTP 200', () => pm.response.to.have.status(200));
+    language: text/javascript
+order: 1000

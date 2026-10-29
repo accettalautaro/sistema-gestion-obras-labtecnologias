@@ -1,0 +1,28 @@
+$kind: http-request
+name: POST /terrenos/mensuras - crear mensura temporal para lote 1
+url: "{{baseUrl}}/api/terrenos/mensuras"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "id_lote": 1,
+      "nombre": "Mensura temporal Postman",
+      "descripcion": "Prueba de colección",
+      "ancho": 10,
+      "largo": 20,
+      "mts_cuadrados": 200
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{tokenArquitecto}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('HTTP 201', () => pm.response.to.have.status(201));
+      if ([200, 201].includes(pm.response.code)) { const d = pm.response.json(); pm.collectionVariables.set('idNuevoMensura', String(d.id_documento)); }
+    language: text/javascript
+order: 3000

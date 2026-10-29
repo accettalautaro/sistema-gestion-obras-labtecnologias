@@ -1,0 +1,25 @@
+$kind: http-request
+name: PUT /terrenos/propietarios/{{idNuevoPropietario}} - actualizar propietario temporal
+url: "{{baseUrl}}/api/terrenos/propietarios/{{idNuevoPropietario}}"
+method: PUT
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "nombre": "Propietario temporal actualizado",
+      "apellido": "Postman",
+      "dni": "99887766",
+      "estado_civil": "Casado",
+      "porcentaje": 15
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{tokenArquitecto}}"
+scripts:
+  - type: afterResponse
+    code: pm.test('HTTP 200', () => pm.response.to.have.status(200));
+    language: text/javascript
+order: 5000

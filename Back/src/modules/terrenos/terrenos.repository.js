@@ -158,17 +158,29 @@ export const actualizar = async (id, { nro_lote, id_direccion, id_obra }) => eje
         return resultado.rows[0] ?? null;
 }, 'Error al actualizar el terreno.');
 
-export const eliminar = async (id) => {
-    try {
-        const resultado = await pool.query(
-            'DELETE FROM lotes WHERE id_lote = $1 RETURNING id_lote;',
-            [id],
-        );
-        return resultado.rowCount > 0;
-    } catch (error) {
-        manejarError(error, 'Error al eliminar el terreno.');
+export const eliminar = async (id) => ejecutarTransaccion(async (client) => {
+    const lote = await client.query(
+        'SELECT id_direccion FROM lotes WHERE id_lote = $1 FOR UPDATE;',
+        [id],
+    );
+    if (!lote.rowCount) return false;
+
+    const idDireccion = lote.rows[0].id_direccion;
+    if (idDireccion != null) {
+        await client.query('SELECT id_direccion FROM direcciones WHERE id_direccion = $1 FOR UPDATE;', [idDireccion]);
     }
-};
+    await client.query('DELETE FROM lotes WHERE id_lote = $1;', [id]);
+
+    if (idDireccion != null) {
+        await client.query(
+            `DELETE FROM direcciones
+             WHERE id_direccion = $1
+               AND NOT EXISTS (SELECT 1 FROM lotes WHERE id_direccion = $1);`,
+            [idDireccion],
+        );
+    }
+    return true;
+}, 'Error al eliminar el terreno.');
 
 export const listarDirecciones = async () => {
     try {

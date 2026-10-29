@@ -1,0 +1,32 @@
+$kind: http-request
+name: POST /tareas - crear tarea temporal en obra 1
+url: "{{baseUrl}}/api/tareas"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "id_obra": 1,
+      "nombre": "Tarea temporal Postman",
+      "duracion_estimada": 2,
+      "porcentaje": 0,
+      "descripcion": "Prueba de colección",
+      "duracion_real": 0,
+      "costo_estimado": 1000,
+      "costo_real": 0,
+      "fecha_inicio": "2026-10-28",
+      "fecha_fin": "2026-10-30"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{tokenArquitecto}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('HTTP 201', () => pm.response.to.have.status(201));
+      if ([200, 201].includes(pm.response.code)) { const d = pm.response.json(); pm.collectionVariables.set('idNuevoTarea', String(d.id_tarea)); }
+    language: text/javascript
+order: 3000

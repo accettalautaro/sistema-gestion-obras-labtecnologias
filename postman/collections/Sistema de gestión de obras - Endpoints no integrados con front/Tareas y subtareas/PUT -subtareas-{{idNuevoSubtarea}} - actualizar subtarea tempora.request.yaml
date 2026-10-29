@@ -1,0 +1,30 @@
+$kind: http-request
+name: PUT /subtareas/{{idNuevoSubtarea}} - actualizar subtarea temporal
+url: "{{baseUrl}}/api/subtareas/{{idNuevoSubtarea}}"
+method: PUT
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "id_tarea": 1,
+      "nombre": "Subtarea temporal actualizada",
+      "duracion_estimada": 2,
+      "porcentaje": 50,
+      "descripcion": "Actualización de prueba",
+      "duracion_real": 1,
+      "costo_estimado": 700,
+      "costo_real": 200,
+      "fecha_inicio": "2026-10-28",
+      "fecha_fin": "2026-10-30"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{tokenArquitecto}}"
+scripts:
+  - type: afterResponse
+    code: pm.test('HTTP 200', () => pm.response.to.have.status(200));
+    language: text/javascript
+order: 10000
