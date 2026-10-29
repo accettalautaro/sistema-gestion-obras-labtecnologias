@@ -11,6 +11,11 @@ CONTRASEÑA: admin
 
 El esquema y la base de datos son pasos distintos. `Back/database/acettadb.sql` crea las tablas en la base a la que ya está conectado `psql`; no crea ni selecciona una base por sí solo. Para preparar una base nueva, desde la raíz del repositorio:
 
+```powershell
+createdb -U postgres accettadb
+psql -U postgres -d accettadb -f Back/database/acettadb.sql
+psql -U postgres -d accettadb -f Back/database/semilla_datos.sql
+```
 
 
 
