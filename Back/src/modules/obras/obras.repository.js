@@ -22,14 +22,27 @@ export const listarTodos = async ()=>{
 
 export const obtenerObra= async (id)=> {
     try{
-        const query=`SELECT o.*, l.id_lote, l.nro_lote,
-                            c.nombre AS cliente_nombre, c.apellido AS cliente_apellido,
-                            a.nombre AS arquitecto_nombre, a.apellido AS arquitecto_apellido
-                     FROM obras o
-                     LEFT JOIN lotes l ON l.id_obra = o.id_obra
-                     LEFT JOIN clientes c ON c.id_cliente = o.id_cliente
-                     LEFT JOIN arquitectos a ON a.id_arquitecto = o.id_arquitecto
-                     WHERE o.id_obra = $1;`;
+        const query = `
+            SELECT
+                o.*,
+                c.nombre AS cliente_nombre,
+                c.apellido AS cliente_apellido,
+                a.nombre AS arquitecto_nombre,
+                a.apellido AS arquitecto_apellido,
+                l.id_lote,
+                l.nro_lote
+            FROM obras o
+            LEFT JOIN clientes c ON c.id_cliente = o.id_cliente
+            LEFT JOIN arquitectos a ON a.id_arquitecto = o.id_arquitecto
+            LEFT JOIN LATERAL (
+                SELECT id_lote, nro_lote
+                FROM lotes
+                WHERE id_obra = o.id_obra
+                ORDER BY id_lote
+                LIMIT 1
+            ) l ON TRUE
+            WHERE o.id_obra = $1;
+        `;
         const res= await pool.query(query,[id]);
         return res.rows[0] ?? null;
     }
@@ -47,6 +60,14 @@ export const obtenerTareas= async (id)=> {
             o.id_obra,
             o.id_cliente,
             o.id_arquitecto,
+            a.nombre AS arquitecto_nombre,
+            a.apellido AS arquitecto_apellido,
+            a.dni AS arquitecto_dni,
+            a.email AS arquitecto_email,
+            a.telefono AS arquitecto_telefono,
+            a.nro_matricula AS arquitecto_nro_matricula,
+            l.id_lote,
+            l.nro_lote,
             o.fecha_inicio AS fecha_inicio_obra,
             o.fecha_fin AS fecha_fin_obra,
             o.estado,
@@ -70,12 +91,25 @@ export const obtenerTareas= async (id)=> {
             s.descripcion AS descripcion_subtarea,
             s.duracion_real AS duracion_real_subtarea,
             s.costo_estimado AS costo_estimado_subtarea,
-            s.costo_real AS costo_real_subtarea,
+            COALESCE(pagos_subtarea.total_abonado, 0) AS costo_real_subtarea,
             s.fecha_inicio AS fecha_inicio_subtarea,
             s.fecha_fin AS fecha_fin_subtarea
         FROM obras o
+        LEFT JOIN arquitectos a ON a.id_arquitecto = o.id_arquitecto
+        LEFT JOIN LATERAL (
+            SELECT id_lote, nro_lote
+            FROM lotes
+            WHERE id_obra = o.id_obra
+            ORDER BY id_lote
+            LIMIT 1
+        ) l ON TRUE
         LEFT JOIN tareas t ON o.id_obra = t.id_obra
         LEFT JOIN subtareas s ON t.id_tarea = s.id_tarea
+        LEFT JOIN (
+            SELECT id_subtarea, SUM(monto) AS total_abonado
+            FROM pagos_parciales
+            GROUP BY id_subtarea
+        ) pagos_subtarea ON pagos_subtarea.id_subtarea = s.id_subtarea
         WHERE o.id_obra = $1;
     `;
         const res= await pool.query(query,[id]);

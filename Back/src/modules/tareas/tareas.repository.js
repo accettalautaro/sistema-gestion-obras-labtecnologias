@@ -15,7 +15,29 @@ export const listarTodos = async ()=>{
 
 export const obtenerTarea= async (id)=> {
     try{
-        const query= 'SELECT * FROM tareas WHERE tareas.id_tarea= $1';
+        const query= `
+            SELECT
+                t.*,
+                s.id_subtarea AS subtarea_id,
+                s.nombre AS subtarea_nombre,
+                s.porcentaje AS subtarea_porcentaje,
+                s.duracion_estimada AS subtarea_duracion_estimada,
+                s.costo_estimado AS subtarea_costo_estimado,
+                COALESCE(pagos.total, 0) AS subtarea_costo_real,
+                CASE
+                    WHEN s.fecha_inicio IS NOT NULL AND s.fecha_fin IS NOT NULL
+                    THEN s.fecha_fin - s.fecha_inicio
+                    ELSE 0
+                END AS subtarea_duracion_real
+            FROM tareas t
+            LEFT JOIN subtareas s ON s.id_tarea = t.id_tarea
+            LEFT JOIN (
+                SELECT id_subtarea, SUM(monto) AS total
+                FROM pagos_parciales
+                GROUP BY id_subtarea
+            ) pagos ON pagos.id_subtarea = s.id_subtarea
+            WHERE t.id_tarea = $1;
+        `;
         const res= await pool.query(query,[id]);
         return res.rows[0] ?? null;
     }

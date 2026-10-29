@@ -1,8 +1,13 @@
 # Sistema de gestión de obras
 
-Aplicación para gestionar clientes y obras, con un backend REST en Express, PostgreSQL y un frontend React.
+Datos requeridos para iniciar sesion:
+Si usted desea iniciar como Cliente los datos son 
+DNI: 7654321 
+CONTRASEÑA: cliente123
 
-## Preparar PostgreSQL
+Si usted desea iniciar como arquitecto los datos son:
+DNI:1234567
+CONTRASEÑA: admin
 
 El esquema y la base de datos son pasos distintos. `Back/database/acettadb.sql` crea las tablas en la base a la que ya está conectado `psql`; no crea ni selecciona una base por sí solo. Para preparar una base nueva, desde la raíz del repositorio:
 

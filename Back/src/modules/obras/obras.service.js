@@ -66,7 +66,6 @@ export const crearObra= async (obra)=>{
 }
 
 export const obtenerObra= async (id)=>{
-
     return await repository.obtenerObra(id);
 }
 
@@ -93,6 +92,22 @@ export const  obtenerTareas= async (id)=> {
         fecha_inicio_obra:filas[0].fecha_inicio_obra,
         fecha_fin_obra:filas[0].fecha_fin_obra,
         estado:filas[0].estado,
+        arquitecto: filas[0].id_arquitecto ? {
+            id_arquitecto: filas[0].id_arquitecto,
+            nombre: filas[0].arquitecto_nombre,
+            apellido: filas[0].arquitecto_apellido,
+            dni: filas[0].arquitecto_dni,
+            email: filas[0].arquitecto_email,
+            telefono: filas[0].arquitecto_telefono,
+            nro_matricula: filas[0].arquitecto_nro_matricula,
+        } : null,
+        lote: filas[0].id_lote ? {
+            id_lote: filas[0].id_lote,
+            nro_lote: filas[0].nro_lote,
+        } : null,
+        costo_estimado:0,
+        total_abonado:0,
+        porcentaje:0,
         descripcion_obra:filas[0].descripcion_obra,
         tareas: []
     };
@@ -102,15 +117,16 @@ export const  obtenerTareas= async (id)=> {
     for (const row of filas) {
         // Si la tarea existe y aún no la agregamos al mapa
         if (row.id_tarea && !mapaTareas.has(row.id_tarea)) {
+            
             const tarea = {
                 id_tarea: row.id_tarea,
                 nombre_tarea: row.nombre_tarea,
                 duracion_estimada_tarea:row.duracion_estimada_tarea,
-                porcentaje_tarea: row.porcentaje_tarea,
+                porcentaje_tarea: 0,
                 descripcion_tarea:row.descripcion_tarea,
                 duracion_real_tarea:row.duracion_real_tarea,
-                costo_estimado_tarea:row.costo_estimado_tarea,
-                costo_real_tarea:row.costo_real_tarea,
+                costo_estimado_tarea:Number(row.costo_estimado_tarea ?? 0),
+                costo_real_tarea:0,
                 fecha_inicio_tarea:row.fecha_inicio_tarea,
                 fecha_fin_tarea:row.fecha_fin_tarea ,
                 subtareas: []
@@ -125,21 +141,37 @@ export const  obtenerTareas= async (id)=> {
             
             const existeSubtarea = tareaActual.subtareas.some(s => s.id_subtarea === row.id_subtarea);//chequeamos si la subtarea ya existe en el arreglo subtareas de nuestra tarea
             if (!existeSubtarea) {//si no existe 
+                const costoRealSubtarea = Number(row.costo_real_subtarea ?? 0);
+                
                 tareaActual.subtareas.push({ //agregamos nuestra subtarea al arreglo
                     id_subtarea: row.id_subtarea,
                     nombre_subtarea: row.nombre_subtarea,
                     duracion_estimada_subtarea:row.duracion_estimada_subtarea,
-                    porcentaje_subtarea: row.porcentaje_subtarea,
+                    porcentaje_subtarea:Number( row.porcentaje_subtarea),
                     descripcion_subtarea:row.descripcion_subtarea,
                     duracion_real_subtarea:row.duracion_real_subtarea,
                     costo_estimado_subtarea:row.costo_estimado_subtarea,
-                    costo_real_subtarea:row.costo_real_subtarea,
+                    costo_real_subtarea:costoRealSubtarea,
                     fecha_inicio_subtarea:row.fecha_inicio_subtarea,
                     fecha_fin_subtarea:row.fecha_fin_subtarea ,
                 });
+                tareaActual.costo_real_tarea+=costoRealSubtarea;
+                tareaActual.porcentaje_tarea+=Number(row.porcentaje_subtarea);
             }
         }
     }
-
+    for (const tarea of obra.tareas){
+        obra.costo_estimado += tarea.costo_estimado_tarea;
+        obra.total_abonado += tarea.costo_real_tarea;
+        if(tarea.subtareas.length>0){
+            tarea.porcentaje_tarea=tarea.porcentaje_tarea/tarea.subtareas.length;
+        }
+    }
+    if (obra.tareas.length > 0) {
+    obra.porcentaje =
+        obra.tareas.reduce((suma, tarea) => suma + tarea.porcentaje_tarea, 0) /
+        obra.tareas.length;
+}
+    
     return obra;//retornamos la obra ya jerarquizada
 }

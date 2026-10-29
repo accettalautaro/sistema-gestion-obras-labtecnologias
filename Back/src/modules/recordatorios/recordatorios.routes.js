@@ -5,13 +5,15 @@ import { verificarRolArquictecto } from '../../middlewares/verificarRolArquitect
 
 const router = Router();
 
-// Rutas públicas
+// Todas las rutas requieren autenticación.
+router.use(verificarToken);
+
 router.get('/', controller.listarRecordatorios);
 router.get('/:id', controller.obtenerRecordatorio);
 
-// Rutas privadas para arquitectos
-router.post('/', verificarToken, verificarRolArquictecto, controller.crearRecordatorio);
-router.put('/:id', verificarToken, verificarRolArquictecto, controller.actualizarRecordatorio);
-router.delete('/:id', verificarToken, verificarRolArquictecto, controller.eliminarRecordatorio);
+// Las modificaciones requieren además el rol de arquitecto.
+router.post('/', verificarRolArquictecto, controller.crearRecordatorio);
+router.put('/:id', verificarRolArquictecto, controller.actualizarRecordatorio);
+router.delete('/:id', verificarRolArquictecto, controller.eliminarRecordatorio);
 
 export default router;

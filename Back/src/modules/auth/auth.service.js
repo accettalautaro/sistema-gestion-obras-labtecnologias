@@ -43,7 +43,7 @@ export const login = async(usuario)=>{
         {expiresIn: env.JWT_EXPIRES_IN} // tiempo de expiracion
         
     );
-    return {token,rol: usuarioDb.rol};
+    return {token};
 }
 
 //SUBTARES(CRUD);TAREAS(Endpoint anidado subtareas) yo
