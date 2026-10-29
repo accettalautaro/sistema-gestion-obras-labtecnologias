@@ -39,7 +39,7 @@ export const obtenerTarea= async (id)=> {
             WHERE t.id_tarea = $1;
         `;
         const res= await pool.query(query,[id]);
-        return res.rows;
+        return res.rows[0] ?? null;
     }
     catch(error){
         console.error('Error al intentar obtener una tarea',error);
@@ -55,7 +55,7 @@ export const crearTarea= async(tarea)=>{
         const query= 'INSERT INTO tareas (id_obra,nombre,duracion_estimada,porcentaje,descripcion,duracion_real,costo_estimado,costo_real,fecha_inicio,fecha_fin) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *;';
         const values= [id_obra,nombre,duracion_estimada,porcentaje,descripcion,duracion_real,costo_estimado,costo_real,fecha_inicio,fecha_fin];
         const res= await pool.query(query,values);
-        return res.rows;
+        return res.rows[0] ?? null;
     }catch(error){
         console.error('Error al intentar crear una tarea',error);
         throw new Error('Error al crear una tarea en la base de datos');
@@ -81,9 +81,9 @@ export const actualizarTarea= async(id,id_obra,nombre,duracion_estimada,porcenta
 
 export const eliminar= async (id)=> {
     try{
-        const query= 'DELETE FROM tareas WHERE tareas.id_tarea = $1';
+        const query= 'DELETE FROM tareas WHERE tareas.id_tarea = $1 RETURNING id_tarea';
         const res= await pool.query(query,[id]);
-        return res.rows;
+        return res.rowCount > 0;
     }
     catch(error){
         console.error('Error al intentar borrar una tarea',error);

@@ -24,6 +24,18 @@ export const obtenerCliente = async(req,res,next)=>{
     }
 }
 
+export const obtenerPerfilUsuario = async (req, res, next) => {
+    try {
+        const cliente = await service.obtenerPerfilUsuario(req.usuario);
+        if (!cliente) {
+            return res.status(404).json({ error: 'No hay un cliente asociado a esta cuenta.' });
+        }
+        return res.status(200).json(cliente);
+    } catch (error) {
+        next(error);
+    }
+};
+
 //POST api/clientes
 
 export const crearCliente = async (req,res,next)=>{
