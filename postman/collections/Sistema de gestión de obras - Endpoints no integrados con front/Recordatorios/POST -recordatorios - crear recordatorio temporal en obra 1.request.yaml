@@ -1,0 +1,25 @@
+$kind: http-request
+name: POST /recordatorios - crear recordatorio temporal en obra 1
+url: "{{baseUrl}}/api/recordatorios"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "id_obra": 1,
+      "fecha": "2026-10-28T12:00:00-03:00",
+      "descripcion": "Recordatorio temporal Postman"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{tokenArquitecto}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('HTTP 201', () => pm.response.to.have.status(201));
+      if ([200, 201].includes(pm.response.code)) { const d = pm.response.json(); pm.collectionVariables.set('idNuevoRecordatorio', String(d.id_recordatorio)); }
+    language: text/javascript
+order: 3000

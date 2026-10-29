@@ -1,0 +1,24 @@
+$kind: http-request
+name: POST /auth/login - arquitecto de la semilla
+url: "{{baseUrl}}/api/auth/login"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "dni": "{{dniArquitecto}}",
+      "contrasena": "{{contrasenaArquitecto}}"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{tokenArquitecto}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('HTTP 200', () => pm.response.to.have.status(200));
+      if (pm.response.code === 200) pm.collectionVariables.set('tokenArquitecto', pm.response.json().token);
+    language: text/javascript
+order: 1000

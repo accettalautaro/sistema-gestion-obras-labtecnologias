@@ -1,0 +1,13 @@
+$kind: http-request
+name: "GET /subtareas/{{idSubtareaSemilla}} - subtarea de semilla: Replanteo"
+url: "{{baseUrl}}/api/subtareas/{{idSubtareaSemilla}}"
+method: GET
+auth:
+  type: bearer
+  credentials:
+    token: "{{tokenArquitecto}}"
+scripts:
+  - type: afterResponse
+    code: pm.test('HTTP 200', () => pm.response.to.have.status(200));
+    language: text/javascript
+order: 7000

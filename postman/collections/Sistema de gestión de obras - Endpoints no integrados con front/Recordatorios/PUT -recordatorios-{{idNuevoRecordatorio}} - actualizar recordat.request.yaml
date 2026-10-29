@@ -1,0 +1,23 @@
+$kind: http-request
+name: PUT /recordatorios/{{idNuevoRecordatorio}} - actualizar recordatorio temporal
+url: "{{baseUrl}}/api/recordatorios/{{idNuevoRecordatorio}}"
+method: PUT
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "id_obra": 1,
+      "fecha": "2026-10-29T12:00:00-03:00",
+      "descripcion": "Recordatorio temporal actualizado"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{tokenArquitecto}}"
+scripts:
+  - type: afterResponse
+    code: pm.test('HTTP 200', () => pm.response.to.have.status(200));
+    language: text/javascript
+order: 5000

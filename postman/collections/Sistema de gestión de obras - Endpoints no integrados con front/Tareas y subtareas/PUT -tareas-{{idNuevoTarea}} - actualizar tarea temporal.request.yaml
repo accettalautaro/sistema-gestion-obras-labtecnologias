@@ -1,0 +1,30 @@
+$kind: http-request
+name: PUT /tareas/{{idNuevoTarea}} - actualizar tarea temporal
+url: "{{baseUrl}}/api/tareas/{{idNuevoTarea}}"
+method: PUT
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "id_obra": 1,
+      "nombre": "Tarea temporal Postman actualizada",
+      "duracion_estimada": 3,
+      "porcentaje": 25,
+      "descripcion": "Actualización de prueba",
+      "duracion_real": 1,
+      "costo_estimado": 1200,
+      "costo_real": 300,
+      "fecha_inicio": "2026-10-28",
+      "fecha_fin": "2026-10-31"
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{tokenArquitecto}}"
+scripts:
+  - type: afterResponse
+    code: pm.test('HTTP 200', () => pm.response.to.have.status(200));
+    language: text/javascript
+order: 5000

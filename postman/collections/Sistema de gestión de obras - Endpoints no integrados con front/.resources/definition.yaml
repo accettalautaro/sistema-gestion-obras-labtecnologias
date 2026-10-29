@@ -1,0 +1,27 @@
+$kind: collection
+name: Sistema de gestión de obras - Endpoints no integrados con frontend
+description: Colección Postman v2.1 para los endpoints backend que el frontend todavía no consume. Las consultas de lectura usan IDs y relaciones presentes en Back/database/semilla_datos.sql. Las pruebas de escritura crean registros temporales, guardan sus IDs y los eliminan; ejecutar en orden desde Collection Runner después de aplicar el esquema y la semilla.
+variables:
+  baseUrl: http://localhost:3000
+  dniArquitecto: "1234567"
+  contrasenaArquitecto: admin
+  tokenArquitecto: ""
+  idObraSemilla: "1"
+  idLoteSemilla: "1"
+  idDireccionSemilla: "1"
+  idMensuraSemilla: "1"
+  idEscrituraSemilla: "2"
+  idPropietarioSemilla: "1"
+  idTareaSemilla: "1"
+  idSubtareaSemilla: "1"
+  idPagoSemilla: "1"
+  idRecordatorioSemilla: "1"
+  idNuevoTarea: ""
+  idNuevoSubtarea: ""
+  idNuevoPago: ""
+  idNuevoRecordatorio: ""
+  idNuevoLote: ""
+  idNuevoDireccion: ""
+  idNuevoMensura: ""
+  idNuevoDocumento: ""
+  idNuevoPropietario: ""

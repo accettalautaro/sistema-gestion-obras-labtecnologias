@@ -1,0 +1,28 @@
+$kind: http-request
+name: POST /terrenos/propietarios - crear propietario temporal para escritura 2
+url: "{{baseUrl}}/api/terrenos/propietarios"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "id_documento": 2,
+      "nombre": "Propietario temporal",
+      "apellido": "Postman",
+      "dni": "99887766",
+      "estado_civil": "Soltero",
+      "porcentaje": 10
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{tokenArquitecto}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('HTTP 201', () => pm.response.to.have.status(201));
+      if ([200, 201].includes(pm.response.code)) { const d = pm.response.json(); pm.collectionVariables.set('idNuevoPropietario', String(d.id_propietario)); }
+    language: text/javascript
+order: 3000

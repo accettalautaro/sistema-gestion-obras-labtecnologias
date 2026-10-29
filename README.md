@@ -61,6 +61,6 @@ El inventario de los **61 endpoints** montados en el backend, con método, acces
 
 ## Pruebas con Postman
 
-Importá [postman/gestion-obras.postman_collection.json](./postman/gestion-obras.postman_collection.json). La colección incluye un caso exitoso y otro de error para cada endpoint, guarda los IDs y tokens de prueba, y agrupa al final una carpeta de limpieza.
+Importá [pruebas-postman/gestion-obras.postman_collection.json](./pruebas-postman/gestion-obras.postman_collection.json). La colección cubre los endpoints de tareas, subtareas, pagos, recordatorios y recursos de terrenos que el frontend aún no consume desde la API. Las lecturas usan IDs de `Back/database/semilla_datos.sql`; las escrituras crean registros temporales, guardan sus IDs en variables de colección y los eliminan al final de cada flujo.
 
-Usá una base de desarrollo con el esquema y la semilla aplicados, y ejecutá la colección completa en el Runner respetando el orden de las carpetas. Las solicitudes crean datos y las de la carpeta **Limpieza (ejecutar al final)** los eliminan; no la ejecutes contra una base con datos que deban conservarse. Las variables principales (`baseUrl`, DNI y contraseña del arquitecto) están en la colección; cambialas si la configuración local es diferente.
+Usá una base de desarrollo con el esquema y la semilla aplicados. Ejecutá la colección completa en el Runner y en orden: la primera solicitud inicia sesión como arquitecto y guarda el token para las demás. La colección crea y borra datos temporales; no la ejecutes contra una base con datos que deban conservarse. Las variables principales (`baseUrl`, DNI y contraseña del arquitecto) están en la colección; cambialas si la configuración local es diferente.

@@ -1,0 +1,27 @@
+$kind: http-request
+name: POST /terrenos/escrituras - crear escritura temporal en lote 1
+url: "{{baseUrl}}/api/terrenos/escrituras"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "id_lote": 1,
+      "nombre": "Escritura temporal Postman",
+      "nro_escritura": "PM-{{$timestamp}}",
+      "descripcion": "Prueba de colección",
+      "archivo": null
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{tokenArquitecto}}"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('HTTP 201', () => pm.response.to.have.status(201));
+      if ([200, 201].includes(pm.response.code)) { const d = pm.response.json(); pm.collectionVariables.set('idNuevoDocumento', String(d.id_documento)); }
+    language: text/javascript
+order: 3000

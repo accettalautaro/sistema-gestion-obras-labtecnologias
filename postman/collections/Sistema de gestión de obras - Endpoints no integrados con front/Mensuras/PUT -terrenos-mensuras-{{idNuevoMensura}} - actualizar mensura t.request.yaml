@@ -1,0 +1,25 @@
+$kind: http-request
+name: PUT /terrenos/mensuras/{{idNuevoMensura}} - actualizar mensura temporal
+url: "{{baseUrl}}/api/terrenos/mensuras/{{idNuevoMensura}}"
+method: PUT
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "nombre": "Mensura temporal actualizada",
+      "descripcion": "Actualización de prueba",
+      "ancho": 12,
+      "largo": 20,
+      "mts_cuadrados": 240
+    }
+auth:
+  type: bearer
+  credentials:
+    token: "{{tokenArquitecto}}"
+scripts:
+  - type: afterResponse
+    code: pm.test('HTTP 200', () => pm.response.to.have.status(200));
+    language: text/javascript
+order: 5000

@@ -1,0 +1,13 @@
+$kind: http-request
+name: GET /terrenos/propietarios/{{idNuevoPropietario}} - propietario creado
+url: "{{baseUrl}}/api/terrenos/propietarios/{{idNuevoPropietario}}"
+method: GET
+auth:
+  type: bearer
+  credentials:
+    token: "{{tokenArquitecto}}"
+scripts:
+  - type: afterResponse
+    code: pm.test('HTTP 200', () => pm.response.to.have.status(200));
+    language: text/javascript
+order: 4000
