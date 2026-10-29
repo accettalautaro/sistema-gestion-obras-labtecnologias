@@ -1,10 +1,4 @@
-# sistema-gestion-obras-labtecnologias
-Esta es una version demo de nuestro sistema de gestion de obras.
-Para poder utilizar esta demo hay que realizar los siguientes pasos:
-Paso 1: Situarse en la direccion "..\sistema-gestion-obras-labtecnologias\frontend"
-Paso 2: Correr en la terminal el siguiente comando "npm install" para instalar las dependencias
-Paso 3: Levantar el servidor Vite con el comando "npm run dev"
-Luego de esto podra acceder a la pagina desde el navegador mediante "http://localhost:5174/" o la direccion asociada a un puerto que usted tenga disponible
+# Sistema de gestión de obras
 
 Datos requeridos para iniciar sesion:
 Si usted desea iniciar como Cliente los datos son 
@@ -15,88 +9,58 @@ Si usted desea iniciar como arquitecto los datos son:
 DNI:1234567
 CONTRASEÑA: admin
 
-## Backend
+El esquema y la base de datos son pasos distintos. `Back/database/acettadb.sql` crea las tablas en la base a la que ya está conectado `psql`; no crea ni selecciona una base por sí solo. Para preparar una base nueva, desde la raíz del repositorio:
 
-El servidor Express se inicia desde `Back` con `npm run dev` (desarrollo) o `npm start`.
-Configura PostgreSQL y el secreto JWT mediante `Back/.env`; no compartas ese archivo.
-El script del esquema está en `Back/database/acettadb.sql`.
+```powershell
+createdb -U postgres accettadb
+psql -U postgres -d accettadb -f Back/database/acettadb.sql
+psql -U postgres -d accettadb -f Back/database/semilla_datos.sql
+```
+
+En `.env` dentro de `Back`, configurá `PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD` y `PGDATABASE=accettadb` para que el pool de Node se conecte a esa misma base. También son necesarios `JWT_SECRET` y, opcionalmente, `JWT_EXPIRES_IN`, `PORT` y `CORS_ORIGIN`. No subas el `.env` al repositorio ni compartas sus secretos.
+
+Las credenciales incluidas por la semilla son solo para desarrollo:
+
+- Arquitecto: DNI `1234567`, contraseña `admin`.
+- Cliente: DNI `7654321`, contraseña `cliente123`.
+
+La semilla crea una única cuenta de arquitecto. El flujo de alta disponible en la API crea cuentas únicamente para clientes existentes y les asigna el rol `cliente`.
+
+## Iniciar la aplicación
+
+Backend:
+
+```powershell
+cd Back
+npm install
+npm run dev
+```
+
+Frontend, en otra terminal:
+
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+
+Vite muestra en la terminal la URL local del frontend. El backend escucha en el puerto indicado por `PORT` (por defecto, `3000`).
+
+## Backend y API
 
 Los módulos siguen el recorrido **ruta → controller → service → repository → PostgreSQL**:
 
-- La ruta define el método HTTP y los middlewares.
-- El controller traduce la petición/respuesta HTTP y delega el trabajo.
-- El service valida los datos y aplica reglas de negocio.
-- El repository ejecuta consultas parametrizadas usando el pool de PostgreSQL.
+- La ruta define el método HTTP y los middlewares de autenticación/autorización.
+- El controller traduce la petición y respuesta HTTP.
+- El service valida datos y aplica reglas de negocio.
+- El repository ejecuta consultas parametrizadas mediante el pool de PostgreSQL.
 
-Las rutas privadas requieren `Authorization: Bearer <token>`. El token se obtiene con
-`POST /api/auth/login`; `verificarToken` valida firma y vencimiento, y deja los datos
-del usuario en `req.usuario`. Las escrituras de pagos y terrenos requieren además el
-rol `arquitecto`.
+Las rutas no existentes responden `404`. Los cuerpos JSON malformados y los datos de entrada inválidos responden `400`; los errores de autenticación/autorización conservan sus códigos `401`/`403`.
 
-### Pagos
+El inventario de los **61 endpoints** montados en el backend, con método, acceso y descripción, está en [docs/endpoints.md](./docs/endpoints.md).
 
-Los pagos parciales se relacionan con una **subtarea** (`pagos_parciales.id_subtarea`),
-no directamente con una tarea u obra. La obra y la tarea se devuelven en las consultas
-a través de esa relación.
+## Pruebas con Postman
 
-| Método | Ruta | Acceso |
-|---|---|---|
-| GET | `/api/pagos` o `/api/pagos/:id` | Token |
-| POST | `/api/pagos` | Arquitecto |
-| PUT | `/api/pagos/:id` | Arquitecto |
-| DELETE | `/api/pagos/:id` | Arquitecto |
+Importá [postman/gestion-obras.postman_collection.json](./postman/gestion-obras.postman_collection.json). La colección incluye un caso exitoso y otro de error para cada endpoint, guarda los IDs y tokens de prueba, y agrupa al final una carpeta de limpieza.
 
-Ejemplo de creación:
-
-```json
-{
-  "id_subtarea": 4,
-  "descripcion": "Adelanto de materiales",
-  "monto": 500000
-}
-```
-
-### Terrenos
-
-`GET /api/terrenos` devuelve lotes con su dirección, mensuras, escrituras, propietarios
-y obra asociada. `GET /api/terrenos/:id` devuelve un lote. Se pueden crear, actualizar
-y eliminar lotes en `/api/terrenos`; los recursos relacionados tienen rutas CRUD bajo
-`/api/terrenos/direcciones`, `/mensuras`, `/escrituras` y `/propietarios`.
-Las asociaciones de propietarios a escrituras se administran en
-`/api/terrenos/escrituras/:id/propietarios/:id_propietario`.
-
-El alta de un lote admite dirección y mensura en la misma operación:
-
-```json
-{
-  "nro_lote": "450",
-  "direccion": {
-    "calle": "Ejército de los Andes",
-    "altura": "1234",
-    "localidad": "San Luis",
-    "provincia": "San Luis",
-    "codigo_postal": "5700"
-  },
-  "mensura": {
-    "ancho": 40,
-    "largo": 20,
-    "mts_cuadrados": 800
-  }
-}
-```
-
-> La autenticación de la interfaz sigue usando datos demo del front (`Back/data`).
-> Es independiente del login JWT del backend; para consumir estas rutas desde la UI
-> todavía hay que conectar el inicio de sesión y enviar el token en cada petición.
-
-### Probar la API con Postman
-
-Importá `postman/gestion-obras.postman_collection.json` en Postman. Iniciá el servidor,
-configurá las variables `dni` y `contrasena` de la colección con credenciales existentes
-en PostgreSQL y ejecutá primero **Autenticación → Login - guarda el token**. El resto de
-las solicitudes hereda el token; para crear pagos, usá el ID de una subtarea existente
-en `id_subtarea`. Las solicitudes de limpieza borran los registros de prueba creados.
-
-La colección incluye obras porque sus rutas están montadas. Aunque los módulos de tareas
-y subtareas tienen archivos de rutas, actualmente no están montados en `app.js`, por lo
-que todavía no son accesibles desde HTTP.
+Usá una base de desarrollo con el esquema y la semilla aplicados, y ejecutá la colección completa en el Runner respetando el orden de las carpetas. Las solicitudes crean datos y las de la carpeta **Limpieza (ejecutar al final)** los eliminan; no la ejecutes contra una base con datos que deban conservarse. Las variables principales (`baseUrl`, DNI y contraseña del arquitecto) están en la colección; cambialas si la configuración local es diferente.

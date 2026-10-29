@@ -1,6 +1,5 @@
 
 SET client_encoding TO 'UTF8';
-CREATE DATABASE accettadb;
 
 CREATE TABLE usuarios (
     id_usuario BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,

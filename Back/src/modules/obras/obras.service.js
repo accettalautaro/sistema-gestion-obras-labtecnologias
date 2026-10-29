@@ -36,6 +36,16 @@ const validarDatosObra = (obra) => {
 export const listarObras= async (req)=>{
 
     const{id_cliente,estado,id_lote,id_arquitecto}= req.query;
+    const parametrosPermitidos = new Set(['id_cliente', 'estado', 'id_lote', 'id_arquitecto']);
+    if (Object.keys(req.query).some((parametro) => !parametrosPermitidos.has(parametro))) {
+        throw errorValidacion('El filtro de obras indicado no es válido.');
+    }
+    for (const [nombre, valor] of Object.entries({ id_cliente, id_lote, id_arquitecto })) {
+        if (valor !== undefined && (!/^\d{1,19}$/.test(valor)
+            || BigInt(valor) < 1n || BigInt(valor) > 9223372036854775807n)) {
+            throw errorValidacion(`${nombre} debe ser un identificador válido.`);
+        }
+    }
     const obras = await repository.listarTodos();
     if(id_cliente) {
         return obras.filter(o=> String(o.id_cliente) === String(id_cliente));
@@ -43,9 +53,9 @@ export const listarObras= async (req)=>{
     if(estado) {
         return obras.filter(o=> o.estado=== estado);
     }
-    //if(id_lote){
-    //    return obras.filter(o=> o.id_lote=== id_lote);      
-    //}
+    if(id_lote) {
+        return obras.filter(o => String(o.id_lote) === String(id_lote));
+    }
     if(id_arquitecto){
         return obras.filter(o=> String(o.id_arquitecto) === String(id_arquitecto));
 

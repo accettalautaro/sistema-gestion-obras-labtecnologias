@@ -1,6 +1,7 @@
 import { resumirAvanceTareas } from '../../../shared/utils/avanceObra.js'
 import { listarTareas } from '../../obras/services/tareasService.js'
 import { listarPagosParciales } from '../../pagos/services/pagosService.js'
+import { obtenerPerfilCliente } from '../../clientes/services/clientesService.js'
 
 const URL_BASE = '/Back/data'
 
@@ -16,14 +17,12 @@ async function leerJson(nombre) {
 const aNumero = (porcentaje) => parseInt(String(porcentaje), 10) || 0
 
 /**
- * Arma lo que necesita la página inicial del cliente usando solo los campos de los JSON:
- * usuarios, clientes, obras, arquitectos, direcciones y recordatorios.
- * Seguridad: solo devuelve obras y recordatorios del cliente indicado.
- * Cuando exista el backend real, este filtro también tiene que aplicarse del lado del servidor.
+ * Combina el perfil verificado por el backend con los datos actuales de obras
+ * y recordatorios, que todavía se leen desde JSON.
  */
-export async function obtenerResumenCliente(idUsuario) {
-  const [clientes, obras, arquitectos, direcciones, recordatorios, tareas, pagos] = await Promise.all([
-    leerJson('clientes'),
+export async function obtenerResumenCliente() {
+  const [cliente, obras, arquitectos, direcciones, recordatorios, tareas, pagos] = await Promise.all([
+    obtenerPerfilCliente(),
     leerJson('obras'),
     leerJson('arquitectos'),
     leerJson('direcciones'),
@@ -32,13 +31,8 @@ export async function obtenerResumenCliente(idUsuario) {
     listarPagosParciales(),
   ])
 
-  const cliente = clientes.find((c) => c['id-usuario'] === idUsuario)
-  if (!cliente) {
-    throw new Error('No se encontró el cliente de este usuario')
-  }
-
   const obrasCliente = obras
-    .filter((o) => o['id-cliente'] === cliente['id-cliente'])
+    .filter((o) => String(o['id-cliente']) === String(cliente['id-cliente']))
     .map((obra) => {
       const arquitecto = arquitectos.find((a) => a['id-arquitecto'] === obra['id-arquitecto'])
       const direccion = direcciones.find((d) => d.nrolote === obra.nrolote)
@@ -75,7 +69,7 @@ export async function obtenerResumenCliente(idUsuario) {
 
   // Todos los recordatorios del cliente, con los datos de su obra
   const recordatoriosCliente = recordatorios
-    .filter((r) => r['id-cliente'] === cliente['id-cliente'])
+    .filter((r) => String(r['id-cliente']) === String(cliente['id-cliente']))
     .map((r) => {
       const obra = obrasCliente.find((o) => o.idObra === r['id-obra'])
       
