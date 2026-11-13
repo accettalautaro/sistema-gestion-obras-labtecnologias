@@ -13,17 +13,27 @@
 .obras-page__tabla { font-size: .9rem; margin: 0; }
 .obras-page__tabla th { color: var(--color-verde-muted); font-size: .75rem; text-transform: uppercase; white-space: nowrap; }
 .obras-page__nombre { color: var(--color-verde-acento) !important; font-weight: 700; }
-.obras-page__estado-badge { background: var(--color-verde-suave); color: var(--color-verde-acento); display: inline-block; font-size: .78rem; padding: .3rem .45rem; white-space: nowrap; }
+.obras-page__estado-badge { align-items: center; border-radius: 999px; display: inline-flex; font-size: .75rem; font-weight: 500; gap: .4rem; line-height: 1.25; padding: 3px 10px; white-space: nowrap; }
+.obras-page__estado-badge > span { background: currentColor; border-radius: 50%; height: 6px; width: 6px; }
+.obras-page__estado-badge--activa { background: #fff8e1; color: #b45309; }
+.obras-page__estado-badge--pausada { background: #f1f3f5; color: #495057; }
+.obras-page__estado-badge--finalizada { background: #e8f5e9; color: #2e7d32; }
+.obras-page__estado-badge--atrasada { background: #fff8e1; color: #b45309; }
+.obras-page__estado-badge--neutral { background: #f1f3f5; color: #495057; }
+.obras-page__estado-badge--cancelada { background: #fbefed; color: #b94a48; }
 .obras-page__avance { min-width: 5.5rem; }
 .obras-page__avance > span { color: var(--color-verde-acento); font-size: .8rem; font-weight: 600; }
 .obras-page__avance .progress { height: .4rem; margin-top: .25rem; }
 .obras-page__avance .progress-bar { background-color: var(--ui-accent); }
-.btn.obras-page__boton-seguimiento { background: var(--ui-accent); border-color: var(--ui-accent); color: var(--color-primario); margin-top: .35rem; white-space: nowrap; }
+.obras-page__acciones-tarea { align-items: center; display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .35rem; }
+.obras-page__acciones-tarea .btn,
+.obras-page__acciones .btn { align-items: center; box-sizing: border-box; display: inline-flex; font-size: .875rem; justify-content: center; line-height: 1.5; min-height: 31px; padding: .25rem .5rem; }
+.btn.obras-page__boton-seguimiento { background: var(--ui-accent); border-color: var(--ui-accent); color: var(--color-primario); white-space: nowrap; }
 .btn.obras-page__boton-seguimiento:hover, .btn.obras-page__boton-seguimiento:focus-visible { background: var(--ui-accent-hover); border-color: var(--ui-accent-hover); color: var(--color-primario); }
 .obras-page__acciones { display: flex; gap: .35rem; }
 .obras-page__header-acciones { align-items: center; display: flex; flex-wrap: wrap; gap: .6rem; }
 .obras-page__form-header { align-items: flex-start; display: flex; gap: 1rem; justify-content: space-between; }
-.obras-page__form-header p { color: var(--color-verde-muted); font-size: .85rem; margin: .35rem 0 0; }
+.obras-page__form-header p { color: var(--color-verde-muted); font-size: .85rem; margin: .35rem 0 1rem; }
 .obras-page__vacio, .obras-page__estado { color: var(--color-verde-muted); padding: 1.25rem !important; text-align: center; }
 .obras-page__ayuda { color: var(--color-verde-muted); font-size: .85rem; margin: .5rem 0 1rem; }
 .obras-page__campos { display: grid; gap: .85rem; }

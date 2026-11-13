@@ -5,14 +5,14 @@ const manejarError = (error, mensaje) => {
     if (error.status) throw error;
     if (error.code === '23505') {
         error.status = 409;
-        error.message = error.constraint === 'lotes_id_obra_unico'
-            ? 'Una obra ya tiene un lote asignado. Cada obra puede estar vinculada a un solo lote.'
-            : 'Ya existe un registro con uno de los valores únicos indicados.';
+        error.message = 'Ya existe un registro con uno de los valores únicos indicados.';
         throw error;
     }
     if (error.code === '23503') {
         error.status = 409;
-        error.message = 'El registro está relacionado con otros datos o la referencia indicada no existe.';
+        error.message = error.constraint === 'obras_id_lote_fkey'
+            ? 'No se puede eliminar este lote porque tiene obras asociadas.'
+            : 'El registro está relacionado con otros datos o la referencia indicada no existe.';
         throw error;
     }
     if (error.code === '23514') {
@@ -39,11 +39,14 @@ const ejecutarTransaccion = async (operacion, mensaje) => {
 };
 
 const SELECT_TERRENOS = `
-    SELECT l.id_lote, l.nro_lote, l.id_direccion, l.id_obra,
+    SELECT l.id_lote, l.nro_lote, l.id_direccion,
            to_jsonb(d) AS direccion,
-           CASE WHEN o.id_obra IS NULL THEN NULL
-                ELSE jsonb_build_object('id_obra', o.id_obra, 'estado', o.estado)
-           END AS obra,
+           COALESCE((
+               SELECT jsonb_agg(jsonb_build_object('id_obra', o.id_obra::text, 'estado', o.estado)
+                                ORDER BY o.id_obra)
+               FROM obras o
+               WHERE o.id_lote = l.id_lote
+           ), '[]'::jsonb) AS obras,
            COALESCE((
                SELECT jsonb_agg(jsonb_build_object(
                    'id_documento', doc.id_documento, 'nombre', doc.nombre,
@@ -72,24 +75,7 @@ const SELECT_TERRENOS = `
            ), '[]'::jsonb) AS escrituras
     FROM lotes l
     LEFT JOIN direcciones d ON d.id_direccion = l.id_direccion
-    LEFT JOIN obras o ON o.id_obra = l.id_obra
 `;
-
-const validarObraSinLoteAsignado = async (client, idObra, idLoteActual = null) => {
-    if (idObra == null) return;
-    const resultado = await client.query(
-        `SELECT id_lote FROM lotes
-         WHERE id_obra = $1 AND ($2::bigint IS NULL OR id_lote <> $2)
-         LIMIT 1;`,
-        [idObra, idLoteActual],
-    );
-    if (resultado.rowCount) {
-        throw Object.assign(
-            new Error('Una obra ya tiene un lote asignado. Cada obra puede estar vinculada a un solo lote.'),
-            { status: 409 },
-        );
-    }
-};
 
 export const listarTodos = async () => {
     try {
@@ -112,8 +98,7 @@ export const obtenerPorId = async (id) => {
     }
 };
 
-export const crear = async ({ nro_lote, id_obra, direccion, mensura }) => ejecutarTransaccion(async (client) => {
-    await validarObraSinLoteAsignado(client, id_obra);
+export const crear = async ({ nro_lote, direccion, mensura }) => ejecutarTransaccion(async (client) => {
     let id_direccion = null;
     if (direccion) {
         const nuevaDireccion = await client.query(
@@ -127,9 +112,9 @@ export const crear = async ({ nro_lote, id_obra, direccion, mensura }) => ejecut
         id_direccion = nuevaDireccion.rows[0].id_direccion;
     }
     const lote = await client.query(
-        `INSERT INTO lotes (nro_lote, id_direccion, id_obra)
-         VALUES ($1, $2, $3) RETURNING *;`,
-        [nro_lote, id_direccion, id_obra ?? null],
+        `INSERT INTO lotes (nro_lote, id_direccion)
+         VALUES ($1, $2) RETURNING *;`,
+        [nro_lote, id_direccion],
     );
     if (mensura) {
         const documento = await client.query(
@@ -148,12 +133,11 @@ export const crear = async ({ nro_lote, id_obra, direccion, mensura }) => ejecut
     return lote.rows[0];
 }, 'Error al crear el terreno.');
 
-export const actualizar = async (id, { nro_lote, id_direccion, id_obra }) => ejecutarTransaccion(async (client) => {
-        await validarObraSinLoteAsignado(client, id_obra, id);
+export const actualizar = async (id, { nro_lote, id_direccion }) => ejecutarTransaccion(async (client) => {
         const resultado = await client.query(
-            `UPDATE lotes SET nro_lote = $1, id_direccion = $2, id_obra = $3
-             WHERE id_lote = $4 RETURNING *;`,
-            [nro_lote, id_direccion ?? null, id_obra ?? null, id],
+            `UPDATE lotes SET nro_lote = $1, id_direccion = $2
+             WHERE id_lote = $3 RETURNING *;`,
+            [nro_lote, id_direccion ?? null, id],
         );
         return resultado.rows[0] ?? null;
 }, 'Error al actualizar el terreno.');

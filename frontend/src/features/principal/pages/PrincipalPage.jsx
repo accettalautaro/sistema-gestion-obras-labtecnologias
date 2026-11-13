@@ -77,7 +77,7 @@ function PrincipalPage() {
             <header className="dashboard__header">
                 <div>
                     <p className="dashboard__eyebrow">Panel de gestión</p>
-                    <h1>Buen día, {usuario.nombre}</h1>
+                    <h1>Buen día, {usuario.nombre || 'arquitecto'}</h1>
                     <p className="dashboard__subtitle">Este es el estado general de tus obras.</p>
                 </div>
             </header>

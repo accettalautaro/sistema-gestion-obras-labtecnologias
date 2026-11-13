@@ -94,12 +94,9 @@ export const crearTerreno = async (terreno) => {
         throw errorCliente('Los datos del terreno deben ser un objeto.');
     }
     const nro_lote = textoObligatorio(terreno.nro_lote, 'nro_lote');
-    const id_obra = terreno.id_obra == null || terreno.id_obra === ''
-        ? null
-        : validarId(terreno.id_obra, 'id_obra');
     const direccion = terreno.direccion == null ? null : validarDireccion(terreno.direccion);
     const mensura = terreno.mensura == null ? null : validarMensura(terreno.mensura, null);
-    const creado = await repository.crear({ nro_lote, id_obra, direccion, mensura });
+    const creado = await repository.crear({ nro_lote, direccion, mensura });
     return repository.obtenerPorId(creado.id_lote);
 };
 
@@ -111,8 +108,6 @@ export const actualizarTerreno = async (id, terreno) => {
         nro_lote: textoObligatorio(terreno.nro_lote, 'nro_lote'),
         id_direccion: terreno.id_direccion == null || terreno.id_direccion === ''
             ? null : validarId(terreno.id_direccion, 'id_direccion'),
-        id_obra: terreno.id_obra == null || terreno.id_obra === ''
-            ? null : validarId(terreno.id_obra, 'id_obra'),
     });
     return actualizado ? repository.obtenerPorId(actualizado.id_lote) : null;
 };

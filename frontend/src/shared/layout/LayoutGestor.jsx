@@ -15,17 +15,16 @@ const ENLACES_GESTOR = [
 
 ]
 
-function LayoutGestor() {
-  // El loader (protegerRuta) ya te devuelve { id, nombre, dni, usuario, rol }
-  const usuario = useLoaderData()
+function LayoutGestor({ usuario: usuarioProp }) {
+  const datosSesion = useLoaderData()
+  const usuario = usuarioProp ?? datosSesion
   const navigate = useNavigate()
 
-  // ¡Magia! Leemos el rol directamente de la sesión. 
-  // (Si en tu sistema el arquitecto usa la cuenta de administrador, lo validas así):
-  const esArquitecto = usuario?.rol === 'administrador' || usuario?.rol === 'arquitecto'
+  // Leemos el rol de la sesión para mostrar las opciones de arquitecto.
+  const esArquitecto = usuario?.rol === 'arquitecto'
 
-  const handleCerrarSesion = () => {
-    cerrarSesion()
+  const handleCerrarSesion = async () => {
+    await cerrarSesion()
     navigate('/login', { replace: true })
   }
 
@@ -47,8 +46,8 @@ function LayoutGestor() {
     const { tareas = [], recordatorios = [] } = datosRec;
 
     tareas.forEach(tarea => {
-      const diffInicio = calcularDiff(tarea['fecha-inicio']);
-      const diffFin = calcularDiff(tarea['fecha-fin']);
+      const diffInicio = calcularDiff(tarea['fecha-inicio-estimada']);
+      const diffFin = calcularDiff(tarea['fecha-fin-estimada']);
       const estado = (tarea.estado || '').toLowerCase();
 
       if (estado === 'sin comenzar') {

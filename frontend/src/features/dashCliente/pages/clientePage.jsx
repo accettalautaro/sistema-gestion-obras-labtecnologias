@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useOutletContext } from 'react-router-dom'
 import { obtenerResumenCliente } from '../services/clienteservice'
 
 // ---------- Constantes ----------
-// Color del badge según el estado que figure en obras.json (cualquier otro valor usa el gris)
+// Color del badge según el estado devuelto por la API (cualquier otro valor usa el gris)
 const ESTADO_OBRA_BADGE = {
   'En ejecución': 'text-bg-success',
   Atrasada: 'text-bg-danger',
@@ -17,7 +17,6 @@ const FILTROS_REC_VACIOS = { texto: '', estado: '', mesAnio: '' }
 // ---------- Helpers ----------
 const normalizar = (texto) => texto.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
 const capitalizar = (t) => t.charAt(0).toUpperCase() + t.slice(1)
-
 // "2026-10-02" -> Date local (new Date('2026-10-02') corre un día atrás en Argentina por UTC)
 const parseFecha = (iso) => {
   const [y, m, d] = iso.split('-').map(Number)
@@ -49,7 +48,7 @@ const estadoRecBadge = (estado) => {
 }
 
 // La fecha de fin solo corresponde a una obra terminada: en ejecución todavía no tiene
-const mostrarFechaFin = (obra) => obra.estado === 'Finalizada' && Boolean(obra.fechaFin)
+const mostrarFechaFin = (obra) => obra.estado === 'Finalizada' && Boolean(obra.fechaFinReal)
 
 // ---------- Tarjeta de obra ----------
 function TarjetaObra({ obra }) {
@@ -84,16 +83,17 @@ function TarjetaObra({ obra }) {
             <i className="bi bi-person-workspace me-2"></i>
             Arquitecto: {obra.arquitecto}
           </li>
-          {obra.fechaInicio && (
+          {obra.fechaInicioEstimada && (
             <li className="mb-1">
               <i className="bi bi-calendar-event me-2"></i>
-              Inicio: {fechaCorta(obra.fechaInicio)}
+              Inicio estimado: {fechaCorta(obra.fechaInicioEstimada)}
             </li>
           )}
+          {obra.fechaInicioReal && <li className="mb-1"><i className="bi bi-play-circle me-2"></i>Inicio real: {fechaCorta(obra.fechaInicioReal)}</li>}
           {mostrarFechaFin(obra) && (
             <li>
               <i className="bi bi-calendar-check me-2"></i>
-              Finalización: {fechaCorta(obra.fechaFin)}
+              Finalización real: {fechaCorta(obra.fechaFinReal)}
             </li>
           )}
         </ul>
@@ -199,6 +199,7 @@ function ModalRecordatorio({ recordatorio, onCerrar }) {
 
 // ---------- Página ----------
 function ClientePage() {
+  const { usuario } = useOutletContext()
   const [datos, setDatos] = useState(null)
   const [error, setError] = useState(null)
   const [filtrosObras, setFiltrosObras] = useState(FILTROS_OBRAS_VACIOS)
@@ -215,7 +216,7 @@ function ClientePage() {
     return () => {
       activo = false
     }
-  }, [])
+  }, [usuario?.id])
 
   // Las opciones fijas de estado
   const estadosObra = ['En ejecución', 'Atrasada', 'Pausa', 'Finalizada']
@@ -229,7 +230,7 @@ function ClientePage() {
         normalizar(`${o.direccionCompleta} ${o.nroLote} ${o.arquitecto} ${o.idObra}`).includes(texto)
       )
       .filter((o) => !filtrosObras.estado || o.estado === filtrosObras.estado)
-      .filter((o) => !filtrosObras.mesAnio || o.fechaInicio?.startsWith(filtrosObras.mesAnio))
+      .filter((o) => !filtrosObras.mesAnio || o.fechaInicioEstimada?.startsWith(filtrosObras.mesAnio))
   }, [datos, filtrosObras])
 
   // CU Visualizar recordatorios: texto libre, estado y fecha. Por fecha, más próximo primero.

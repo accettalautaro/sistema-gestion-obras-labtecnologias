@@ -53,12 +53,15 @@
 
 .layout-cliente .cliente-dashboard__bienvenida h1 { margin: 0; }
 .layout-cliente .cliente-dashboard__bienvenida > p:last-child { color: var(--ui-muted); margin-top: .35rem; }
-.layout-cliente .cliente-dashboard__titulo-seccion { margin: 0 0 .8rem; text-transform: none; }
+.layout-cliente .cliente-dashboard__titulo-seccion { color: var(--ui-accent); margin: 0 0 .8rem; text-transform: none; }
 
 .layout-cliente .cliente-obra-card {
 	color: var(--ui-ink);
 	min-height: 100%;
 	transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+.layout-cliente main .cliente-dashboard .cliente-obra-card {
+	border-left: 5px solid var(--ui-accent) !important;
 }
 .layout-cliente .cliente-obra-card:hover,
 .layout-cliente .cliente-obra-card:focus-visible {
@@ -66,6 +69,10 @@
 	box-shadow: 0 8px 22px rgb(40 39 37 / 9%);
 	color: var(--ui-ink);
 	transform: translateY(-2px);
+}
+.layout-cliente main .cliente-dashboard .cliente-obra-card:hover,
+.layout-cliente main .cliente-dashboard .cliente-obra-card:focus-visible {
+	border-left-color: var(--ui-accent-hover) !important;
 }
 .layout-cliente .cliente-obra-card .card-title { color: var(--ui-ink); font-size: 1.08rem; font-weight: 600; }
 .layout-cliente .cliente-obra-card .progress { height: 8px; }

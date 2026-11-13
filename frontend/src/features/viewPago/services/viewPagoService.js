@@ -1,15 +1,7 @@
 import { listarTareas } from '../../obras/services/tareasService.js'
 import { listarPagosParciales } from '../../pagos/services/pagosService.js'
 import { derivarTareas, normalizarIdTarea } from '../../../shared/utils/avanceObra.js'
-const URL_BASE = '/Back/data'
-
-async function leerJson(nombre) {
-  const respuesta = await fetch(`${URL_BASE}/${nombre}.json`)
-  if (!respuesta.ok) {
-    throw new Error(`No se pudo obtener ${nombre}`)
-  }
-  return respuesta.json()
-}
+import { api } from '../../../shared/services/api.js'
 
 export async function obtenerDetalleTareaYPagos(idObra, idTarea) {
   idObra = Number(idObra)
@@ -17,7 +9,7 @@ export async function obtenerDetalleTareaYPagos(idObra, idTarea) {
   const [tareas, pagos, obras] = await Promise.all([
     listarTareas(),
     listarPagosParciales(),
-    leerJson('obras')
+    api('/obras'),
   ])
 
   const tareasObra = tareas.filter(t => String(t['id-obra']) === String(idObra))
@@ -27,7 +19,7 @@ export async function obtenerDetalleTareaYPagos(idObra, idTarea) {
     throw new Error('Tarea no encontrada')
   }
 
-  const obra = obras.find(o => o['id-obra'] === idObra)
+  const obra = obras.find(o => Number(o.id_obra) === idObra)
   
   const idsTarea = new Set([tareaDerivada, ...(tareaDerivada?.subtareas ?? [])].flatMap((item) => [normalizarIdTarea(item['id-tarea']), ...(item.subtareas ?? []).map((hijo) => normalizarIdTarea(hijo['id-tarea']))]))
   const incluirDescendientes = (item) => {
@@ -40,8 +32,8 @@ export async function obtenerDetalleTareaYPagos(idObra, idTarea) {
 
   return {
     obra: {
-      idObra: obra['id-obra'],
-      nroLote: obra.nrolote
+      idObra: obra.id_obra,
+      nroLote: obra.nro_lote ?? ''
     },
     tarea: {
       idTarea: tarea['id-tarea'],
@@ -49,12 +41,20 @@ export async function obtenerDetalleTareaYPagos(idObra, idTarea) {
       descripcion: tarea.descripcion,
       estado: tarea.estado,
       porcentaje: tareaDerivada.avance,
-      fechaInicio: tarea['fecha-inicio'],
-      fechaFin: tarea['fecha-fin'],
+      fechaInicio: tarea['fecha-inicio'], fechaInicioEstimada: tarea['fecha-inicio-estimada'] || tarea['fecha-inicio'],
+      fechaFin: tarea['fecha-fin'], fechaFinEstimada: tarea['fecha-fin-estimada'] || tarea['fecha-fin'],
+      fechaInicioReal: tarea['fecha-inicio-real'] || '', fechaFinReal: tarea['fecha-fin-real'] || '',
       duracionEstimada: tareaDerivada['duracion-estimada'],
       duracionReal: tareaDerivada['duracion-real'],
       costoEstimado: tarea['costo-estimado'],
-      costoReal: tareaDerivada['costo-real']
+      costoReal: tareaDerivada['costo-real'],
+      subtareas: (tareaDerivada.subtareas ?? []).map((subtarea) => ({
+        idTarea: subtarea['id-tarea'],
+        nombre: subtarea.nombre,
+        porcentaje: subtarea.avance ?? 0,
+        costoEstimado: subtarea['costo-estimado'],
+        costoReal: subtarea['costo-real'],
+      }))
     },
     pagos: pagosTarea.map(p => ({
       idPago: p['id-pago'],

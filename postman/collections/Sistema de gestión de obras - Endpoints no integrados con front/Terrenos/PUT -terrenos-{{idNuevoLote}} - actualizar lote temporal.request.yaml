@@ -9,8 +9,7 @@ body:
   content: |-
     {
       "nro_lote": "PM-ACT-{{$timestamp}}",
-      "id_direccion": null,
-      "id_obra": null
+      "id_direccion": null
     }
 auth:
   type: bearer

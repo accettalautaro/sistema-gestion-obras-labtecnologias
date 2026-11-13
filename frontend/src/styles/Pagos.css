@@ -56,6 +56,105 @@
 }
 
 .pagos-page__toolbar {
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 1rem 1.5rem;
+}
+
+.pagos-page__obra-identidad {
+	align-items: center;
+	display: flex;
+	flex: 1 1 26rem;
+	flex-wrap: wrap;
+	gap: .85rem 1rem;
+	min-width: 0;
+}
+
+.pagos-page__obra-datos { flex: 1 1 15rem; min-width: 0; }
+
+.pagos-page__obra-titulo-fila {
+	align-items: center;
+	display: flex;
+	flex-wrap: wrap;
+	gap: .5rem .65rem;
+}
+
+.pagos-page__obra-titulo {
+	color: #1f1f1f;
+	font-size: 1.05rem;
+	font-weight: 600;
+	line-height: 1.35;
+	margin: 0;
+}
+
+.pagos-page__cliente {
+	color: #6b7280;
+	font-size: .85rem;
+	margin: .2rem 0 0;
+}
+
+.pagos-page__cliente span {
+	font-weight: 600;
+}
+
+.pagos-page__estado {
+	align-items: center;
+	border-radius: 999px;
+	display: inline-flex;
+	font-size: .75rem;
+	font-weight: 500;
+	gap: .4rem;
+	line-height: 1.25;
+	padding: 3px 10px;
+	white-space: nowrap;
+}
+
+.pagos-page__estado > span {
+	border-radius: 50%;
+	height: 6px;
+	width: 6px;
+}
+
+.pagos-page__estado--activa { background: #fff8e1; color: #b45309; }
+.pagos-page__estado--pausada { background: #f1f3f5; color: #495057; }
+.pagos-page__estado--finalizada { background: #e8f5e9; color: #2e7d32; }
+.pagos-page__estado--atrasada { background: #fff8e1; color: #b45309; }
+.pagos-page__estado--neutral { background: #f1f3f5; color: #495057; }
+.pagos-page__estado--cancelada { background: #fbefed; color: #b94a48; }
+.pagos-page__estado--activa > span,
+.pagos-page__estado--pausada > span,
+.pagos-page__estado--finalizada > span,
+.pagos-page__estado--atrasada > span,
+.pagos-page__estado--neutral > span,
+.pagos-page__estado--cancelada > span { background: currentColor; }
+
+.pagos-page__resumen-obra {
+	align-items: center;
+	display: flex;
+	flex: 0 1 auto;
+	flex-wrap: wrap;
+	gap: .6rem 1.25rem;
+}
+
+.pagos-page__resumen-obra > span {
+	align-items: flex-end;
+	display: flex;
+	flex-direction: column;
+	line-height: 1.35;
+}
+
+.pagos-page__resumen-obra small { color: #6b7280; font-size: .72rem; }
+.pagos-page__resumen-obra strong { color: #4a3d32; font-size: .9rem; font-weight: 650; }
+
+.pagos-page__btn-desplegar { flex: 0 0 auto; }
+
+@media (max-width: 700px) {
+	.pagos-page__obra-identidad { align-items: flex-start; flex-basis: 100%; }
+	.pagos-page__resumen-obra { flex: 1 1 100%; justify-content: flex-start; }
+	.pagos-page__resumen-obra > span { align-items: flex-start; }
+}
+
+.pagos-page__toolbar {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;

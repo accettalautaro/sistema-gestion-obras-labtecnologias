@@ -1,22 +1,138 @@
-const URL_TAREAS = '/Back/data/tareas.json'
-const CLAVE_CAMBIOS = 'gestion-obras:tareas:v1'
+import { api, jsonBody } from '../../../shared/services/api.js'
+import { NOMENCLADOR_TAREAS } from '../data/nomencladorTareas.js'
 
-export async function listarNomenclador() {
-	const respuesta = await fetch(URL_TAREAS)
-	if (!respuesta.ok) throw new Error('No se pudo cargar el nomenclador de tareas.')
-	return respuesta.json()
+function fechaISO(valor) {
+  if (!valor) return ''
+  if (valor instanceof Date && Number.isNaN(valor.getTime())) return ''
+  const texto = valor instanceof Date ? valor.toISOString() : String(valor).trim()
+  const coincidencia = texto.match(/^(\d{4}-\d{2}-\d{2})(?:$|T|\s)/)
+  if (!coincidencia) return ''
+  const fecha = coincidencia[1]
+  const validada = new Date(`${fecha}T00:00:00Z`)
+  return Number.isNaN(validada.getTime()) || validada.toISOString().slice(0, 10) !== fecha ? '' : fecha
+}
+
+const fecha = fechaISO
+const porcentaje = (valor) => Number.parseFloat(String(valor ?? 0).replace('%', '').replace(',', '.')) || 0
+
+export async function listarNomenclador() { return NOMENCLADOR_TAREAS }
+
+function mapearObraTareas(datos) {
+  return (datos?.tareas ?? []).flatMap((tarea) => {
+    const principal = {
+      'id-obra': String(datos.id_obra), 'id-tarea': String(tarea.id_tarea),
+      nombre: tarea.nombre_tarea, descripcion: tarea.descripcion_tarea ?? '',
+      porcentaje: `${Number(tarea.porcentaje_tarea) || 0}%`,
+      estado: Number(tarea.porcentaje_tarea) >= 100 ? 'finalizada' : Number(tarea.porcentaje_tarea) > 0 ? 'en ejecucion' : 'sin comenzar',
+      'fecha-inicio-estimada': fecha(tarea.fecha_inicio_tarea), 'fecha-fin-estimada': fecha(tarea.fecha_fin_tarea),
+      'fecha-inicio-real': fecha(tarea.fecha_inicio_tarea), 'fecha-fin-real': fecha(tarea.fecha_fin_tarea),
+      'fecha-inicio': fecha(tarea.fecha_inicio_tarea), 'fecha-fin': fecha(tarea.fecha_fin_tarea),
+      'duracion-estimada': tarea.duracion_estimada_tarea ?? '', 'duracion-real': tarea.duracion_real_tarea ?? '',
+      'costo-estimado': tarea.costo_estimado_tarea ?? '', 'costo-real': tarea.costo_real_tarea ?? '',
+      _persistida: true,
+    }
+    const subtareas = (tarea.subtareas ?? []).map((subtarea) => ({
+      ...principal,
+      'id-tarea': `${tarea.id_tarea}_${subtarea.id_subtarea}`,
+      nombre: subtarea.nombre_subtarea, descripcion: subtarea.descripcion_subtarea ?? '',
+      porcentaje: `${Number(subtarea.porcentaje_subtarea) || 0}%`,
+      estado: Number(subtarea.porcentaje_subtarea) >= 100 ? 'finalizada' : Number(subtarea.porcentaje_subtarea) > 0 ? 'en ejecucion' : 'sin comenzar',
+      'fecha-inicio-estimada': fecha(subtarea.fecha_inicio_subtarea), 'fecha-fin-estimada': fecha(subtarea.fecha_fin_subtarea),
+      'fecha-inicio-real': fecha(subtarea.fecha_inicio_subtarea), 'fecha-fin-real': fecha(subtarea.fecha_fin_subtarea),
+      'fecha-inicio': fecha(subtarea.fecha_inicio_subtarea), 'fecha-fin': fecha(subtarea.fecha_fin_subtarea),
+      'duracion-estimada': subtarea.duracion_estimada_subtarea ?? '', 'duracion-real': subtarea.duracion_real_subtarea ?? '',
+      'costo-estimado': subtarea.costo_estimado_subtarea ?? '', 'costo-real': subtarea.costo_real_subtarea ?? '',
+      _dbSubtareaId: subtarea.id_subtarea,
+    }))
+    return [principal, ...subtareas]
+  })
+}
+
+export async function listarTareasDeObra(idObra) {
+  return mapearObraTareas(await api(`/obras/${encodeURIComponent(idObra)}/tareas`))
 }
 
 export async function listarTareas() {
-	const tareasBase = await listarNomenclador()
-	const cambios = JSON.parse(localStorage.getItem(CLAVE_CAMBIOS) || '{}')
-	const tareasPorObra = new Map(Object.entries(cambios))
-	const obrasConCambios = new Set(tareasPorObra.keys())
-	return [...tareasBase.filter((tarea) => !obrasConCambios.has(String(tarea['id-obra']))), ...[...tareasPorObra.values()].flat()]
+  const obras = await api('/obras')
+  const listas = await Promise.all(obras.map((obra) => listarTareasDeObra(obra.id_obra)))
+  return listas.flat()
 }
 
-export function guardarTareasObra(idObra, tareasObra) {
-	const cambios = JSON.parse(localStorage.getItem(CLAVE_CAMBIOS) || '{}')
-	cambios[String(idObra)] = tareasObra
-	localStorage.setItem(CLAVE_CAMBIOS, JSON.stringify(cambios))
+function payloadTarea(tarea, idObra, idPadre = null) {
+  const inicio = fechaISO(tarea['fecha-inicio-real']) || fechaISO(tarea['fecha-inicio-estimada']) || fechaISO(tarea['fecha-inicio']) || null
+  const fin = fechaISO(tarea['fecha-fin-real']) || fechaISO(tarea['fecha-fin-estimada']) || fechaISO(tarea['fecha-fin']) || null
+  return {
+    ...(idPadre == null ? { id_obra: Number(idObra) } : { id_tarea: Number(idPadre) }),
+    nombre: String(tarea.nombre ?? '').trim(), descripcion: tarea.descripcion || null,
+    porcentaje: porcentaje(tarea.porcentaje), fecha_inicio: inicio || null, fecha_fin: fin || null,
+    duracion_estimada: tarea['duracion-estimada'] === '' ? null : Number(tarea['duracion-estimada']) || null,
+    duracion_real: tarea['duracion-real'] === '' ? null : Number(tarea['duracion-real']) || null,
+    costo_estimado: tarea['costo-estimado'] === '' ? null : Number(tarea['costo-estimado']) || null,
+    costo_real: tarea['costo-real'] === '' ? null : Number(tarea['costo-real']) || null,
+  }
+}
+
+export async function guardarTareasObra(idObra, lista) {
+  const existentes = await listarTareasDeObra(idObra)
+  const etapas = lista.filter((item) => !String(item['id-tarea']).includes('_') && !item._dbSubtareaId)
+  const idsPersistidos = new Map()
+  for (const etapa of etapas) {
+    const idAnterior = String(etapa['id-tarea'])
+    const persistida = existentes.find((item) => String(item['id-tarea']) === idAnterior && !item._dbSubtareaId)
+    const resultado = persistida
+      ? await api(`/tareas/${persistida['id-tarea']}`, { method: 'PUT', body: jsonBody(payloadTarea(etapa, idObra)) })
+      : await api('/tareas', { method: 'POST', body: jsonBody(payloadTarea(etapa, idObra)) })
+    idsPersistidos.set(idAnterior, resultado.id_tarea)
+  }
+
+  const subtareasNuevas = lista.filter((item) => item._dbSubtareaId || String(item['id-tarea']).includes('_'))
+  const idsSubtareasPersistidas = new Set()
+  for (const subtarea of subtareasNuevas) {
+    const idTexto = String(subtarea['id-tarea'])
+    const [idPadreTexto] = idTexto.split('_')
+    const idPadre = idsPersistidos.get(idPadreTexto) ?? Number(idPadreTexto)
+    const payload = payloadTarea(subtarea, idObra, idPadre)
+    if (subtarea._dbSubtareaId) {
+      await api(`/subtareas/${subtarea._dbSubtareaId}`, { method: 'PUT', body: jsonBody(payload) })
+      idsSubtareasPersistidas.add(String(subtarea._dbSubtareaId))
+    } else {
+      const creada = await api('/subtareas', { method: 'POST', body: jsonBody(payload) })
+      idsSubtareasPersistidas.add(String(creada.id_subtarea))
+    }
+  }
+
+  const idsTareasFinales = new Set(etapas.map((item) => {
+    const previo = existentes.find((actual) => String(actual['id-tarea']) === String(item['id-tarea']) && !actual._dbSubtareaId)
+    return String(idsPersistidos.get(String(item['id-tarea'])) ?? previo?.['id-tarea'] ?? '')
+  }))
+  for (const tarea of existentes.filter((item) => item._dbSubtareaId && !idsSubtareasPersistidas.has(String(item._dbSubtareaId)))) {
+    await api(`/subtareas/${tarea._dbSubtareaId}`, { method: 'DELETE' })
+  }
+  for (const tarea of existentes.filter((item) => !item._dbSubtareaId && !idsTareasFinales.has(String(item['id-tarea'])))) {
+    await api(`/tareas/${tarea['id-tarea']}`, { method: 'DELETE' })
+  }
+  return listarTareasDeObra(idObra)
+}
+
+export async function actualizarEstadoTarea(idObra, tarea, accion) {
+  const nuevaFecha = new Date().toISOString().slice(0, 10)
+  const datos = { ...tarea }
+  if (accion === 'iniciar') {
+    datos['fecha-inicio-real'] = nuevaFecha
+    datos.estado = 'en ejecucion'
+  } else if (accion === 'completar') {
+    datos['fecha-inicio-real'] ||= nuevaFecha
+    datos['fecha-fin-real'] = nuevaFecha
+    datos.porcentaje = '100%'
+    datos.estado = 'finalizada'
+  } else {
+    datos['fecha-fin-real'] = ''
+    datos.porcentaje = '0%'
+    datos.estado = 'sin comenzar'
+  }
+  const esSubtarea = tarea._dbSubtareaId != null
+  const payload = payloadTarea(datos, idObra, esSubtarea ? Number(String(tarea['id-tarea']).split('_')[0]) : null)
+  const ruta = esSubtarea ? `/subtareas/${tarea._dbSubtareaId}` : `/tareas/${tarea['id-tarea']}`
+  await api(ruta, { method: 'PUT', body: jsonBody(payload) })
+  return listarTareasDeObra(idObra)
 }

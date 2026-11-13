@@ -1,44 +1,22 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useParams, useOutletContext } from 'react-router-dom'
-import { listarDatosPropietarios, guardarPropietario, eliminarPropietario } from '../services/propietariosService.js'
+import { listarDatosPropietarios, crearPropietario, actualizarPropietario, eliminarPropietario } from '../services/propietariosService.js'
 import Volver from '../../../shared/components/Volver.jsx'
+import { useFetch } from '../../../shared/hooks/useFetch.js'
 
 const FORMULARIO_VACIO = { dniUnico: '', nombre: '', apellido: '', dni: '', estadocivil: '', porcentaje: '', nroescritura: '' }
+const listarDatosPropietariosPorVersion = (clave) => listarDatosPropietarios(clave.slice(0, clave.lastIndexOf('|')))
 
 function PropietariosPage() {
 	const { esArquitecto } = useOutletContext() || {}
 	const { nrolote } = useParams()
-	
-	const [datos, setDatos] = useState(null)
-	const [cargando, setCargando] = useState(true)
-	const [error, setError] = useState(null)
-	
+	const [version, setVersion] = useState(0)
 	const [formulario, setFormulario] = useState(FORMULARIO_VACIO)
 	const [editando, setEditando] = useState(null)
 	const [aviso, setAviso] = useState(null)
+	const [guardando, setGuardando] = useState(false)
+	const { datos, cargando, error } = useFetch(listarDatosPropietariosPorVersion, `${nrolote}|${version}`)
 
-	useEffect(() => {
-		let activo = true
-		setCargando(true)
-		listarDatosPropietarios(nrolote)
-			.then(res => {
-				if (activo) {
-					setDatos(res)
-					// Si hay escrituras, pre-seleccionar la primera
-					if (res.escriturasLote.length > 0) {
-						setFormulario(prev => ({ ...prev, nroescritura: String(res.escriturasLote[0].nroescritura) }))
-					}
-					setCargando(false)
-				}
-			})
-			.catch(err => {
-				if (activo) {
-					setError(err)
-					setCargando(false)
-				}
-			})
-		return () => { activo = false }
-	}, [nrolote])
 
 	if (esArquitecto === null || esArquitecto === undefined) return <p className="obras-page__estado" role="status">Verificando acceso...</p>
 	if (!esArquitecto) return <div className="alert alert-danger" role="alert">Esta pantalla está disponible únicamente para arquitectos.</div>
@@ -46,6 +24,7 @@ function PropietariosPage() {
 	if (error) return <div className="alert alert-danger" role="alert">{error.message}</div>
 
 	const { lote, escriturasLote, propietariosLote, personasUnicas } = datos
+	const nroEscrituraSeleccionada = formulario.nroescritura || String(escriturasLote[0]?.nroescritura ?? '')
 
 	const manejarSeleccionExistente = (e) => {
 		const dniSel = e.target.value
@@ -89,25 +68,25 @@ function PropietariosPage() {
 
 	const guardar = async (e) => {
 		e.preventDefault()
+		setGuardando(true)
 		try {
-			const escritura = escriturasLote.find((item) => String(item.nroescritura) === String(formulario.nroescritura))
-			await guardarPropietario(editando, { ...formulario, id_documento: escritura?.id_documento })
-			setDatos(await listarDatosPropietarios(nrolote))
-			setAviso({ titulo: editando === null ? 'Propietario agregado' : 'Cambios guardados', mensaje: 'Los datos se guardaron en el servidor.' })
-			nuevo()
-		} catch (motivo) {
-			setAviso({ titulo: 'No se pudo guardar', mensaje: motivo.message })
-		}
+			const escritura = escriturasLote.find((item) => String(item.nroescritura) === nroEscrituraSeleccionada)
+			if (!escritura) throw new Error('Seleccioná una escritura del lote.')
+			const entrada = { nombre: formulario.nombre.trim(), apellido: formulario.apellido.trim(), dni: formulario.dni.trim(), estadoCivil: formulario.estadocivil || null, porcentaje: Number(formulario.porcentaje) }
+			if (editando === null) await crearPropietario(lote.id, escritura.documentoId, entrada)
+			else await actualizarPropietario(lote.id, escritura.documentoId, editando, entrada)
+			setVersion((actual) => actual + 1); nuevo()
+			setAviso({ titulo: editando === null ? 'Propietario agregado' : 'Propietario actualizado', mensaje: 'Los cambios se guardaron en PostgreSQL.' })
+		} catch (motivo) { setAviso({ titulo: 'No se pudo guardar', mensaje: motivo.message || 'Ocurrió un error al guardar el propietario.' }) }
+		finally { setGuardando(false) }
 	}
 
 	const eliminar = async (prop) => {
+		if (!window.confirm(`¿Quitar a ${prop.nombre} ${prop.apellido} de esta escritura?`)) return
 		try {
-			await eliminarPropietario(prop['id-propietario'])
-			setDatos(await listarDatosPropietarios(nrolote))
-			setAviso({ titulo: 'Propietario eliminado', mensaje: 'Se quitó el registro del servidor.' })
-		} catch (motivo) {
-			setAviso({ titulo: 'No se pudo eliminar', mensaje: motivo.message })
-		}
+			await eliminarPropietario(lote.id, prop.documentoId, prop['id-propietario'])
+			setVersion((actual) => actual + 1)
+		} catch (motivo) { setAviso({ titulo: 'No se pudo quitar el propietario', mensaje: motivo.message || 'Ocurrió un error.' }) }
 	}
 
 	return (
@@ -123,9 +102,7 @@ function PropietariosPage() {
 				</div>
 			</header>
 			
-			<div className="alert alert-info" role="note">
-				<strong>Gestión conectada:</strong> los cambios se guardan en el servidor.
-			</div>
+			<div className="alert alert-info" role="note">Las asociaciones de propietarios se guardan en PostgreSQL. El porcentaje pertenece al registro de propietario y se refleja en todas sus escrituras.</div>
 
 			<div className="obras-page__workspace">
 				<section className="obras-page__listado" aria-labelledby="props-listado-titulo">
@@ -151,7 +128,7 @@ function PropietariosPage() {
 										<td className="obras-page__nombre fw-semibold">{prop.nombre} {prop.apellido}</td>
 										<td>{prop.dni}</td>
 										<td>{prop.estadocivil}</td>
-										<td><span className="badge text-bg-dark">{prop.porcentaje}</span></td>
+										<td><span className="badge text-bg-dark">{prop.porcentaje}%</span></td>
 										<td>
 											<div className="obras-page__acciones">
 												<button className="btn btn-sm btn-outline-secondary" type="button" onClick={() => editar(prop)}>Editar</button>
@@ -172,7 +149,7 @@ function PropietariosPage() {
 					<div className="obras-page__form-header">
 						<div>
 							<h2 id="prop-form-titulo">{editando === null ? 'Agregar propietario' : `Editar propietario`}</h2>
-							<p>Vista previa del formulario.</p>
+							<p>Los cambios se guardan en PostgreSQL.</p>
 						</div>
 						{editando !== null && (
 							<button className="btn btn-sm btn-outline-secondary" type="button" onClick={nuevo}>Nuevo</button>
@@ -184,7 +161,7 @@ function PropietariosPage() {
 								Escritura asociada
 								<input 
 									className="form-control"
-									value={formulario.nroescritura ? `Escritura N.º ${formulario.nroescritura}` : 'Sin escrituras'} 
+					value={nroEscrituraSeleccionada ? `Escritura N.º ${nroEscrituraSeleccionada}` : 'Sin escrituras'}
 									disabled
 									readOnly
 								/>
@@ -226,7 +203,7 @@ function PropietariosPage() {
 						</div>
 						<div className="obras-page__form-actions mt-3">
 							{editando !== null && <button className="btn btn-outline-secondary" type="button" onClick={nuevo}>Cancelar</button>}
-							<button className="btn btn-dark" type="submit" disabled={escriturasLote.length === 0}>{editando === null ? 'Agregar propietario' : 'Guardar cambios'}</button>
+							<button className="btn btn-dark" type="submit" disabled={guardando || escriturasLote.length === 0}>{guardando ? 'Guardando...' : editando === null ? 'Agregar propietario' : 'Guardar cambios'}</button>
 						</div>
 					</form>
 				</section>

@@ -1,106 +1,42 @@
 import { resumirAvanceTareas } from '../../../shared/utils/avanceObra.js'
-import { listarTareas } from '../../obras/services/tareasService.js'
-import { listarPagosParciales } from '../../pagos/services/pagosService.js'
 import { obtenerPerfilCliente } from '../../clientes/services/clientesService.js'
+import { listarObras } from '../../obras/services/obrasService.js'
+import { listarTerrenos } from '../../terrenos/services/terrenosService.js'
+import { api } from '../../../shared/services/api.js'
 
-const URL_BASE = '/Back/data'
-
-async function leerJson(nombre) {
-  const respuesta = await fetch(`${URL_BASE}/${nombre}.json`)
-  if (!respuesta.ok) {
-    throw new Error(`No se pudo obtener ${nombre}`)
-  }
-  return respuesta.json()
-}
-
-// "50%" -> 50
-const aNumero = (porcentaje) => parseInt(String(porcentaje), 10) || 0
-
-/**
- * Combina el perfil verificado por el backend con los datos actuales de obras
- * y recordatorios, que todavía se leen desde JSON.
- */
 export async function obtenerResumenCliente() {
-  const [cliente, obras, arquitectos, direcciones, recordatorios, tareas, pagos] = await Promise.all([
-    obtenerPerfilCliente(),
-    leerJson('obras'),
-    leerJson('arquitectos'),
-    leerJson('direcciones'),
-    leerJson('recordatorios'),
-    listarTareas(),
-    listarPagosParciales(),
+  const [cliente, datosObras, lotes, recordatoriosApi] = await Promise.all([
+    obtenerPerfilCliente(), listarObras(), listarTerrenos(), api('/recordatorios'),
   ])
-
-  const obrasCliente = obras
-    .filter((o) => String(o['id-cliente']) === String(cliente['id-cliente']))
+  const obrasCliente = datosObras.obras
+    .filter((obra) => String(obra['id-cliente']) === String(cliente['id-cliente']))
     .map((obra) => {
-      const arquitecto = arquitectos.find((a) => a['id-arquitecto'] === obra['id-arquitecto'])
-      const direccion = direcciones.find((d) => d.nrolote === obra.nrolote)
-      
-      const tareasObra = tareas.filter((t) => String(t['id-obra']) === String(obra['id-obra']))
-      const resumen = resumirAvanceTareas(tareasObra, pagos)
-      const tieneTareaAtrasada = resumen.unidades.some((t) => Number(t['duracion-real']) > Number(t['duracion-estimada']) && aNumero(t.porcentaje) < 100)
-      const avanceObra = resumen.avance
-      
-      let estadoObra = obra.Estado
-      if (estadoObra === 'En ejecución' && tieneTareaAtrasada) {
-        estadoObra = 'Atrasada'
-      }
-
+      const lote = lotes.find((item) => String(item['id-lote']) === String(obra['id-lote']))
+      const direccion = lote?.direcciones?.[0]
+      const tareas = obra.tareas ?? []
+      const resumen = resumirAvanceTareas(tareas)
+      const atrasadas = resumen.unidades.filter((tarea) => Number(tarea['duracion-real']) > Number(tarea['duracion-estimada']) && Number(tarea.porcentaje) < 100).length
+      const estado = atrasadas && String(obra.Estado).toLowerCase().includes('ejecuci') ? 'Atrasada' : obra.Estado
       return {
-        idObra: obra['id-obra'],
-        nroLote: obra.nrolote,
-        estado: estadoObra,
-        porcentaje: avanceObra,
-        fechaInicio: obra['fecha-inicio'] ?? null,
-        fechaFin: obra['fecha-fin'] ?? null,
-        direccion: direccion ? `${direccion.calle} ${direccion.altura}, ${direccion.localidad}` : 'Sin dirección cargada',
-        direccionCompleta: direccion
-          ? `${direccion.calle} ${direccion.altura}, ${direccion.localidad}, ${direccion.provincia} (CP ${direccion.codpos})`
-          : 'Sin dirección cargada',
-        arquitecto: arquitecto ? `${arquitecto.nombre} ${arquitecto.apellido}` : 'Sin asignar',
-        arquitectoTelefono: arquitecto?.telefono ?? '',
-        arquitectoMatricula: arquitecto?.nromatricula ?? '',
+        idObra: obra['id-obra'], nroLote: obra.nrolote, estado, porcentaje: resumen.avance,
+        diasAtraso: atrasadas,
+        direccion: direccion ? [direccion.calle, direccion.altura, direccion.localidad, direccion.provincia].filter(Boolean).join(', ') : 'Dirección sin registrar',
+        arquitecto: obra.arquitectoNombre || 'Sin asignar',
+        fechaInicioEstimada: obra['fecha-inicio'], fechaFinEstimada: obra['fecha-fin'],
+        fechaInicioReal: '', fechaFinReal: '', tareas,
       }
     })
-
-  const hoy = new Date()
-  hoy.setHours(0, 0, 0, 0)
-
-  // Todos los recordatorios del cliente, con los datos de su obra
-  const recordatoriosCliente = recordatorios
-    .filter((r) => String(r['id-cliente']) === String(cliente['id-cliente']))
-    .map((r) => {
-      const obra = obrasCliente.find((o) => o.idObra === r['id-obra'])
-      
-      let estadoR = r.estado.toLowerCase()
-      if (estadoR === 'pendiente') {
-        const [y, m, d] = r.fecha.split('-').map(Number)
-        const fechaR = new Date(y, m - 1, d)
-        if (fechaR < hoy) {
-          estadoR = 'atrasado'
-        }
-      }
-
-      return {
-        idRecordatorio: r['id-recordatorio'],
-        idObra: r['id-obra'],
-        fecha: r.fecha,
-        descripcion: r.descripcion,
-        estado: estadoR,
-        nroLote: obra?.nroLote ?? null,
-        direccion: obra?.direccion ?? 'Obra no encontrada',
-        direccionCompleta: obra?.direccionCompleta ?? '',
-        estadoObra: obra?.estado ?? '',
-        arquitecto: obra?.arquitecto ?? '',
-        arquitectoTelefono: obra?.arquitectoTelefono ?? '',
-        arquitectoMatricula: obra?.arquitectoMatricula ?? '',
-      }
-    })
-
-  return {
-    cliente: { nombre: cliente.nombre, apellido: cliente.apellido },
-    obras: obrasCliente,
-    recordatorios: recordatoriosCliente,
-  }
+  const idsObras = new Map(obrasCliente.map((obra) => [String(obra.idObra), obra]))
+  const recordatorios = recordatoriosApi.filter((item) => idsObras.has(String(item.id_obra))).map((item) => {
+    const obra = idsObras.get(String(item.id_obra))
+    const fecha = String(item.fecha).slice(0, 10)
+    const hoy = new Date(); hoy.setHours(0, 0, 0, 0)
+    const fechaRecordatorio = new Date(`${fecha}T00:00:00`)
+    return {
+      idRecordatorio: item.id_recordatorio, idObra: item.id_obra, nroLote: obra.nroLote,
+      fecha, estado: fechaRecordatorio < hoy ? 'atrasado' : 'pendiente',
+      descripcion: item.descripcion, direccion: obra.direccion, direccionCompleta: obra.direccion,
+    }
+  })
+  return { cliente, obras: obrasCliente, recordatorios }
 }

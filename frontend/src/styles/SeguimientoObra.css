@@ -1,27 +1,51 @@
 .seguimiento-obra { margin: 0 auto; max-width: 1320px; }
 .btn.seguimiento-obra__boton { background: var(--ui-accent); border-color: var(--ui-accent); color: var(--color-primario); }
 .btn.seguimiento-obra__boton:hover, .btn.seguimiento-obra__boton:focus-visible { background: var(--ui-accent-hover); border-color: var(--ui-accent-hover); color: var(--color-primario); }
-.seguimiento-obra .progress-bar { background-color: var(--ui-accent); }
+.seguimiento-obra .progress-bar { background-color: var(--seguimiento-acento); }
 .seguimiento-obra__header { align-items: center; border-bottom: 1px solid var(--seguimiento-line); display: flex; gap: 1rem; margin-bottom: 1.25rem; padding-bottom: 1.25rem; }
 .seguimiento-obra__volver { align-items: center; border: 1px solid var(--seguimiento-line); border-radius: 50%; color: var(--seguimiento-ink); display: inline-flex; flex: 0 0 2.5rem; font-size: 1.35rem; height: 2.5rem; justify-content: center; text-decoration: none; }
 .seguimiento-obra__encabezado-texto { min-width: 0; }
-.seguimiento-obra__eyebrow { color: var(--seguimiento-acento); font-size: .72rem; font-weight: 700; letter-spacing: .08em; margin: 0 0 .25rem; text-transform: uppercase; }
+.seguimiento-obra__eyebrow { color: var(--seguimiento-acento); font-size: .72rem; font-weight: 600; letter-spacing: .05em; margin: 0 0 .25rem; text-transform: uppercase; }
+.seguimiento-obra .card-body h6 { color: var(--seguimiento-acento) !important; font-weight: 600 !important; letter-spacing: .05em; margin-bottom: 1rem !important; }
 .seguimiento-obra__header h1 { color: var(--seguimiento-ink); font-size: clamp(1.4rem, 3vw, 1.9rem); font-weight: 650; margin: 0; }
 .seguimiento-obra__header p:last-child { color: var(--seguimiento-muted); font-size: .9rem; margin: .3rem 0 0; }
-.seguimiento-obra__estado-badge { background: #f7ebde; border-radius: 99px; color: var(--ui-accent-hover); font-size: .78rem; margin-left: auto; padding: .45rem .8rem; white-space: nowrap; }
-.seguimiento-obra__estado-badge--finalizada { background: #eef0f2; color: #60676e; }
+.seguimiento-obra__header-acciones { align-items: center; display: flex; flex: 0 0 auto; flex-wrap: wrap; gap: .6rem; }
+.seguimiento-obra__estado-badge { align-items: center; border-radius: 999px; display: inline-flex; font-size: .75rem; font-weight: 500; gap: .4rem; line-height: 1.25; padding: 3px 10px; white-space: nowrap; }
+.seguimiento-obra__estado-badge > span { background: currentColor; border-radius: 50%; height: 6px; width: 6px; }
+.seguimiento-obra__estado-badge--activa { background: var(--ui-accent-soft); color: var(--seguimiento-acento); }
+.seguimiento-obra__estado-badge--pausada, .seguimiento-obra__estado-badge--neutral,
+.seguimiento-obra__estado-badge--cancelada { background: var(--color-fondo-tabla); color: var(--seguimiento-muted); }
+.seguimiento-obra__estado-badge--finalizada { background: var(--color-verde-suave); color: var(--dashboard-green); }
+.seguimiento-obra__estado-badge--atrasada { background: var(--ui-accent-soft); color: var(--seguimiento-acento); }
+.seguimiento-obra__tarjeta-titulo { align-items: center; display: flex; gap: .75rem; margin-bottom: 1rem; }
+.seguimiento-obra__tarjeta-titulo h6 { margin: 0 !important; }
+.seguimiento-obra__enlace-lote { align-items: center; color: var(--ui-accent-hover); display: inline-flex; flex: 0 0 auto; font-size: .76rem; font-weight: 600; gap: .6rem; text-decoration: none; white-space: nowrap; }
+.seguimiento-obra__enlace-lote:hover { text-decoration: underline; }
+.seguimiento-obra__dato-lote { align-items: center; display: flex; gap: .65rem; margin-bottom: .75rem; }
+.seguimiento-obra__dato-lote > .seguimiento-obra__dato-general { margin-bottom: 0; }
+.seguimiento-obra__dato-general { align-items: baseline; display: flex; gap: .5rem; margin-bottom: .5rem; }
+.seguimiento-obra__dato-general > i { color: var(--seguimiento-muted); flex: 0 0 auto; }
+.seguimiento-obra__dato-etiqueta, .seguimiento-obra__finanzas-etiqueta { color: var(--seguimiento-muted); font-size: .85rem; font-weight: 400; }
+.seguimiento-obra__dato-valor, .seguimiento-obra__finanzas-valor { color: var(--seguimiento-ink); font-weight: 600; }
+.seguimiento-obra__finanzas-etiqueta { display: block; margin-bottom: .15rem; }
+.seguimiento-obra__finanzas-valor { display: block; overflow-wrap: anywhere; }
+.seguimiento-obra__barra-presupuesto { background: var(--seguimiento-line); border-radius: 99px; height: 7px; overflow: hidden; }
+.seguimiento-obra__barra-presupuesto > span { background: var(--seguimiento-acento); border-radius: inherit; display: block; height: 100%; transition: width .3s ease; }
+.seguimiento-obra__presupuesto-estado { font-size: .9rem; font-weight: 600; line-height: 1.45; margin-top: auto; }
+.seguimiento-obra__presupuesto-ok { color: var(--seguimiento-muted); }
+.seguimiento-obra__tiempo-badge { background: var(--color-verde-suave); border-radius: 999px; color: var(--dashboard-green); display: inline-flex; font-size: .78rem; font-weight: 600; line-height: 1.25; padding: .35rem .65rem; }
 .seguimiento-obra__resumen { display: grid; gap: .85rem; grid-template-columns: minmax(250px, 1.5fr) repeat(3, minmax(120px, .7fr)); margin-bottom: 1rem; }
-.seguimiento-obra__avance-card, .seguimiento-obra__dato, .seguimiento-obra__panel { background: var(--color-primario); border: 1px solid var(--seguimiento-line); border-radius: .45rem; box-shadow: 0 4px 16px rgb(35 45 40 / 3%); }
+.seguimiento-obra__avance-card, .seguimiento-obra__dato, .seguimiento-obra__panel { background: var(--ui-surface); border: 1px solid var(--seguimiento-line); border-radius: .45rem; box-shadow: var(--ui-shadow); }
 .seguimiento-obra__avance-card { background: var(--color-seguimiento-ink); color: var(--color-primario); padding: 1.15rem 1.25rem; }
 .seguimiento-obra__avance-cabecera { align-items: center; display: flex; justify-content: space-between; }
-.seguimiento-obra__avance-card .seguimiento-obra__eyebrow { color: #f0c89e; }
-.layout-gestor main .seguimiento-obra__avance-card h2 { color: #edc598; font-size: 2.15rem; font-weight: 650; letter-spacing: -.04em; line-height: 1; margin: 0; }
+.seguimiento-obra__avance-card .seguimiento-obra__eyebrow { color: var(--ui-accent-soft); }
+.layout-gestor main .seguimiento-obra__avance-card h2 { color: var(--ui-accent-soft); font-size: 2.15rem; font-weight: 650; letter-spacing: -.04em; line-height: 1; margin: 0; }
 .seguimiento-obra__avance-card h2 span { font-size: 1rem; margin-left: .12rem; }
-.seguimiento-obra__circulo { align-items: center; border: 1px solid #9b7a5e; border-radius: 50%; color: #f2d8be; display: inline-flex; font-size: 1rem; height: 2rem; justify-content: center; width: 2rem; }
-.seguimiento-obra__barra { background: #f0ece8; border-radius: 99px; height: .55rem; overflow: hidden; }
-.seguimiento-obra__avance-card .seguimiento-obra__barra { background: rgb(255 255 255 / 20%); margin-top: 1rem; }
-.seguimiento-obra__barra > span { background: var(--ui-accent); border-radius: inherit; display: block; height: 100%; transition: width .3s ease; }
-.seguimiento-obra__avance-card p { color: #ded2c6; font-size: .75rem; margin: .55rem 0 0; }
+.seguimiento-obra__circulo { align-items: center; border: 1px solid var(--ui-accent); border-radius: 50%; color: var(--ui-accent-soft); display: inline-flex; font-size: 1rem; height: 2rem; justify-content: center; width: 2rem; }
+.seguimiento-obra__barra { background: var(--seguimiento-line); border-radius: 99px; height: .55rem; overflow: hidden; }
+.seguimiento-obra__avance-card .seguimiento-obra__barra { background: var(--ui-accent-hover); margin-top: 1rem; }
+.seguimiento-obra__barra > span { background: var(--seguimiento-acento); border-radius: inherit; display: block; height: 100%; transition: width .3s ease; }
+.seguimiento-obra__avance-card p { color: var(--ui-accent-soft); font-size: .75rem; margin: .55rem 0 0; }
 .seguimiento-obra__dato { display: flex; flex-direction: column; justify-content: center; min-width: 0; padding: 1rem; }
 .seguimiento-obra__dato span { color: var(--seguimiento-muted); font-size: .73rem; margin-bottom: .45rem; }
 .seguimiento-obra__dato strong { color: var(--seguimiento-ink); font-size: .95rem; overflow-wrap: anywhere; }
@@ -37,32 +61,41 @@
 .seguimiento-obra__gantt-fechas > div { display: flex; justify-content: space-between; }
 .seguimiento-obra__gantt-fila { min-height: 3rem; }
 .seguimiento-obra__gantt-label { display: flex; flex-direction: column; gap: .18rem; min-width: 0; }
-.seguimiento-obra__gantt-label strong { color: #4a3d32; font-size: .78rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.seguimiento-obra__gantt-label span { color: var(--seguimiento-muted); font-size: .69rem; }
-.seguimiento-obra__gantt-label span b { color: var(--ui-accent); font-weight: 700; }
-.seguimiento-obra__gantt-pista { background: #f7f4f1; border-radius: 99px; height: .7rem; position: relative; }
-.seguimiento-obra__gantt-barra { background: #ddd5cd; border-radius: inherit; height: 100%; min-width: .35rem; overflow: hidden; position: absolute; top: 0; }
-.seguimiento-obra__gantt-barra > span { background: var(--ui-accent); display: block; height: 100%; }
-.seguimiento-obra__gantt-barra.is-activa { background: #f3dfca; }
-.seguimiento-obra__gantt-barra.is-activa > span { background: var(--ui-accent); }
-.seguimiento-obra__gantt-barra.is-completa { background: #e7c6a4; }
-.seguimiento-obra__gantt-barra.is-completa > span { background: var(--ui-accent-hover); }
-.seguimiento-obra__sin-cronograma { background: #f8f6f4; border: 1px dashed #e9e2dc; border-radius: .35rem; color: var(--seguimiento-muted); font-size: .88rem; padding: 1rem; text-align: center; }
+.seguimiento-obra a.seguimiento-obra__tarea-link { color: var(--seguimiento-ink); display: inline-block; max-width: 100%; text-decoration: none; }
+.seguimiento-obra a.seguimiento-obra__tarea-link:hover, .seguimiento-obra a.seguimiento-obra__tarea-link:focus-visible { color: var(--ui-accent-hover); text-decoration: underline; }
+.seguimiento-obra__gantt-label strong { color: var(--seguimiento-ink); font-size: .78rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.seguimiento-obra__gantt-estado { font-size: .69rem; font-weight: 500; }
+.seguimiento-obra__gantt-estado.is-completa, .seguimiento-obra__gantt-estado.is-pendiente { color: var(--seguimiento-muted); }
+.seguimiento-obra__gantt-estado.is-activa { color: var(--seguimiento-acento); font-weight: 500; }
+.seguimiento-obra__gantt-estado b { font-weight: 500; }
+.seguimiento-obra__gantt-pista { background: var(--seguimiento-line); border-radius: 99px; height: .7rem; position: relative; }
+.seguimiento-obra__gantt-barra { background: var(--seguimiento-line); border-radius: inherit; height: 100%; min-width: .35rem; overflow: hidden; position: absolute; top: 0; }
+.seguimiento-obra__gantt-barra > span { background: var(--seguimiento-acento); display: block; height: 100%; }
+.seguimiento-obra__gantt-barra.is-activa > span,
+.seguimiento-obra__gantt-barra.is-completa > span { background: var(--seguimiento-acento); }
+.seguimiento-obra__sin-cronograma { background: var(--color-fondo-tabla); border: 1px dashed var(--seguimiento-line); border-radius: .35rem; color: var(--seguimiento-muted); font-size: .88rem; padding: 1rem; text-align: center; }
 .seguimiento-obra__etapas { display: grid; gap: .75rem; }
 .seguimiento-obra__etapa { border: 1px solid var(--seguimiento-line); border-radius: .35rem; overflow: hidden; }
-.seguimiento-obra__etapa-cabecera { align-items: center; background: #f8f6f4; cursor: pointer; display: flex; gap: 1rem; justify-content: space-between; list-style: none; padding: .85rem 2.75rem .85rem 1rem; position: relative; }
+.seguimiento-obra__etapa-cabecera { align-items: center; background: var(--color-fondo-tabla); cursor: pointer; display: flex; gap: 1rem; justify-content: space-between; list-style: none; padding: .85rem 2.75rem .85rem 1rem; position: relative; }
 .seguimiento-obra__etapa-cabecera::-webkit-details-marker { display: none; }
 .seguimiento-obra__etapa-cabecera::after { color: var(--ui-accent); content: '+'; font-size: 1.35rem; font-weight: 500; line-height: 1; position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); }
 .seguimiento-obra__etapa[open] > .seguimiento-obra__etapa-cabecera::after { content: '−'; }
 .seguimiento-obra__etapa-cabecera:focus-visible { outline: 2px solid var(--ui-accent); outline-offset: -2px; }
 .seguimiento-obra__etapa-titulo { align-items: center; display: flex; gap: .7rem; min-width: 0; }
-.seguimiento-obra__etapa-titulo > span { align-items: center; background: #f7ebde; border-radius: .3rem; color: var(--ui-accent-hover); display: inline-flex; flex: 0 0 2.3rem; font-size: .75rem; font-weight: 700; height: 2rem; justify-content: center; }
-.seguimiento-obra__etapa-titulo h3 { color: var(--color-seguimiento-ink); font-size: .91rem; font-weight: 650; margin: 0; text-transform: uppercase; }
+.seguimiento-obra__etapa-titulo > span { align-items: center; background: var(--color-fondo-tabla); border: 1px solid transparent; border-radius: .3rem; color: var(--seguimiento-muted); display: inline-flex; flex: 0 0 2.3rem; font-size: .75rem; font-weight: 700; height: 2rem; justify-content: center; }
+.seguimiento-obra__etapa.is-completa .seguimiento-obra__etapa-titulo > span,
+.seguimiento-obra__etapa.is-activa .seguimiento-obra__etapa-titulo > span { background: var(--ui-accent-soft); border-color: var(--color-acento-borde); color: var(--seguimiento-acento); font-weight: 600; }
+.seguimiento-obra__etapa.is-pendiente .seguimiento-obra__etapa-titulo > span { background: var(--color-fondo-tabla); color: var(--seguimiento-muted); }
+.seguimiento-obra__etapa-titulo h3 { color: var(--color-seguimiento-ink); font-size: .91rem; font-weight: 650; margin: 0; }
 .seguimiento-obra__etapa-titulo small { color: var(--seguimiento-muted); display: block; font-size: .7rem; margin-top: .15rem; }
 .seguimiento-obra__etapa-avance { align-items: center; display: flex; gap: .6rem; width: min(35%, 12rem); }
-.seguimiento-obra__etapa-avance > strong { color: var(--ui-accent); font-size: .8rem; min-width: 2.5rem; text-align: right; }
+.seguimiento-obra__etapa-avance > strong { color: var(--seguimiento-muted); font-size: .8rem; min-width: 2.5rem; text-align: right; }
+.seguimiento-obra__etapa-avance.is-completa > strong { color: var(--seguimiento-muted); }
+.seguimiento-obra__etapa-avance.is-activa > strong { color: var(--seguimiento-acento); }
 .seguimiento-obra__barra--pequena { flex: 1; height: .38rem; }
-.seguimiento-obra__barra--pequena > span { background: var(--ui-accent); }
+.seguimiento-obra__barra--pequena > span,
+.seguimiento-obra__barra--pequena.is-completa > span,
+.seguimiento-obra__barra--pequena.is-activa > span { background: var(--seguimiento-acento); }
 .seguimiento-obra__subtareas { padding: 0 .9rem; }
 .seguimiento-obra__detalle-cliente { color: var(--ui-accent-hover); display: inline-block; font-size: .78rem; font-weight: 600; margin: .65rem .2rem .35rem; text-decoration: none; }
 .seguimiento-obra__detalle-cliente:hover { color: var(--ui-accent); text-decoration: underline; }
@@ -70,17 +103,18 @@
 .seguimiento-obra__subtarea--cliente:hover { background: var(--color-superficie-hover); color: var(--seguimiento-ink); }
 .seguimiento-obra__detalle-fila { color: var(--ui-accent-hover); font-size: .75rem; font-weight: 600; white-space: nowrap; }
 .seguimiento-obra__sin-subtareas { color: var(--seguimiento-muted); font-size: .82rem; margin: 0; padding: .9rem .2rem; }
-.seguimiento-obra__subtarea { align-items: center; border-top: 1px solid #efe9e3; display: grid; gap: .75rem; grid-template-columns: minmax(0, 1fr) minmax(7rem, auto) auto; min-height: 3.3rem; padding: .55rem .2rem; }
+.seguimiento-obra__subtarea { align-items: center; border-top: 1px solid var(--seguimiento-line); display: grid; gap: .75rem; grid-template-columns: minmax(0, 1fr) minmax(7rem, auto) auto; min-height: 3.3rem; padding: .55rem .2rem; }
 .seguimiento-obra__subtarea > div:first-child { align-items: baseline; display: flex; gap: .6rem; min-width: 0; }
-.seguimiento-obra__subtarea-codigo { color: var(--color-verde-codigo); flex: 0 0 auto; font-size: .72rem; font-weight: 700; }
-.seguimiento-obra__subtarea strong { color: #4a4037; font-size: .8rem; font-weight: 500; }
-.seguimiento-obra__estado-tarea { background: #f0f1ef; border-radius: 99px; color: #6f7771; font-size: .68rem; justify-self: start; padding: .25rem .55rem; white-space: nowrap; }
-.seguimiento-obra__estado-tarea.is-pendiente { background: #f0f1ef; color: #6f7771; }
-.seguimiento-obra__estado-tarea.is-completa { background: #f1e3d5; color: #79502f; }
+.seguimiento-obra__subtarea-codigo { color: var(--seguimiento-acento); flex: 0 0 auto; font-size: .72rem; font-weight: 700; }
+.seguimiento-obra__subtarea strong { color: var(--seguimiento-ink); font-size: .8rem; font-weight: 600; }
+.seguimiento-obra__estado-tarea { background: var(--color-fondo-tabla); border-radius: 99px; color: var(--seguimiento-muted); font-size: .68rem; justify-self: start; padding: .25rem .55rem; white-space: nowrap; }
+.seguimiento-obra__estado-tarea.is-pendiente { background: var(--color-fondo-tabla); color: var(--seguimiento-muted); }
+.seguimiento-obra__estado-tarea.is-completa { background: var(--color-verde-suave); color: var(--dashboard-green); }
+.seguimiento-obra__fechas-vacias { color: var(--seguimiento-muted); font-size: .75rem; }
 .btn.seguimiento-obra__editar-avance { border-color: var(--ui-accent); color: var(--ui-accent-hover); white-space: nowrap; }
 .btn.seguimiento-obra__editar-avance:hover, .btn.seguimiento-obra__editar-avance:focus-visible { background: var(--ui-accent); color: var(--color-primario); }
 .seguimiento-obra__nota, .seguimiento-obra__estado { color: var(--seguimiento-muted); font-size: .8rem; text-align: center; }
 .seguimiento-obra__nota { margin: .25rem 0 1rem; }
 @media (max-width: 950px) { .seguimiento-obra__resumen { grid-template-columns: repeat(3, minmax(0, 1fr)); } .seguimiento-obra__avance-card { grid-column: 1 / -1; } }
-@media (max-width: 650px) { .seguimiento-obra__header { align-items: flex-start; flex-wrap: wrap; } .seguimiento-obra__estado-badge { margin-left: auto; } .seguimiento-obra__resumen { grid-template-columns: repeat(2, minmax(0, 1fr)); } .seguimiento-obra__avance-card { grid-column: 1 / -1; } .seguimiento-obra__panel-encabezado { align-items: flex-start; flex-direction: column; } .seguimiento-obra__panel-encabezado > p { text-align: left; } .seguimiento-obra__etapa-cabecera { align-items: flex-start; flex-direction: column; } .seguimiento-obra__etapa-avance { width: 100%; } .seguimiento-obra__subtarea { align-items: flex-start; grid-template-columns: minmax(0, 1fr) auto; } .seguimiento-obra__editar-avance { grid-column: 1 / -1; justify-self: start; } }
+@media (max-width: 650px) { .seguimiento-obra__header { align-items: center; flex-wrap: wrap; } .seguimiento-obra__header-acciones { align-items: center; } .seguimiento-obra__resumen { grid-template-columns: repeat(2, minmax(0, 1fr)); } .seguimiento-obra__avance-card { grid-column: 1 / -1; } .seguimiento-obra__panel-encabezado { align-items: flex-start; flex-direction: column; } .seguimiento-obra__panel-encabezado > p { text-align: left; } .seguimiento-obra__etapa-cabecera { align-items: flex-start; flex-direction: column; } .seguimiento-obra__etapa-avance { width: 100%; } .seguimiento-obra__subtarea { align-items: flex-start; grid-template-columns: minmax(0, 1fr) auto; } .seguimiento-obra__editar-avance { grid-column: 1 / -1; justify-self: start; } }
 @media (prefers-reduced-motion: reduce) { .seguimiento-obra__barra > span { transition: none; } }

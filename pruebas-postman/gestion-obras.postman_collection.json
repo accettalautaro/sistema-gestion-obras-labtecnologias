@@ -1148,7 +1148,7 @@
                 },
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"nro_lote\": \"PM-{{$timestamp}}\",\n  \"id_obra\": null\n}",
+                  "raw": "{\n  \"nro_lote\": \"PM-{{$timestamp}}\"\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -1221,7 +1221,7 @@
                 },
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"nro_lote\": \"PM-ACT-{{$timestamp}}\",\n  \"id_direccion\": null,\n  \"id_obra\": null\n}",
+                  "raw": "{\n  \"nro_lote\": \"PM-ACT-{{$timestamp}}\",\n  \"id_direccion\": null\n}",
                   "options": {
                     "raw": {
                       "language": "json"

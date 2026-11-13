@@ -1,9 +1,10 @@
-import { useEffect, useState, useMemo } from 'react'
+import { useMemo } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { obtenerDetalleObra } from '../services/obraService'
 import { construirEtapas } from '../../../shared/utils/avanceObra.js'
 import Volver from '../../../shared/components/Volver.jsx'
 import '../../../styles/SeguimientoObra.css'
+import { useFetch } from '../../../shared/hooks/useFetch.js'
 
 const ESTADO_OBRA_BADGE = {
   'En ejecución': 'text-bg-success',
@@ -27,28 +28,7 @@ const formatMoneda = (valor) => {
 
 function ViewObraPage() {
   const { id } = useParams()
-  const [obra, setObra] = useState(null)
-  const [error, setError] = useState(null)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    let activo = true
-    setLoading(true)
-    obtenerDetalleObra(id)
-      .then((data) => {
-        if (activo) {
-          setObra(data)
-          setLoading(false)
-        }
-      })
-      .catch((e) => {
-        if (activo) {
-          setError(e.message)
-          setLoading(false)
-        }
-      })
-    return () => { activo = false }
-  }, [id])
+  const { datos: obra, error: errorCarga, cargando: loading } = useFetch(obtenerDetalleObra, id)
 
   const etapas = useMemo(() => {
     if (!obra?.tareas) return []
@@ -66,7 +46,7 @@ function ViewObraPage() {
       const [y, m, d] = iso.split('-').map(Number)
       return new Date(y, m - 1, d)
     }
-    const conFechas = etapas.map((tarea) => ({ tarea, inicio: parseFecha(tarea.fechaInicio), fin: parseFecha(tarea.fechaFin) }))
+    const conFechas = etapas.map((tarea) => ({ tarea, inicio: parseFecha(tarea.fechaInicioEstimada), fin: parseFecha(tarea.fechaFinEstimada) }))
       .filter(({ inicio, fin }) => inicio && fin && fin >= inicio)
     if (!conFechas.length) return null
     const minDate = new Date(Math.min(...conFechas.map(({ inicio }) => inicio.getTime())))
@@ -85,13 +65,13 @@ function ViewObraPage() {
   }, [etapas])
 
   if (loading) return <div className="p-4 text-muted">Cargando detalles de la obra...</div>
-  if (error) return <div className="p-4 alert alert-danger">Error: {error}</div>
+  if (errorCarga) return <div className="p-4 alert alert-danger">Error: {errorCarga.message}</div>
   if (!obra) return <div className="p-4 alert alert-warning">Obra no encontrada.</div>
 
   const diffPresupuesto = obra.costoEstimadoTotal - obra.montoAbonado;
-  let presupuestoStatus = '';
-  let presupuestoColor = '';
-  
+  let presupuestoStatus;
+  let presupuestoColor;
+
   if (obra.montoAbonado > obra.costoEstimadoTotal && obra.costoEstimadoTotal > 0) {
     presupuestoStatus = `Excedido por ${formatMoneda(Math.abs(diffPresupuesto))}`
     presupuestoColor = 'text-danger'
@@ -132,7 +112,7 @@ function ViewObraPage() {
                     <i className="bi bi-map me-2 text-muted"></i>
                     <strong>Lote:</strong> {obra.nroLote}
                   </div>
-                  <Link to={`/cliente/lotes/${obra.nroLote}`} className="btn btn-sm btn-outline-dark rounded-pill" style={{fontSize: '0.75rem'}}>
+                  <Link to={`/cliente/lotes/${obra.nroLote}`} className="btn btn-sm btn-outline-dark rounded-pill" style={{ fontSize: '0.75rem' }}>
                     Ver información
                   </Link>
                 </li>
@@ -154,14 +134,16 @@ function ViewObraPage() {
                 )}
                 <li className="mb-2">
                   <i className="bi bi-calendar-event me-2 text-muted"></i>
-                  <strong>Fecha de Inicio:</strong> {obra.fechaInicio}
+                  <strong>Inicio estimado:</strong> {obra.fechaInicioEstimada || 'Sin fecha'}
                 </li>
-                {obra.fechaFin && (
+                {obra.fechaFinEstimada && (
                   <li className="mb-2">
                     <i className="bi bi-calendar-check me-2 text-muted"></i>
-                    <strong>Fecha de Fin:</strong> {obra.fechaFin}
+                    <strong>Fin estimado:</strong> {obra.fechaFinEstimada}
                   </li>
                 )}
+                {obra.fechaInicioReal && <li className="mb-2"><i className="bi bi-play-circle me-2 text-muted"/><strong>Inicio real:</strong> {obra.fechaInicioReal}</li>}
+                {obra.fechaFinReal && <li className="mb-2"><i className="bi bi-check-circle me-2 text-muted"/><strong>Fin real:</strong> {obra.fechaFinReal}</li>}
               </ul>
             </div>
           </div>
@@ -207,19 +189,24 @@ function ViewObraPage() {
                   ></div>
                 </div>
               </div>
-              
+
+              <div className="mb-3">
+                <span className="d-block text-muted small mb-1">Duración estimada · Duración real</span>
+                <span className="fw-semibold">{obra.duracionEstimada ?? 'Sin datos'}{obra.duracionEstimada != null ? ' días' : ''} · {obra.duracionReal ?? 'Pendiente'}{obra.duracionReal != null ? ' días' : ''}</span>
+              </div>
+
               <div className="mt-auto">
                 <span className="d-block text-muted small mb-1">Atraso de Obra</span>
                 {obra.diasAtrasoTotal > 0 ? (
-                   <span className="text-danger fw-bold fs-5">
-                     <i className="bi bi-clock-history me-2"></i>
-                     Atrasada por {obra.diasAtrasoTotal} día{obra.diasAtrasoTotal !== 1 && 's'}
-                   </span>
+                  <span className="text-danger fw-bold fs-5">
+                    <i className="bi bi-clock-history me-2"></i>
+                    Atrasada por {obra.diasAtrasoTotal} día{obra.diasAtrasoTotal !== 1 && 's'}
+                  </span>
                 ) : (
-                   <span className="text-success fw-bold fs-5">
-                     <i className="bi bi-calendar-check me-2"></i>
-                     A tiempo
-                   </span>
+                  <span className="text-success fw-bold fs-5">
+                    <i className="bi bi-calendar-check me-2"></i>
+                    A tiempo
+                  </span>
                 )}
               </div>
             </div>
@@ -233,7 +220,7 @@ function ViewObraPage() {
           <div className="seguimiento-obra__gantt-fechas"><span>Tarea</span><div><span>{fechaCorta(ganttDatos.minDate.toISOString().slice(0, 10))}</span><span>{fechaCorta(ganttDatos.maxDate.toISOString().slice(0, 10))}</span></div></div>
           {ganttDatos.tasks.map((tarea) => <div className="seguimiento-obra__gantt-fila" key={tarea.idTarea}>
             <div className="seguimiento-obra__gantt-label"><strong>{codigoVisible(tarea.idTarea)} · {tarea.nombre}</strong><span>{tarea.estado === 'finalizada' ? 'Finalizada' : tarea.estado === 'en ejecucion' ? 'En ejecución' : 'Sin comenzar'} · <b>{tarea.avance}%</b></span></div>
-            <div className="seguimiento-obra__gantt-pista"><Link to={`/cliente/obras/${obra.idObra}/tareas/${tarea.idTarea}`} className={`seguimiento-obra__gantt-barra ${tarea.avance >= 100 ? 'is-completa' : tarea.avance > 0 ? 'is-activa' : ''}`} style={{ left: `${tarea.leftPercent}%`, width: `${tarea.widthPercent}%` }} title={`${tarea.nombre}: ${fechaCorta(tarea.fechaInicio)}–${fechaCorta(tarea.fechaFin)}`} aria-label={`Ver detalle de ${tarea.nombre}`}><span style={{ width: `${tarea.avance}%` }} /></Link></div>
+            <div className="seguimiento-obra__gantt-pista"><Link to={`/cliente/obras/${obra.idObra}/tareas/${tarea.idTarea}`} className={`seguimiento-obra__gantt-barra ${tarea.avance >= 100 ? 'is-completa' : tarea.avance > 0 ? 'is-activa' : ''}`} style={{ left: `${tarea.leftPercent}%`, width: `${tarea.widthPercent}%` }} title={`${tarea.nombre}: ${fechaCorta(tarea.fechaInicioEstimada)}–${fechaCorta(tarea.fechaFinEstimada)}`} aria-label={`Ver detalle de ${tarea.nombre}`}><span style={{ width: `${tarea.avance}%` }} /></Link></div>
           </div>)}
         </div></div> : <div className="seguimiento-obra__sin-cronograma">No hay tareas con fechas de inicio y fin para dibujar el cronograma. Abajo podés consultar las tareas cargadas.</div>}
       </section>

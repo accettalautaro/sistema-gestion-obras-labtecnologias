@@ -6,28 +6,33 @@ import '../../../styles/Pagos.css'
 
 const FORMULARIO_VACIO = { 'id-obra': '', 'id-tarea': '', descripcion: '', monto: '' }
 
-function FilaPago({ pago, tareas, onMutacion }) {
+function estadoClase(estado) {
+    const normalizado = String(estado ?? '').toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    if (normalizado.includes('cancel')) return 'pagos-page__estado--cancelada'
+    if (normalizado.includes('paus') || normalizado.includes('suspend')) return 'pagos-page__estado--pausada'
+    if (normalizado.includes('atras')) return 'pagos-page__estado--atrasada'
+    if (normalizado.includes('ejecucion') || normalizado.includes('progreso')) return 'pagos-page__estado--activa'
+    if (normalizado.includes('final') || normalizado.includes('complet')) return 'pagos-page__estado--finalizada'
+    return 'pagos-page__estado--neutral'
+}
+
+function FilaPago({ pago, tareas, onActualizar, onEliminar }) {
     const [estaEditando, setEstaEditando] = useState(false);
-    const [datosEdicion, setDatosEdicion] = useState({ ...pago });
+    const [datosEdicion, setDatosEdicion] = useState({ ...pago, descripcion: pago.descripcion ?? '' });
 
     const iniciarEdicion = () => {
-        setDatosEdicion({ ...pago });
+        setDatosEdicion({ ...pago, descripcion: pago.descripcion ?? '' });
         setEstaEditando(true);
     };
 
     const cancelarEdicion = () => {
-        setDatosEdicion({ ...pago });
+        setDatosEdicion({ ...pago, descripcion: pago.descripcion ?? '' });
         setEstaEditando(false);
     };
 
     const confirmarEdicion = async () => {
-        try {
-            await actualizarPago(pago['id-pago'], datosEdicion)
-            setEstaEditando(false)
-            onMutacion()
-        } catch (error) {
-            window.alert(error.message)
-        }
+        try { await onActualizar({ ...datosEdicion, 'id-pago': pago['id-pago'], 'id-obra': pago['id-obra'] }); setEstaEditando(false) }
+        catch (error) { window.alert(error.message || 'No se pudo actualizar el pago.') }
     };
 
     if (estaEditando) {
@@ -40,7 +45,7 @@ function FilaPago({ pago, tareas, onMutacion }) {
                         value={datosEdicion['id-tarea']}
                         onChange={e => setDatosEdicion({ ...datosEdicion, 'id-tarea': e.target.value })}
                     >
-                        {tareas.filter(t => t['id-obra'] == pago['id-obra']).map(t => (
+                        {tareas.filter(t => t['id-obra'] == pago['id-obra'] && t._dbSubtareaId).map(t => (
                             <option key={t['id-tarea']} value={t['id-tarea']}>{t.nombre}</option>
                         ))}
                     </select>
@@ -78,7 +83,7 @@ function FilaPago({ pago, tareas, onMutacion }) {
         );
     }
 
-    // Por ahora, mostrar 'datosEdicion' en modo lectura permite que los cambios simulados queden guardados temporalmente en pantalla
+    // Los valores mostrados corresponden al pago cargado desde PostgreSQL.
     const tareaObj = tareas.find(t => t['id-tarea'] == datosEdicion['id-tarea']);
     const nombreTarea = tareaObj ? tareaObj.nombre : `Tarea #${datosEdicion['id-tarea']}`;
 
@@ -95,10 +100,7 @@ function FilaPago({ pago, tareas, onMutacion }) {
                             <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z" />
                         </svg>
                     </button>
-                    <button type="button" className="btn btn-sm btn-outline-danger" title="Eliminar pago" onClick={async () => {
-                        if (!window.confirm('¿Eliminar este pago?')) return
-                        try { await eliminarPago(pago['id-pago']); onMutacion() } catch (error) { window.alert(error.message) }
-                    }}>
+                    <button type="button" className="btn btn-sm btn-outline-danger" title="Eliminar pago" onClick={() => onEliminar(pago)}>
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
                             <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" />
                             <path fillRule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z" />
@@ -110,23 +112,34 @@ function FilaPago({ pago, tareas, onMutacion }) {
     );
 }
 
-function ObraSeccionPagos({ obra, pagosDeLaObra, totalObra, tareas, onMutacion }) {
+function ObraSeccionPagos({ obra, pagosDeLaObra, totalAbonado, tareas, onActualizar, onEliminar }) {
     const [desplegado, setDesplegado] = useState(false);
+    const estado = obra.estado ?? obra.Estado ?? 'Pendiente'
+    const nombreObra = obra.nombre || obra.descripcion
+        ? `Obra #${obra['id-obra']} · ${obra.nombre || obra.descripcion}`
+        : `Obra #${obra['id-obra']}`
 
     return (
         <section className="pagos-page__listado border-bottom">
             <div className="pagos-page__toolbar">
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <h2>Obra #{obra['id-obra']} (Estado: {obra.Estado})</h2>
+                <div className="pagos-page__obra-identidad">
+                    <div className="pagos-page__obra-datos">
+                        <div className="pagos-page__obra-titulo-fila">
+                            <h2 className="pagos-page__obra-titulo">{nombreObra}</h2>
+                            <span className={`pagos-page__estado ${estadoClase(estado)}`}><span aria-hidden="true" />{estado}</span>
+                        </div>
+                        <p className="pagos-page__cliente"><span>Cliente:</span> {obra.clienteNombre || 'Sin cliente asignado'}</p>
+                    </div>
                     <button
                         className="btn btn-sm btn-outline-secondary pagos-page__btn-desplegar"
+                        type="button"
                         onClick={() => setDesplegado(!desplegado)}
                         aria-expanded={desplegado}
                     >
                         {desplegado ? 'Ocultar pagos' : 'Ver pagos'}
                     </button>
                 </div>
-                <span className="badge pagos-page__badge-obra fs-6">Total obra: ${totalObra.toLocaleString('es-AR')}</span>
+                <div className="pagos-page__resumen-obra"><span><small>Total abonado</small><strong>${totalAbonado.toLocaleString('es-AR')}</strong></span><span><small>Costo total</small><strong>${Number(obra.costoTotal || 0).toLocaleString('es-AR')}</strong></span></div>
             </div>
             <div className={`pagos-page__desplegable ${desplegado ? 'abierto' : ''}`}>
                 <div className="pagos-page__desplegable-inner">
@@ -141,9 +154,9 @@ function ObraSeccionPagos({ obra, pagosDeLaObra, totalObra, tareas, onMutacion }
                                     <th className="text-end" style={{ width: '100px' }}>Acciones</th>
                                 </tr>
                             </thead>
-                            <tbody>
+            <tbody>
                                 {pagosDeLaObra.map((pago) => (
-                                    <FilaPago key={pago['id-pago']} pago={pago} tareas={tareas} onMutacion={onMutacion} />
+                                    <FilaPago key={pago['id-pago']} pago={pago} tareas={tareas} onActualizar={onActualizar} onEliminar={onEliminar} />
                                 ))}
                                 {!pagosDeLaObra.length && <tr><td colSpan="5" className="pagos-page__vacio">No hay pagos registrados para esta obra.</td></tr>}
                             </tbody>
@@ -211,16 +224,21 @@ function PagosPage() {
                 {obras.map(obra => {
                     // Filtrar los pagos que pertenecen a esta obra
                     const pagosDeLaObra = pagos.filter(p => Number(p['id-obra']) === Number(obra['id-obra']))
-                    const totalObra = pagosDeLaObra.reduce((acc, curr) => acc + (Number(curr.monto) || 0), 0)
+                    const totalAbonado = pagosDeLaObra.reduce((acc, curr) => acc + (Number(curr.monto) || 0), 0)
 
                     return (
                         <ObraSeccionPagos
                             key={obra['id-obra']}
                             obra={obra}
                             pagosDeLaObra={pagosDeLaObra}
-                            totalObra={totalObra}
+                            totalAbonado={totalAbonado}
                             tareas={tareas}
-                            onMutacion={() => setVersion((actual) => actual + 1)}
+                            onActualizar={async (pago) => { await actualizarPago(pago); setVersion((actual) => actual + 1) }}
+                            onEliminar={async (pago) => {
+                                if (!window.confirm(`¿Eliminar el pago #${pago['id-pago']}?`)) return
+                                try { await eliminarPago(pago); setVersion((actual) => actual + 1) }
+                                catch (motivo) { setErrorMutacion(motivo.message || 'No se pudo eliminar el pago.') }
+                            }}
                         />
                     )
                 })}
@@ -240,10 +258,10 @@ function PagosPage() {
                                         ))}
                                     </select>
                                 </label>
-                                <label>Tarea
+                                <label>Subtarea
                                     <select className="form-select" name="id-tarea" value={formulario['id-tarea']} onChange={(event) => setFormulario({ ...formulario, 'id-tarea': event.target.value })} required disabled={!formulario['id-obra']}>
                                         <option value="" disabled>{formulario['id-obra'] ? 'Seleccionar tarea' : 'Seleccione una obra primero'}</option>
-                                        {tareas.filter(t => t['id-obra'] == formulario['id-obra']).map(tarea => (
+                                        {tareas.filter(t => t['id-obra'] == formulario['id-obra'] && t._dbSubtareaId).map(tarea => (
                                             <option key={tarea['id-tarea']} value={tarea['id-tarea']}>{tarea.nombre}</option>
                                         ))}
                                     </select>

@@ -30,18 +30,18 @@ INSERT INTO direcciones (id_direccion, provincia, codigo_postal, calle, altura, 
 ON CONFLICT (id_direccion) DO UPDATE SET provincia=EXCLUDED.provincia, codigo_postal=EXCLUDED.codigo_postal, calle=EXCLUDED.calle, altura=EXCLUDED.altura, piso=EXCLUDED.piso, departamento=EXCLUDED.departamento, localidad=EXCLUDED.localidad;
 
 
--- Obras (deduplicadas por coincidencia de datos)
-INSERT INTO obras (id_obra, id_cliente, id_arquitecto, fecha_inicio, fecha_fin, estado, descripcion) OVERRIDING SYSTEM VALUE VALUES
-  (1, 1, 1, '2026-10-01', NULL, 'En ejecución', NULL),
-  (2, 1, 1, '2026-11-01', '2027-01-01', 'Finalizada', NULL)
-ON CONFLICT (id_obra) DO UPDATE SET id_cliente=EXCLUDED.id_cliente, id_arquitecto=EXCLUDED.id_arquitecto, fecha_inicio=EXCLUDED.fecha_inicio, fecha_fin=EXCLUDED.fecha_fin, estado=EXCLUDED.estado, descripcion=EXCLUDED.descripcion;
+-- Lotes; un lote puede tener varias obras.
+INSERT INTO lotes (id_lote, nro_lote, id_direccion) OVERRIDING SYSTEM VALUE VALUES
+  (1, '450', 1),
+  (2, '500', 2)
+ON CONFLICT (id_lote) DO UPDATE SET nro_lote=EXCLUDED.nro_lote, id_direccion=EXCLUDED.id_direccion;
 
 
--- Lotes (asociados a la primera obra del mismo lote)
-INSERT INTO lotes (id_lote, nro_lote, id_direccion, id_obra) OVERRIDING SYSTEM VALUE VALUES
-  (1, '450', 1, 1),
-  (2, '500', 2, 2)
-ON CONFLICT (id_lote) DO UPDATE SET nro_lote=EXCLUDED.nro_lote, id_direccion=EXCLUDED.id_direccion, id_obra=EXCLUDED.id_obra;
+-- Obras vinculadas al lote por id_lote.
+INSERT INTO obras (id_obra, id_cliente, id_arquitecto, id_lote, fecha_inicio, fecha_fin, estado, descripcion) OVERRIDING SYSTEM VALUE VALUES
+  (1, 1, 1, 1, '2026-10-01', NULL, 'En ejecución', NULL),
+  (2, 1, 1, 2, '2026-11-01', '2027-01-01', 'Finalizada', NULL)
+ON CONFLICT (id_obra) DO UPDATE SET id_cliente=EXCLUDED.id_cliente, id_arquitecto=EXCLUDED.id_arquitecto, id_lote=EXCLUDED.id_lote, fecha_inicio=EXCLUDED.fecha_inicio, fecha_fin=EXCLUDED.fecha_fin, estado=EXCLUDED.estado, descripcion=EXCLUDED.descripcion;
 
 
 -- Documentos (mensuras y escrituras)

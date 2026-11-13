@@ -17,6 +17,14 @@ psql -U postgres -d accettadb -f Back/database/acettadb.sql
 psql -U postgres -d accettadb -f Back/database/semilla_datos.sql
 ```
 
+Para actualizar una base existente desde la relación anterior (`lotes.id_obra`), aplicá una sola vez la migración `Back/database/migrations/001_obra_referencia_lote.sql`:
+
+```powershell
+psql -U postgres -d accettadb -f Back/database/migrations/001_obra_referencia_lote.sql
+```
+
+La migración conserva las asignaciones actuales y se detiene sin aplicar cambios si encuentra obras sin lote. A partir de este esquema, cada obra referencia un lote mediante `obras.id_lote` y un lote puede tener varias obras.
+
 
 
 En `.env` dentro de `Back`, configurá `PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD` y `PGDATABASE=accettadb` para que el pool de Node se conecte a esa misma base. También son necesarios `JWT_SECRET` y, opcionalmente, `JWT_EXPIRES_IN`, `PORT` y `CORS_ORIGIN`. No subas el `.env` al repositorio ni compartas sus secretos.

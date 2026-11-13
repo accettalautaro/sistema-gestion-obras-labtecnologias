@@ -91,6 +91,7 @@ export const  obtenerTareas= async (id)=> {
         id_obra: filas[0].id_obra,
         id_cliente:filas[0].id_cliente,
         id_arquitecto:filas[0].id_arquitecto,
+        id_lote: filas[0].id_lote,
         fecha_inicio_obra:filas[0].fecha_inicio_obra,
         fecha_fin_obra:filas[0].fecha_fin_obra,
         estado:filas[0].estado,

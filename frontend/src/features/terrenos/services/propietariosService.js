@@ -12,27 +12,41 @@ export async function listarDatosPropietarios(nrolote) {
   })))
   const propietariosLote = grupos.flatMap(({ escritura, propietarios }) => propietarios.map((p) => ({
     ...p, 'id-propietario': p.id_propietario, nroescritura: escritura.nro_escritura,
-    id_documento: escritura.id_documento, estadocivil: p.estado_civil,
+    id_documento: escritura.id_documento, documentoId: escritura.id_documento, estadocivil: p.estado_civil,
   })))
   const personas = await api('/terrenos/propietarios')
   const personasUnicas = [...new Map(personas.map((p) => [String(p.dni), {
     nombre: p.nombre, apellido: p.apellido, dni: p.dni, estadocivil: p.estado_civil,
   }])).values()]
   return {
-    lote: { ...lote, nrolote: lote.nro_lote },
-    escriturasLote: escriturasLote.map((e) => ({ ...e, nroescritura: e.nro_escritura })),
+    lote: { ...lote, id: lote.id_lote, nrolote: lote.nro_lote },
+    escriturasLote: escriturasLote.map((e) => ({ ...e, documentoId: e.id_documento, nroescritura: e.nro_escritura })),
     propietariosLote, personasUnicas,
   }
 }
 
-export async function guardarPropietario(id, datos) {
-  const body = {
+function cuerpoPropietario(datos, id_documento) {
+  return {
     nombre: datos.nombre, apellido: datos.apellido, dni: datos.dni,
-    estado_civil: datos.estadocivil || null, porcentaje: Number(datos.porcentaje),
+    estado_civil: datos.estadoCivil ?? datos.estadocivil ?? null,
+    porcentaje: Number(datos.porcentaje), ...(id_documento ? { id_documento: Number(id_documento) } : {}),
   }
-  return id == null
-    ? api('/terrenos/propietarios', { method: 'POST', body: jsonBody({ ...body, id_documento: Number(datos.id_documento) }) })
-    : api(`/terrenos/propietarios/${id}`, { method: 'PUT', body: jsonBody(body) })
 }
 
-export const eliminarPropietario = (id) => api(`/terrenos/propietarios/${id}`, { method: 'DELETE' })
+export async function guardarPropietario(id, datos) {
+  return id == null
+    ? api('/terrenos/propietarios', { method: 'POST', body: jsonBody(cuerpoPropietario(datos, datos.id_documento)) })
+    : api(`/terrenos/propietarios/${id}`, { method: 'PUT', body: jsonBody(cuerpoPropietario(datos)) })
+}
+
+export async function crearPropietario(idLote, idDocumento, datos) {
+  const personas = await api('/terrenos/propietarios')
+  const persona = personas.find((item) => String(item.dni) === String(datos.dni))
+  if (persona) return api(`/terrenos/escrituras/${idDocumento}/propietarios/${persona.id_propietario}`, { method: 'POST' })
+  return guardarPropietario(null, { ...datos, id_documento: idDocumento })
+}
+
+export const actualizarPropietario = (_idLote, _idDocumento, id, datos) => guardarPropietario(id, datos)
+
+export const eliminarPropietario = (_idLote, idDocumento, id) =>
+  api(`/terrenos/escrituras/${idDocumento}/propietarios/${id}`, { method: 'DELETE' })

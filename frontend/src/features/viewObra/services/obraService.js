@@ -1,99 +1,47 @@
 import { resumirAvanceTareas } from '../../../shared/utils/avanceObra.js'
-import { listarTareas } from '../../obras/services/tareasService.js'
+import { listarObras } from '../../obras/services/obrasService.js'
 import { listarPagosParciales } from '../../pagos/services/pagosService.js'
 
-const URL_BASE = '/Back/data'
-
-async function leerJson(nombre) {
-  const respuesta = await fetch(`${URL_BASE}/${nombre}.json`)
-  if (!respuesta.ok) {
-    throw new Error(`No se pudo obtener ${nombre}`)
-  }
-  return respuesta.json()
-}
-
-const aNumero = (porcentaje) => parseInt(String(porcentaje), 10) || 0
-const aMonto = (valor) => {
-  const numero = Number(valor)
-  return Number.isFinite(numero) ? numero : 0
-}
+const numero = (valor) => Number.parseFloat(String(valor ?? 0).replace('%', '').replace(',', '.')) || 0
 
 export async function obtenerDetalleObra(idObra) {
-  idObra = Number(idObra)
-  const [obras, arquitectos, direcciones, tareas, pagos] = await Promise.all([
-    leerJson('obras'),
-    leerJson('arquitectos'),
-    leerJson('direcciones'),
-    listarTareas(),
-    listarPagosParciales(),
-  ])
-
-  const obra = obras.find((o) => o['id-obra'] === idObra)
-  if (!obra) {
-    throw new Error('Obra no encontrada')
-  }
-
-  const arquitecto = arquitectos.find((a) => a['id-arquitecto'] === obra['id-arquitecto'])
-  const direccion = direcciones.find((d) => d.nrolote === obra.nrolote)
-  
-  const tareasObra = tareas
-    .filter((t) => t['id-obra'] === idObra)
-    .sort((a, b) => {
-      const dateA = new Date(a['fecha-inicio'] || '9999-12-31')
-      const dateB = new Date(b['fecha-inicio'] || '9999-12-31')
-      return dateA - dateB
-    })
-  const pagosObra = pagos.filter((p) => p['id-obra'] === idObra)
-  const resumenTareas = resumirAvanceTareas(tareasObra, pagos)
-  const avanceObra = resumenTareas.avance
-
-  // Si una etapa tiene subtareas, su costo es un resumen. Sumamos solo las unidades
-  // finales del avance para no contar a la vez el total de la etapa y cada subtarea.
-  const costoEstimadoTotal = resumenTareas.unidades.reduce((total, tarea) => total + aMonto(tarea['costo-estimado']), 0)
-  const montoAbonado = pagosObra.reduce((total, pago) => total + aMonto(pago.monto), 0)
-  
-  const diasAtrasoTotal = resumenTareas.unidades.reduce((acc, t) => {
-    const estimado = t['duracion-estimada'] || 0
-    const real = t['duracion-real'] || 0
-    if (real > estimado && aNumero(t.porcentaje) < 100) {
-      return acc + (real - estimado)
-    }
-    return acc
+  const [{ obras, lotes }, pagos] = await Promise.all([listarObras(), listarPagosParciales()])
+  const obra = obras.find((item) => String(item['id-obra']) === String(idObra))
+  if (!obra) throw new Error('Obra no encontrada')
+  const lote = lotes.find((item) => String(item['id-lote']) === String(obra['id-lote']))
+  const tareas = obra.tareas ?? []
+  const resumen = resumirAvanceTareas(tareas, pagos)
+  const pagosObra = pagos.filter((pago) => String(pago['id-obra']) === String(idObra))
+  const duracionEstimada = resumen.unidades.reduce((suma, tarea) => suma + numero(tarea['duracion-estimada']), 0)
+  const duracionReal = resumen.unidades.reduce((suma, tarea) => suma + numero(tarea['duracion-real']), 0)
+  const diasAtrasoTotal = resumen.unidades.reduce((suma, tarea) => {
+    const atraso = numero(tarea['duracion-real']) - numero(tarea['duracion-estimada'])
+    return suma + (atraso > 0 && numero(tarea.porcentaje) < 100 ? atraso : 0)
   }, 0)
-
-  let estadoObra = obra.Estado
-  if (estadoObra === 'En ejecución' && diasAtrasoTotal > 0) {
-    estadoObra = 'Atrasada'
-  }
-
+  const estado = String(obra.Estado ?? '')
+  const estadoObra = estado.toLowerCase().includes('ejecuci') && diasAtrasoTotal > 0 ? 'Atrasada' : estado
+  const direccion = lote?.direccion
+  const tareasPlanas = resumen.etapas.flatMap((etapa) => [etapa, ...etapa.subtareas]).map((tarea) => ({
+    idTarea: tarea['id-tarea'], nombre: tarea.nombre, descripcion: tarea.descripcion,
+    porcentaje: numero(tarea.porcentaje), estado: tarea.estado,
+    fechaInicio: tarea['fecha-inicio-estimada'] || tarea['fecha-inicio'],
+    fechaFin: tarea['fecha-fin-estimada'] || tarea['fecha-fin'],
+    fechaInicioEstimada: tarea['fecha-inicio-estimada'] || tarea['fecha-inicio'],
+    fechaFinEstimada: tarea['fecha-fin-estimada'] || tarea['fecha-fin'],
+    fechaInicioReal: tarea['fecha-inicio-real'] || '', fechaFinReal: tarea['fecha-fin-real'] || '',
+    duracionEstimada: tarea['duracion-estimada'], duracionReal: tarea['duracion-real'],
+    costoEstimado: tarea['costo-estimado'], costoReal: tarea['costo-real'],
+  }))
   return {
-    idObra: obra['id-obra'],
-    nroLote: obra.nrolote,
-    estado: estadoObra,
-    porcentaje: avanceObra,
-    fechaInicio: obra['fecha-inicio'] ?? null,
-    fechaFin: obra['fecha-fin'] ?? null,
-    direccionCompleta: direccion
-      ? `${direccion.calle} ${direccion.altura}, ${direccion.localidad}, ${direccion.provincia} (CP ${direccion.codpos})`
-      : 'Sin dirección cargada',
-    arquitecto: arquitecto ? `${arquitecto.nombre} ${arquitecto.apellido}` : 'Sin asignar',
-    arquitectoTelefono: arquitecto?.telefono ?? '',
-    arquitectoMatricula: arquitecto?.nromatricula ?? '',
-    costoEstimadoTotal,
-    montoAbonado,
-    diasAtrasoTotal,
-    tareas: resumenTareas.etapas.flatMap(etapa => [etapa, ...etapa.subtareas]).map(t => ({
-      idTarea: t['id-tarea'],
-      nombre: t.nombre,
-      descripcion: t.descripcion,
-      porcentaje: aNumero(t.porcentaje),
-      estado: t.estado,
-      fechaInicio: t['fecha-inicio'],
-      fechaFin: t['fecha-fin'],
-      duracionEstimada: t['duracion-estimada'],
-      duracionReal: t['duracion-real'],
-      costoEstimado: t['costo-estimado'],
-      costoReal: t['costo-real'],
-    }))
+    idObra: obra['id-obra'], nroLote: obra.nrolote, estado: estadoObra,
+    porcentaje: resumen.avance,
+    fechaInicioEstimada: obra['fecha-inicio'], fechaFinEstimada: obra['fecha-fin'],
+    fechaInicioReal: '', fechaFinReal: '',
+    direccionCompleta: direccion ? [direccion.calle && `${direccion.calle} ${direccion.altura ?? ''}`.trim(), direccion.localidad, direccion.provincia, direccion.codigo_postal && `CP ${direccion.codigo_postal}`].filter(Boolean).join(', ') : 'Sin dirección cargada',
+    arquitecto: obra.arquitectoNombre || 'Sin asignar',
+    arquitectoTelefono: obra.arquitectoTelefono ?? '', arquitectoMatricula: obra.arquitectoMatricula ?? '',
+    costoEstimadoTotal: resumen.unidades.reduce((suma, tarea) => suma + numero(tarea['costo-estimado']), 0),
+    montoAbonado: pagosObra.reduce((suma, pago) => suma + numero(pago.monto), 0),
+    duracionEstimada, duracionReal, diasAtrasoTotal, tareas: tareasPlanas,
   }
 }

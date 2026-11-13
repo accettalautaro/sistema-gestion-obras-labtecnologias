@@ -40,26 +40,25 @@ CREATE TABLE direcciones (
     localidad VARCHAR(100)
 );
 
+CREATE TABLE lotes (
+    id_lote BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    nro_lote VARCHAR(30) NOT NULL,
+    id_direccion BIGINT REFERENCES direcciones(id_direccion),
+    UNIQUE (id_direccion, nro_lote)
+);
+
 CREATE TABLE obras (
     id_obra BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     id_cliente BIGINT NOT NULL REFERENCES clientes(id_cliente),
     id_arquitecto BIGINT REFERENCES arquitectos(id_arquitecto),
+    id_lote BIGINT NOT NULL REFERENCES lotes(id_lote) ON DELETE RESTRICT,
     fecha_inicio DATE,
     fecha_fin DATE,
     estado VARCHAR(30) NOT NULL DEFAULT 'pendiente',
     descripcion TEXT
 );
 
-CREATE TABLE lotes (
-    id_lote BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    nro_lote VARCHAR(30) NOT NULL,
-    id_direccion BIGINT REFERENCES direcciones(id_direccion),
-    id_obra BIGINT REFERENCES obras(id_obra),
-    UNIQUE (id_direccion, nro_lote)
-);
-
--- Una obra puede estar vinculada como máximo a un lote; los lotes sin obra siguen permitidos.
-CREATE UNIQUE INDEX lotes_id_obra_unico ON lotes(id_obra) WHERE id_obra IS NOT NULL;
+CREATE INDEX obras_id_lote_idx ON obras(id_lote);
 
 CREATE TABLE tareas (
     id_tarea BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,

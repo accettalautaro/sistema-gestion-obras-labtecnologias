@@ -104,7 +104,6 @@
 
 .clientes-page__acciones {
 	display: flex;
-	flex-wrap: wrap;
 	gap: 0.4rem;
 }
 
@@ -210,34 +209,8 @@
 
 .clientes-page__modal-acciones {
 	display: flex;
-	gap: 0.5rem;
 	justify-content: flex-end;
 	margin-top: 1rem;
-}
-
-.clientes-page__campo-usuario {
-	color: #334a41;
-	display: block;
-	font-size: 0.85rem;
-	font-weight: 600;
-	margin-top: 0.9rem;
-}
-
-.clientes-page__campo-usuario .form-control {
-	font-weight: 400;
-	margin-top: 0.3rem;
-}
-
-.clientes-page__nota-usuario {
-	color: #697771;
-	font-size: 0.8rem;
-	margin: 0.75rem 0 0;
-}
-
-.clientes-page__error-usuario {
-	color: #a32626;
-	font-size: 0.85rem;
-	margin: 0.75rem 0 0;
 }
 
 @media (max-width: 1050px) {

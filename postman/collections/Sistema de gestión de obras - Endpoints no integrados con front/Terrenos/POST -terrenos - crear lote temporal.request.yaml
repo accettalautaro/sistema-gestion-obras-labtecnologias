@@ -8,8 +8,7 @@ body:
   type: json
   content: |-
     {
-      "nro_lote": "PM-{{$timestamp}}",
-      "id_obra": null
+      "nro_lote": "PM-{{$timestamp}}"
     }
 auth:
   type: bearer

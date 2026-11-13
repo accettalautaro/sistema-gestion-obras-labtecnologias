@@ -1,0 +1,22 @@
+.cliente-detalle-tarea .tarea-detalle__titulo,
+.cliente-detalle-tarea .tarea-detalle__total-label { color: var(--ui-accent); }
+.cliente-detalle-tarea .tarea-detalle__barra { background-color: var(--ui-accent) !important; }
+.tarea-detalle__subtareas { display: grid; }
+.tarea-detalle__subtarea { align-items: center; border-top: 1px solid var(--ui-line, #e8e4df); display: grid; gap: 1.25rem; grid-template-columns: minmax(220px, 1.5fr) minmax(120px, .7fr) minmax(120px, .7fr) auto; padding: 1rem .15rem; }
+.tarea-detalle__subtarea-principal { align-items: center; display: flex; gap: .7rem; justify-content: space-between; min-width: 0; }
+.tarea-detalle__subtarea-enlace { color: var(--ui-ink, #292722); font-size: .9rem; font-weight: 600; min-width: 0; overflow-wrap: anywhere; text-decoration: none; }
+.tarea-detalle__subtarea-enlace:hover { color: var(--ui-accent-hover, #60452f); text-decoration: underline; }
+.tarea-detalle__estado { border-radius: 99px; font-size: .72rem; font-weight: 650; padding: .3rem .65rem; white-space: nowrap; }
+.tarea-detalle__estado.is-completa { background: #f1e3d5; color: #79502f; }
+.tarea-detalle__estado.is-pendiente { background: #f0f1ef; color: #6f7771; }
+.tarea-detalle__subtarea-costo { display: flex; flex-direction: column; gap: .25rem; }
+.tarea-detalle__subtarea-costo span { color: var(--ui-muted, #77736e); font-size: .73rem; }
+.tarea-detalle__subtarea-costo strong { color: var(--ui-ink, #292722); font-size: .88rem; font-weight: 600; }
+.tarea-detalle__ver { color: var(--ui-accent-hover, #60452f); font-size: .78rem; font-weight: 600; text-decoration: none; white-space: nowrap; }
+.tarea-detalle__ver:hover { text-decoration: underline; }
+@media (max-width: 700px) {
+	.tarea-detalle__subtarea { gap: .7rem 1rem; grid-template-columns: minmax(0, 1fr) auto; }
+	.tarea-detalle__subtarea-principal { grid-column: 1 / -1; }
+	.tarea-detalle__subtarea-costo { align-self: start; }
+	.tarea-detalle__ver { align-self: center; justify-self: end; }
+}

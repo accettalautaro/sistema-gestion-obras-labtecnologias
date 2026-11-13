@@ -4,12 +4,13 @@ import { cerrarSesion } from '../../features/login'
 import Footer from './Footer'
 import '../../styles/ClienteArea.css'
 
-    function LayoutCliente(){
-        const usuario = useLoaderData() 
+    function LayoutCliente({ usuario: usuarioProp }){
+        const datosSesion = useLoaderData()
+        const usuario = usuarioProp ?? datosSesion
         const navigate = useNavigate()
         const esCliente = usuario?.rol === 'cliente'
-        const handleCerrarSesion = () => {
-        cerrarSesion()
+        const handleCerrarSesion = async () => {
+        await cerrarSesion()
         navigate('/login', { replace: true })
         }
 
