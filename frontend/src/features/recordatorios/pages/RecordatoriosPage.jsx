@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Navigate, useOutletContext } from 'react-router-dom'
 import { useFetch } from '../../../shared/hooks/useFetch'
-import { obtenerDatosRecordatorios, crearRecordatorio } from '../services/recordatoriosService'
+import { obtenerDatosRecordatorios, crearRecordatorio, eliminarRecordatorio } from '../services/recordatoriosService'
 import '../../../styles/Recordatorios.css'
 
 function calcularDiasDiferencia(fechaStr) {
@@ -50,8 +50,8 @@ function determinarAlerta(tarea) {
 
 function RecordatoriosPage() {
     const { usuario } = useOutletContext()
-
-    const { datos, cargando, error } = useFetch(obtenerDatosRecordatorios)
+    const [version, setVersion] = useState(0)
+    const { datos, cargando, error } = useFetch(obtenerDatosRecordatorios, version)
     const { obras = [], tareas = [], recordatorios = [], clientes = [] } = datos || {}
 
     const FORMULARIO_VACIO = { 'id-cliente': '', 'id-obra': '', fecha: '', descripcion: '', estado: 'pendiente' }
@@ -67,7 +67,8 @@ function RecordatoriosPage() {
         setExito('')
         try {
             await crearRecordatorio(formulario)
-            setExito('Recordatorio registrado correctamente (simulado).')
+            setVersion((actual) => actual + 1)
+            setExito('Recordatorio registrado correctamente.')
             setFormulario(FORMULARIO_VACIO)
         } catch (motivo) {
             setErrorMutacion(motivo.message || 'No se pudo registrar el recordatorio.')
@@ -184,6 +185,11 @@ function RecordatoriosPage() {
                                         <strong>{rec.descripcion}</strong>
                                         <span>Fecha: {rec.fecha} {rec.diasRestantes < 0 ? '(Atrasado)' : (rec.diasRestantes === 0 ? '(Hoy)' : `(En ${rec.diasRestantes} días)`)}</span>
                                     </div>
+                                    <button className="btn btn-sm btn-outline-danger" type="button" onClick={async () => {
+                                        if (!window.confirm('¿Eliminar este recordatorio?')) return
+                                        try { await eliminarRecordatorio(rec['id-recordatorio']); setVersion((actual) => actual + 1) }
+                                        catch (motivo) { setErrorMutacion(motivo.message) }
+                                    }}>Eliminar</button>
                                 </div>
                             ))}
                         </div>

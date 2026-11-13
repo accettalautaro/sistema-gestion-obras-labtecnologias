@@ -1,45 +1,43 @@
-import { listarTareas } from '../../obras/services/tareasService.js'
-const URL_BASE = '/Back/data'
-const CLAVE_PAGOS = 'gestion-obras:pagos-parciales:v1'
+import { api, jsonBody } from '../../../shared/services/api.js'
+
+const formatoPago = (p) => ({
+  'id-pago': p.id_pago, 'id-tarea': p.id_subtarea, 'id-subtarea': p.id_subtarea,
+  'id-obra': p.id_obra, 'id-tarea-padre': p.id_tarea,
+  descripcion: p.descripcion ?? '', monto: Number(p.monto) || 0,
+})
 
 export async function listarPagosParciales() {
-    const local = localStorage.getItem(CLAVE_PAGOS)
-    if (local) return JSON.parse(local)
-    const respuesta = await fetch(`${URL_BASE}/pagos-parciales.json?t=${Date.now()}`)
-    if (!respuesta.ok) throw new Error('No se pudieron cargar los pagos parciales.')
-    return respuesta.json()
+  return (await api('/pagos')).map(formatoPago)
 }
 
 export async function listarPagos() {
-    const t = Date.now()
-    const [pagosRes, obrasRes, tareas] = await Promise.all([
-        listarPagosParciales(),
-        fetch(`${URL_BASE}/obras.json?t=${t}`),
-        listarTareas()
-    ])
-
-    if (!obrasRes.ok) {
-        throw new Error('No se pudieron cargar los datos de pagos.')
-    }
-
-    const pagos = pagosRes
-    const obras = await obrasRes.json()
-
-    return { pagos, obras, tareas }
+  const [pagos, obrasApi, tareasApi] = await Promise.all([
+    listarPagosParciales(), api('/obras'), api('/tareas'),
+  ])
+  const obras = obrasApi.map((o) => ({
+    'id-obra': o.id_obra, 'id-cliente': o.id_cliente, Estado: o.estado,
+    nrolote: o.nro_lote, descripcion: o.descripcion,
+  }))
+  const detalles = await Promise.all(tareasApi.map((t) => api(`/tareas/${t.id_tarea}`)))
+  const tareas = detalles.flatMap((t) => (t.subtareas ?? []).map((s) => ({
+    'id-obra': t.id_obra, 'id-tarea': s.id_subtarea, nombre: `${t.nombre} · ${s.nombre}`,
+  })))
+  return { pagos, obras, tareas }
 }
 
 export async function crearPago(datos) {
-    const pagos = await listarPagosParciales()
-    const nuevoPago = {
-        'id-pago': Math.max(0, ...pagos.map((pago) => Number(pago['id-pago']) || 0)) + 1,
-        'id-obra': Number(datos['id-obra']),
-        'id-tarea': String(datos['id-tarea']),
-        descripcion: datos.descripcion.trim(),
-        monto: Number(datos.monto),
-    }
-    if (!nuevoPago['id-obra'] || !nuevoPago['id-tarea'] || !Number.isFinite(nuevoPago.monto) || nuevoPago.monto <= 0) {
-        throw new Error('Completá una obra, tarea y monto válido.')
-    }
-    localStorage.setItem(CLAVE_PAGOS, JSON.stringify([...pagos, nuevoPago]))
-    return nuevoPago
+  if (!datos['id-tarea'] || !Number.isFinite(Number(datos.monto)) || Number(datos.monto) <= 0) {
+    throw new Error('Completá una subtarea y un monto válido.')
+  }
+  return formatoPago(await api('/pagos', {
+    method: 'POST', body: jsonBody({ id_subtarea: Number(datos['id-tarea']), descripcion: datos.descripcion.trim(), monto: Number(datos.monto) }),
+  }))
 }
+
+export async function actualizarPago(id, datos) {
+  return formatoPago(await api(`/pagos/${id}`, {
+    method: 'PUT', body: jsonBody({ id_subtarea: Number(datos['id-tarea']), descripcion: datos.descripcion, monto: Number(datos.monto) }),
+  }))
+}
+
+export const eliminarPago = (id) => api(`/pagos/${id}`, { method: 'DELETE' })

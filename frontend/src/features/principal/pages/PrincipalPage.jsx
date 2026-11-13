@@ -35,7 +35,7 @@ function PrincipalPage() {
 
     // 2. Extraemos las listas del objeto datos (con un fallback de array vacío por seguridad)
     // Al hacer esto, no necesitas cambiar absolutamente nada de tu código de abajo.
-    const { obras = [], clientes = [], tareas = [] } = datos || {}
+    const { obras = [], clientes = [], tareas = [], inversionEjecutada = 0 } = datos || {}
 
     // 3. Ejecutamos todos los hooks (useMemo) ANTES de cualquier return condicional
     const resumen = useMemo(() => {
@@ -45,9 +45,9 @@ function PrincipalPage() {
         const avance = obras.length
             ? Math.round(obras.reduce((total, obra) => total + leerPorcentaje(obra.Porcentaje), 0) / obras.length)
             : 0
-        const costoTotal = tareas.filter((tarea) => tarea.EsUnidadFinal).reduce((total, tarea) => total + (Number(tarea.CostReal) || 0), 0)
+        const costoTotal = inversionEjecutada
         return { activas, pausadas, terminadas, avance, costoTotal }
-    }, [obras, tareas])
+    }, [obras, tareas, inversionEjecutada])
 
     // 4. Protegemos la ruta
     if (!usuario) return <Navigate to="/login" replace />

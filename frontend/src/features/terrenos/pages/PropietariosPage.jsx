@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, useOutletContext } from 'react-router-dom'
-import { listarDatosPropietarios } from '../services/propietariosService.js'
+import { listarDatosPropietarios, guardarPropietario, eliminarPropietario } from '../services/propietariosService.js'
 import Volver from '../../../shared/components/Volver.jsx'
 
 const FORMULARIO_VACIO = { dniUnico: '', nombre: '', apellido: '', dni: '', estadocivil: '', porcentaje: '', nroescritura: '' }
@@ -87,19 +87,27 @@ function PropietariosPage() {
 		})
 	}
 
-	const guardar = (e) => {
+	const guardar = async (e) => {
 		e.preventDefault()
-		setAviso({
-			titulo: editando === null ? 'Propietario no agregado' : 'Cambios no guardados',
-			mensaje: 'El formulario es una vista previa. En esta entrega los datos se leen desde los JSON y no se guardan cambios.'
-		})
+		try {
+			const escritura = escriturasLote.find((item) => String(item.nroescritura) === String(formulario.nroescritura))
+			await guardarPropietario(editando, { ...formulario, id_documento: escritura?.id_documento })
+			setDatos(await listarDatosPropietarios(nrolote))
+			setAviso({ titulo: editando === null ? 'Propietario agregado' : 'Cambios guardados', mensaje: 'Los datos se guardaron en el servidor.' })
+			nuevo()
+		} catch (motivo) {
+			setAviso({ titulo: 'No se pudo guardar', mensaje: motivo.message })
+		}
 	}
 
-	const eliminar = (prop) => {
-		setAviso({
-			titulo: 'Propietario no eliminado',
-			mensaje: `El propietario ${prop.nombre} sigue registrado en el archivo JSON. La eliminación estará disponible cuando se implemente el backend.`
-		})
+	const eliminar = async (prop) => {
+		try {
+			await eliminarPropietario(prop['id-propietario'])
+			setDatos(await listarDatosPropietarios(nrolote))
+			setAviso({ titulo: 'Propietario eliminado', mensaje: 'Se quitó el registro del servidor.' })
+		} catch (motivo) {
+			setAviso({ titulo: 'No se pudo eliminar', mensaje: motivo.message })
+		}
 	}
 
 	return (
@@ -116,7 +124,7 @@ function PropietariosPage() {
 			</header>
 			
 			<div className="alert alert-info" role="note">
-				<strong>Modo consulta:</strong> la información se lee desde los archivos JSON. Crear, editar o eliminar estará disponible cuando se conecte el backend.
+				<strong>Gestión conectada:</strong> los cambios se guardan en el servidor.
 			</div>
 
 			<div className="obras-page__workspace">

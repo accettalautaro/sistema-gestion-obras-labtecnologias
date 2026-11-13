@@ -1,47 +1,38 @@
-async function leerJson(ruta, etiqueta) {
-	const respuesta = await fetch(ruta)
-	if (!respuesta.ok) throw new Error(`No se pudieron cargar ${etiqueta}.`)
-	const datos = await respuesta.json()
-	return Array.isArray(datos) ? datos : []
-}
+import { api, jsonBody } from '../../../shared/services/api.js'
 
 export async function listarDatosPropietarios(nrolote) {
-	const [lotes, escrituras, propietarios] = await Promise.all([
-		leerJson('/Back/data/lotes.json', 'los lotes'),
-		leerJson('/Back/data/escrituras.json', 'las escrituras'),
-		leerJson('/Back/data/propietarios.json', 'los propietarios'),
-	])
-
-	const lote = lotes.find((l) => String(l.nrolote) === String(nrolote))
-	if (!lote) throw new Error('Lote no encontrado')
-
-	// Buscar escrituras del lote
-	const escriturasLote = escrituras.filter((e) => String(e.nrolote) === String(nrolote))
-	
-	// Todos los propietarios asignados a estas escrituras (los propietarios actuales del lote)
-	const propietariosLote = propietarios.filter((p) => 
-		escriturasLote.some((e) => String(e.nroescritura) === String(p.nroescritura))
-	)
-
-	// Extraer personas únicas de toda la base para autocompletado
-	// Filtramos por DNI para que sean únicos
-	const personasUnicasMap = new Map()
-	propietarios.forEach(p => {
-		if (p.dni && !personasUnicasMap.has(String(p.dni))) {
-			personasUnicasMap.set(String(p.dni), {
-				nombre: p.nombre,
-				apellido: p.apellido,
-				dni: p.dni,
-				estadocivil: p.estadocivil
-			})
-		}
-	})
-	const personasUnicas = Array.from(personasUnicasMap.values())
-
-	return {
-		lote,
-		escriturasLote,
-		propietariosLote,
-		personasUnicas
-	}
+  const lotes = await api('/terrenos')
+  const lote = lotes.find((item) => String(item.nro_lote) === String(nrolote))
+  if (!lote) throw new Error('Lote no encontrado')
+  const escrituras = await api('/terrenos/escrituras')
+  const escriturasLote = escrituras.filter((e) => String(e.id_lote) === String(lote.id_lote))
+  const grupos = await Promise.all(escriturasLote.map(async (e) => ({
+    escritura: e,
+    propietarios: await api(`/terrenos/propietarios?id_documento=${encodeURIComponent(e.id_documento)}`),
+  })))
+  const propietariosLote = grupos.flatMap(({ escritura, propietarios }) => propietarios.map((p) => ({
+    ...p, 'id-propietario': p.id_propietario, nroescritura: escritura.nro_escritura,
+    id_documento: escritura.id_documento, estadocivil: p.estado_civil,
+  })))
+  const personas = await api('/terrenos/propietarios')
+  const personasUnicas = [...new Map(personas.map((p) => [String(p.dni), {
+    nombre: p.nombre, apellido: p.apellido, dni: p.dni, estadocivil: p.estado_civil,
+  }])).values()]
+  return {
+    lote: { ...lote, nrolote: lote.nro_lote },
+    escriturasLote: escriturasLote.map((e) => ({ ...e, nroescritura: e.nro_escritura })),
+    propietariosLote, personasUnicas,
+  }
 }
+
+export async function guardarPropietario(id, datos) {
+  const body = {
+    nombre: datos.nombre, apellido: datos.apellido, dni: datos.dni,
+    estado_civil: datos.estadocivil || null, porcentaje: Number(datos.porcentaje),
+  }
+  return id == null
+    ? api('/terrenos/propietarios', { method: 'POST', body: jsonBody({ ...body, id_documento: Number(datos.id_documento) }) })
+    : api(`/terrenos/propietarios/${id}`, { method: 'PUT', body: jsonBody(body) })
+}
+
+export const eliminarPropietario = (id) => api(`/terrenos/propietarios/${id}`, { method: 'DELETE' })

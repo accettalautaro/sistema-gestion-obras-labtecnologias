@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useOutletContext } from 'react-router-dom'
 import { useFetch } from '../../../shared/hooks/useFetch'
-import { listarTerrenos } from '../services/terrenosService.js'
+import { listarTerrenos, crearTerreno } from '../services/terrenosService.js'
 import Volver from '../../../shared/components/Volver.jsx'
 import '../../../styles/Terrenos.css'
 
@@ -31,8 +31,10 @@ function TerrenosPage() {
 	const [busqueda, setBusqueda] = useState('')
 	const [mostrarFormulario, setMostrarFormulario] = useState(false)
 	const [mostrarAvisoCarga, setMostrarAvisoCarga] = useState(false)
+	const [version, setVersion] = useState(0)
+	const [errorMutacion, setErrorMutacion] = useState('')
 	const [formulario, setFormulario] = useState(FORMULARIO_TERRENO_VACIO)
-	const { datos: lotes = [], cargando, error } = useFetch(listarTerrenos)
+	const { datos: lotes = [], cargando, error } = useFetch(listarTerrenos, version)
 
 	if (esArquitecto === undefined && esCliente === undefined) return <p className="terrenos-page__estado" role="status">Verificando acceso...</p>
 	if (!esArquitecto && !esCliente) return <div className="alert alert-danger" role="alert">Esta pantalla está disponible únicamente para cuentas autorizadas.</div>
@@ -51,9 +53,21 @@ function TerrenosPage() {
 	if (nrolote && !terreno) return <section className="terrenos-page"><div className="alert alert-warning">No se encontró el lote {nrolote}.</div><Volver to={destinoTerrenos}>{esCliente ? 'Volver a mis obras' : 'Volver a terrenos'}</Volver></section>
 
 	const cambiarCampo = (event) => setFormulario((actual) => ({ ...actual, [event.target.name]: event.target.value }))
-	const enviarFormulario = (event) => {
+	const enviarFormulario = async (event) => {
 		event.preventDefault()
-		setMostrarAvisoCarga(true)
+		setErrorMutacion('')
+		try {
+			await crearTerreno({
+				nrolote: formulario.nrolote,
+				direccion: { calle: formulario.calle, altura: formulario.altura, localidad: formulario.localidad, provincia: formulario.provincia, codpos: formulario.codpos },
+				mensura: { nombre: `Mensura lote ${formulario.nrolote}`, ancho: formulario.ancho, largo: formulario.largo },
+			})
+			setFormulario(FORMULARIO_TERRENO_VACIO)
+			setMostrarFormulario(false)
+			setVersion((actual) => actual + 1)
+		} catch (motivo) {
+			setErrorMutacion(motivo.message || 'No se pudo guardar el terreno.')
+		}
 	}
 
 	return <section className="terrenos-page">
@@ -86,7 +100,8 @@ function TerrenosPage() {
 		</> : mostrarFormulario ? <>
 			<Volver onClick={() => setMostrarFormulario(false)}>Volver al listado</Volver>
 			<section className="terrenos-page__formulario" aria-labelledby="terreno-form-titulo">
-				<div className="terrenos-page__panel-titulo"><div><h2 id="terreno-form-titulo">Datos del terreno</h2><p>Completá la información para preparar la carga.</p></div><span className="terrenos-page__proximo">Vista previa</span></div>
+			<div className="terrenos-page__panel-titulo"><div><h2 id="terreno-form-titulo">Datos del terreno</h2><p>Completá la información para guardar el terreno.</p></div></div>
+				{errorMutacion && <div className="alert alert-danger" role="alert">{errorMutacion}</div>}
 				<form onSubmit={enviarFormulario}>
 					<fieldset className="terrenos-page__grupo-campos"><legend>Identificación y ubicación</legend><div className="terrenos-page__campos">
 						<label>Número de lote<input className="form-control" name="nrolote" value={formulario.nrolote} onChange={cambiarCampo} required /></label>
@@ -120,7 +135,7 @@ function TerrenosPage() {
 				})}
 				{!lotesFiltrados.length && <p className="terrenos-page__vacio">{busqueda ? 'No hay terrenos que coincidan con la búsqueda.' : 'Todavía no hay lotes en los archivos JSON.'}</p>}
 			</div>
-			{!modoConsulta && <div className="terrenos-page__carga"><div><h2>¿Necesitás registrar otro terreno?</h2><p>Podés completar los datos; el guardado se habilitará en una próxima etapa.</p></div><button className="btn btn-outline-secondary" type="button" onClick={() => setMostrarFormulario(true)}>Cargar terreno</button></div>}
+			{!modoConsulta && <div className="terrenos-page__carga"><div><h2>¿Necesitás registrar otro terreno?</h2><p>Podés completar los datos del lote y guardarlos en el sistema.</p></div><button className="btn btn-outline-secondary" type="button" onClick={() => setMostrarFormulario(true)}>Cargar terreno</button></div>}
 		</>}
 		{mostrarAvisoCarga && <div className="terrenos-page__modal-fondo" onMouseDown={(event) => { if (event.target === event.currentTarget) setMostrarAvisoCarga(false) }}>
 			<section className="terrenos-page__modal" role="dialog" aria-modal="true" aria-labelledby="terreno-modal-titulo" aria-describedby="terreno-modal-descripcion">
