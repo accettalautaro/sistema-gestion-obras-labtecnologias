@@ -45,20 +45,24 @@ const validarDatos = (tarea) => {
 
 function mapearTarea(filas) {
     const fila = filas[0];
-    const subtareas = filas
-        .filter((item) => item.subtarea_id != null)
-        .map((item) => ({
+    const subtareasPorId = new Map();
+    filas.filter((item) => item.subtarea_id != null).forEach((item) => {
+        const subtarea = subtareasPorId.get(item.subtarea_id) ?? {
             id_subtarea: item.subtarea_id,
             nombre: item.subtarea_nombre,
             descripcion: item.subtarea_descripcion,
             porcentaje: item.subtarea_porcentaje,
             costo_estimado: item.subtarea_costo_estimado,
-            costo_real: item.subtarea_costo_real,
+            costo_real: 0,
             fecha_inicio_estimada: item.subtarea_fecha_inicio_estimada,
             fecha_fin_estimada: item.subtarea_fecha_fin_estimada,
             fecha_inicio_real: item.subtarea_fecha_inicio_real,
             fecha_fin_real: item.subtarea_fecha_fin_real,
-        }));
+        };
+        subtarea.costo_real += Number(item.subtarea_monto_pago) || 0;
+        subtareasPorId.set(item.subtarea_id, subtarea);
+    });
+    const subtareas = [...subtareasPorId.values()];
     const derivada = derivarTarea(subtareas);
     const {
         subtarea_id,
@@ -70,7 +74,7 @@ function mapearTarea(filas) {
         subtarea_fecha_fin_estimada,
         subtarea_fecha_inicio_real,
         subtarea_fecha_fin_real,
-        subtarea_costo_real,
+        subtarea_monto_pago,
         ...datosTarea
     } = fila;
     return { ...datosTarea, ...derivada };

@@ -157,9 +157,9 @@ export const listarObras= async (req)=>{
             throw errorValidacion(`${nombre} debe ser un identificador válido.`);
         }
     }
-    const obras = (await repository.listarTodos()).map((obra) => ({
-        ...obra,
-        estado: obra.estado_calculado ?? obra.estado,
+    const obras = await Promise.all((await repository.listarTodos()).map(async (obra) => {
+        const resumen = await obtenerTareas(obra.id_obra);
+        return { ...obra, estado: resumen?.estado ?? obra.estado };
     }));
     if(id_cliente) {
         return obras.filter(o=> String(o.id_cliente) === String(id_cliente));
@@ -179,18 +179,22 @@ export const listarObras= async (req)=>{
 }
 export const crearObra= async (obra)=>{
     const creada = await repository.crearObra(validarDatosObra(obra));
-    return creada ? { ...creada, estado: creada.estado_calculado ?? creada.estado } : null;
+    return creada ? { ...creada, estado: creada.estado } : null;
 }
 
 export const obtenerObra= async (id)=>{
     const obra = await repository.obtenerObra(id);
-    return obra ? { ...obra, estado: obra.estado_calculado ?? obra.estado } : null;
+    if (!obra) return null;
+    const resumen = await obtenerTareas(id);
+    return { ...obra, estado: resumen?.estado ?? obra.estado };
 }
 
 export const actualizarObra= async(id,obra)=>{
     const {id_arquitecto,id_cliente,id_lote,fecha_inicio_estimada,fecha_fin_estimada,descripcion}=validarDatosObra(obra);
     const actualizada = await repository.actualizarObra(id,id_arquitecto,id_cliente,id_lote,fecha_inicio_estimada,fecha_fin_estimada,descripcion);
-    return actualizada ? { ...actualizada, estado: actualizada.estado_calculado ?? actualizada.estado } : null;
+    if (!actualizada) return null;
+    const resumen = await obtenerTareas(id);
+    return { ...actualizada, estado: resumen?.estado ?? actualizada.estado };
 }
 
 export const eliminarObra= async (id)=>{
@@ -216,18 +220,23 @@ export const  obtenerTareas= async (id)=> {
             });
         }
         if (fila.id_subtarea != null) {
-            mapaTareas.get(fila.id_tarea).subtareas.push({
+            let subtarea = mapaTareas.get(fila.id_tarea).subtareas.find((item) => item.id_subtarea === fila.id_subtarea);
+            if (!subtarea) {
+                subtarea = {
                 id_subtarea: fila.id_subtarea,
                 nombre_subtarea: fila.nombre_subtarea,
                 porcentaje: Number(fila.porcentaje_subtarea) || 0,
                 descripcion_subtarea: fila.descripcion_subtarea,
                 costo_estimado: fila.costo_estimado_subtarea,
-                costo_real: fila.costo_real_subtarea,
+                costo_real: 0,
                 fecha_inicio_estimada: fila.fecha_inicio_subtarea,
                 fecha_fin_estimada: fila.fecha_fin_subtarea,
                 fecha_inicio_real: fila.fecha_inicio_real_subtarea,
                 fecha_fin_real: fila.fecha_fin_real_subtarea,
-            });
+                };
+                mapaTareas.get(fila.id_tarea).subtareas.push(subtarea);
+            }
+            subtarea.costo_real += Number(fila.monto_pago_subtarea) || 0;
         }
     }
 

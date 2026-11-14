@@ -1,31 +1,5 @@
 import {pool} from '../../config/db.js';
 
-const ESTADO_OBRA_CALCULADO = `
-    CASE
-        WHEN LOWER(COALESCE(o.estado, '')) IN ('pausa', 'pausada', 'suspendida', 'suspendido') THEN 'Pausada'
-        WHEN NOT EXISTS (
-            SELECT 1
-            FROM subtareas s
-            JOIN tareas t ON t.id_tarea = s.id_tarea
-            WHERE t.id_obra = o.id_obra AND s.fecha_inicio_real IS NOT NULL
-        ) THEN 'No Inicio'
-        WHEN EXISTS (
-            SELECT 1
-            FROM tareas t
-            WHERE t.id_obra = o.id_obra
-              AND (
-                  NOT EXISTS (SELECT 1 FROM subtareas s WHERE s.id_tarea = t.id_tarea)
-                  OR EXISTS (
-                      SELECT 1 FROM subtareas s
-                      WHERE s.id_tarea = t.id_tarea
-                        AND (s.porcentaje < 100 OR s.fecha_fin_real IS NULL)
-                  )
-              )
-        ) THEN 'En ejecución'
-        ELSE 'Finalizada'
-    END AS estado_calculado
-`;
-
 const propagarErrorObra = (error, mensaje) => {
     if (error.status) throw error;
     if (error.code === '23503' && error.constraint === 'obras_id_lote_fkey') {
@@ -37,7 +11,7 @@ const propagarErrorObra = (error, mensaje) => {
 
 export const listarTodos = async ()=>{
     try{
-        const query=`SELECT o.*, l.nro_lote, ${ESTADO_OBRA_CALCULADO},
+        const query=`SELECT o.*, l.nro_lote,
                             c.nombre AS cliente_nombre, c.apellido AS cliente_apellido,
                             a.nombre AS arquitecto_nombre, a.apellido AS arquitecto_apellido
                      FROM obras o
@@ -64,8 +38,7 @@ export const obtenerObra= async (id)=> {
                 c.apellido AS cliente_apellido,
                 a.nombre AS arquitecto_nombre,
                 a.apellido AS arquitecto_apellido,
-                l.nro_lote,
-                ${ESTADO_OBRA_CALCULADO}
+                l.nro_lote
             FROM obras o
             LEFT JOIN clientes c ON c.id_cliente = o.id_cliente
             LEFT JOIN arquitectos a ON a.id_arquitecto = o.id_arquitecto
@@ -100,7 +73,6 @@ export const obtenerTareas= async (id)=> {
             o.fecha_inicio_estimada AS fecha_inicio_obra,
             o.fecha_fin_estimada AS fecha_fin_obra,
             o.estado,
-            ${ESTADO_OBRA_CALCULADO},
             o.descripcion AS descripcion_obra,
 
             t.id_tarea,
@@ -114,7 +86,7 @@ export const obtenerTareas= async (id)=> {
             s.porcentaje AS porcentaje_subtarea,
             s.descripcion AS descripcion_subtarea,
             s.costo_estimado AS costo_estimado_subtarea,
-            COALESCE(pagos_subtarea.total_abonado, 0) AS costo_real_subtarea,
+            p.monto AS monto_pago_subtarea,
             s.fecha_inicio_estimada AS fecha_inicio_subtarea,
             s.fecha_fin_estimada AS fecha_fin_subtarea,
             s.fecha_inicio_real AS fecha_inicio_real_subtarea,
@@ -124,11 +96,7 @@ export const obtenerTareas= async (id)=> {
         LEFT JOIN lotes l ON l.id_lote = o.id_lote
         LEFT JOIN tareas t ON o.id_obra = t.id_obra
         LEFT JOIN subtareas s ON t.id_tarea = s.id_tarea
-        LEFT JOIN (
-            SELECT id_subtarea, SUM(monto) AS total_abonado
-            FROM pagos_parciales
-            GROUP BY id_subtarea
-        ) pagos_subtarea ON pagos_subtarea.id_subtarea = s.id_subtarea
+        LEFT JOIN pagos_parciales p ON p.id_subtarea = s.id_subtarea
         WHERE o.id_obra = $1;
     `;
         const res= await pool.query(query,[id]);

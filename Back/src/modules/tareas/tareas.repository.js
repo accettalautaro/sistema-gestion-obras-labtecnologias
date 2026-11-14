@@ -12,14 +12,10 @@ const CONSULTA_TAREAS = `
         s.fecha_fin_estimada AS subtarea_fecha_fin_estimada,
         s.fecha_inicio_real AS subtarea_fecha_inicio_real,
         s.fecha_fin_real AS subtarea_fecha_fin_real,
-        COALESCE(pagos.total, 0) AS subtarea_costo_real
+        p.monto AS subtarea_monto_pago
     FROM tareas t
     LEFT JOIN subtareas s ON s.id_tarea = t.id_tarea
-    LEFT JOIN (
-        SELECT id_subtarea, SUM(monto) AS total
-        FROM pagos_parciales
-        GROUP BY id_subtarea
-    ) pagos ON pagos.id_subtarea = s.id_subtarea
+    LEFT JOIN pagos_parciales p ON p.id_subtarea = s.id_subtarea
 `;
 
 const manejarError = (error, mensaje) => {
