@@ -32,7 +32,8 @@ function FormularioContacto({ onIngresar }) {
 
   function handleChange(e) {
     const { name, value } = e.target
-    setValores({ ...valores, [name]: value })
+    const valorNormalizado = name === 'dni' ? value.replace(/\D/g, '').slice(0, 8) : value
+    setValores({ ...valores, [name]: valorNormalizado })
     // Borrar el error específico cuando el usuario empieza a tipear de nuevo
     if (errores[name]) setErrores({ ...errores, [name]: undefined })
     setErrorServidor('')
@@ -77,12 +78,14 @@ function FormularioContacto({ onIngresar }) {
           type="text"
           inputMode="numeric"
           autoComplete="username"
-          maxLength={8}
+          placeholder="Ej.: 12345678"
+          aria-describedby="dni-ayuda"
           className={`form-control ${errores.dni ? 'is-invalid' : ''}`}  
           value={valores.dni}
           onChange={handleChange}
           required 
         />
+        <small id="dni-ayuda" className="form-text text-muted">Ingresalo con o sin puntos.</small>
         {/* Mostrar mensaje de error si existe */}
         {errores.dni && <div className="invalid-feedback text-danger">{errores.dni}</div>}
       </div>
