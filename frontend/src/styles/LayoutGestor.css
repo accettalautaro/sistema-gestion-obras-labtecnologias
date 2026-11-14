@@ -22,6 +22,16 @@
 	padding-right: .75rem;
 }
 
+.sidebar-gestor__cerrar-sesion {
+	border-top: 1px solid var(--gestor-line);
+	margin-top: 1rem;
+	padding: 1rem .8rem 0;
+}
+
+.sidebar-gestor__cerrar-sesion .navbar-gestor__logout {
+	width: 100%;
+}
+
 .navbar-gestor__greeting {
 	color: var(--gestor-muted);
 	font-size: .85rem;

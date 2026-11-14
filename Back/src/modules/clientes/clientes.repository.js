@@ -1,4 +1,5 @@
 import {pool} from '../../config/db.js';
+import { crearErrorHttp } from '../../utils/httpError.js';
 
 const manejarError = (error, mensaje) => {
     console.error(mensaje, error);
@@ -9,7 +10,7 @@ const manejarError = (error, mensaje) => {
     if (error.code === '23503') {
         throw Object.assign(new Error('No se puede eliminar el cliente porque tiene datos asociados.'), { status: 409 });
     }
-    throw new Error(mensaje);
+    throw crearErrorHttp(mensaje);
 };
 
 export const listarClientes = async ()=>{

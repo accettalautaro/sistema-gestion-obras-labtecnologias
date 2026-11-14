@@ -1,4 +1,5 @@
 import { pool } from '../../config/db.js';
+import { crearErrorHttp } from '../../utils/httpError.js';
 
 export const listarTodos = async () => {
     try {
@@ -7,7 +8,7 @@ export const listarTodos = async () => {
         return res.rows;
     } catch (error) {
         console.error('Error al intentar obtener todos los recordatorios', error);
-        throw new Error('Error al consultar los recordatorios en la base de datos');
+        throw crearErrorHttp('Error al consultar los recordatorios en la base de datos');
     }
 };
 
@@ -18,7 +19,7 @@ export const obtenerRecordatorio = async (id) => {
         return res.rows[0] ?? null;
     } catch (error) {
         console.error('Error al intentar obtener un recordatorio', error);
-        throw new Error('Error al consultar un recordatorio en la base de datos');
+        throw crearErrorHttp('Error al consultar un recordatorio en la base de datos');
     }
 };
 
@@ -34,7 +35,7 @@ export const crearRecordatorio = async (recordatorio) => {
         return res.rows[0] ?? null;
     } catch (error) {
         console.error('Error al intentar crear un recordatorio', error);
-        throw new Error('Error al crear un recordatorio en la base de datos');
+        throw crearErrorHttp('Error al crear un recordatorio en la base de datos');
     }
 };
 
@@ -50,7 +51,7 @@ export const actualizarRecordatorio = async (id, id_obra, fecha, descripcion) =>
         return res.rows[0] ?? null;
     } catch (error) {
         console.error('Error al intentar actualizar un recordatorio', error);
-        throw new Error('Error al actualizar un recordatorio en la base de datos');
+        throw crearErrorHttp('Error al actualizar un recordatorio en la base de datos');
     }
 };
 
@@ -61,6 +62,6 @@ export const eliminarRecordatorio = async (id) => {
         return res.rowCount > 0;
     } catch (error) {
         console.error('Error al intentar borrar un recordatorio', error);
-        throw new Error('Error al borrar un recordatorio en la base de datos');
+        throw crearErrorHttp('Error al borrar un recordatorio en la base de datos');
     }
 };

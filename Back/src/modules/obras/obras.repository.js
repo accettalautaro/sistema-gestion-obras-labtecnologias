@@ -1,4 +1,5 @@
 import {pool} from '../../config/db.js';
+import { crearErrorHttp } from '../../utils/httpError.js';
 
 const propagarErrorObra = (error, mensaje) => {
     if (error.status) throw error;
@@ -6,7 +7,7 @@ const propagarErrorObra = (error, mensaje) => {
         throw Object.assign(new Error('El lote seleccionado no existe.'), { status: 400 });
     }
     console.error(mensaje, error);
-    throw new Error(mensaje);
+    throw crearErrorHttp(mensaje);
 };
 
 export const listarTodos = async ()=>{
@@ -25,7 +26,7 @@ export const listarTodos = async ()=>{
 
     }catch(error){
         console.error('Error al intentar obtener todas las obras', error);
-        throw new Error('Error al consultar las obras en la base de datos.');
+        throw crearErrorHttp('Error al consultar las obras en la base de datos.');
     }
 }
 
@@ -50,7 +51,7 @@ export const obtenerObra= async (id)=> {
     }
     catch(error){
         console.error('Error al intentar obtener una obra',error);
-        throw new Error('Error al consultar una obra en la base de datos');
+        throw crearErrorHttp('Error al consultar una obra en la base de datos');
         
 
     }
@@ -104,7 +105,7 @@ export const obtenerTareas= async (id)=> {
     }
     catch(error){
         console.error('Error al intentar obtener las tareas una obra',error);
-        throw new Error('Error al consultar una las tareas de una obra en la base de datos');
+        throw crearErrorHttp('Error al consultar una las tareas de una obra en la base de datos');
         
 
     }
@@ -158,7 +159,7 @@ export const actualizarEstado = async (id, estado) => {
         return resultado.rows[0] ?? null;
     } catch (error) {
         console.error('Error al actualizar el estado de la obra', error);
-        throw new Error('Error al actualizar el estado de la obra en la base de datos');
+        throw crearErrorHttp('Error al actualizar el estado de la obra en la base de datos');
     }
 };
 
@@ -181,7 +182,7 @@ export const eliminar= async (id)=> {
             );
         }
         if (error.status) throw error;
-        throw new Error('Error al borrar una obra en la base de datos');
+        throw crearErrorHttp('Error al borrar una obra en la base de datos');
     } finally {
         client.release();
     }

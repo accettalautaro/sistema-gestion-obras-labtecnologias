@@ -13,7 +13,7 @@ async function solicitar(ruta, opciones) {
 
   const datos = await respuesta.json()
   if (!respuesta.ok) {
-    const mensaje = respuesta.status === 401
+    const mensaje = respuesta.status === 401 && ruta === '/auth/login'
       ? 'DNI o contraseña incorrectos.'
       : datos.error || 'No se pudo completar la solicitud.'
     throw Object.assign(new Error(mensaje), { status: respuesta.status })
@@ -33,14 +33,51 @@ export async function iniciarSesion(dni, contrasena) {
     body: JSON.stringify({ dni: dni.trim(), contrasena }),
   })
 
-  if (typeof respuesta.token !== 'string' || !respuesta.token
-    || typeof respuesta.rol !== 'string' || !respuesta.rol) {
+  if (typeof respuesta.rol !== 'string' || !respuesta.rol) {
+    throw new Error('El servidor devolvió una respuesta de inicio de sesión inválida.')
+  }
+
+  if (respuesta.requiereCambioContrasena) {
+    if (typeof respuesta.tokenCambioContrasenaInicial !== 'string' || !respuesta.tokenCambioContrasenaInicial) {
+      throw new Error('El servidor no devolvió un acceso válido para cambiar la contraseña inicial.')
+    }
+    return {
+      requiereCambioContrasena: true,
+      tokenCambioContrasenaInicial: respuesta.tokenCambioContrasenaInicial,
+      rol: respuesta.rol,
+    }
+  }
+
+  if (typeof respuesta.token !== 'string' || !respuesta.token) {
     throw new Error('El servidor devolvió una respuesta de inicio de sesión inválida.')
   }
 
   return guardarSesion({
     id_usuario: null,
     dni: dni.trim(),
+    rol: respuesta.rol,
+    token: respuesta.token,
+  })
+}
+
+export async function cambiarContrasenaInicial(tokenCambio, contrasenaNueva) {
+  const respuesta = await solicitar('/auth/cambiar-contrasena-inicial', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${tokenCambio}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ contrasenaNueva }),
+  })
+
+  if (typeof respuesta.token !== 'string' || !respuesta.token
+    || typeof respuesta.rol !== 'string' || !respuesta.rol) {
+    throw new Error('El servidor devolvió una respuesta inválida al cambiar la contraseña.')
+  }
+
+  return guardarSesion({
+    id_usuario: respuesta.id_usuario ?? null,
+    dni: respuesta.dni ?? '',
     rol: respuesta.rol,
     token: respuesta.token,
   })

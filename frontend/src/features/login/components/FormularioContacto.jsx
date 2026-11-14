@@ -55,6 +55,7 @@ function FormularioContacto({ onIngresar }) {
     try {
       // 2. Pasamos los valores correctos a la función onIngresar
       await onIngresar(valores.dni, valores.usuario)
+      setValores((actuales) => ({ ...actuales, usuario: '' }))
     } catch (error) {
       setErrorServidor(error.message)
       setEnviando(false)

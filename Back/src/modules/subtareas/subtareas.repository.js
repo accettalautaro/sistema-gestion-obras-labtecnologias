@@ -1,9 +1,10 @@
 import {pool} from '../../config/db.js';
+import { crearErrorHttp } from '../../utils/httpError.js';
 
 const manejarError = (error, mensaje) => {
     if (error.status) throw error;
     console.error(mensaje, error);
-    throw new Error(mensaje);
+    throw crearErrorHttp(mensaje);
 };
 
 export const crearSubtarea = async ({ id_tarea, nombre, descripcion, costo_estimado, fecha_inicio_estimada, fecha_fin_estimada }) => {

@@ -1,4 +1,5 @@
 import { pool } from '../../config/db.js';
+import { crearErrorHttp } from '../../utils/httpError.js';
 
 const manejarError = (error, mensaje) => {
     console.error(mensaje, error);
@@ -20,7 +21,7 @@ const manejarError = (error, mensaje) => {
         error.message = 'Los datos no cumplen las restricciones de la base de datos.';
         throw error;
     }
-    throw new Error(mensaje);
+    throw crearErrorHttp(mensaje);
 };
 
 const ejecutarTransaccion = async (operacion, mensaje) => {

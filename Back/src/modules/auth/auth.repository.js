@@ -1,4 +1,5 @@
 import { pool } from '../../config/db.js';
+import { crearErrorHttp } from '../../utils/httpError.js';
 
 export const obtenerUsuario = async (dni) => {
     try {
@@ -7,7 +8,7 @@ export const obtenerUsuario = async (dni) => {
         return res.rows;
     } catch (error) {
         console.error('Error al intentar obtener un usuario', error);
-        throw new Error('Error al consultar un usuario en la base de datos');
+        throw crearErrorHttp('Error al consultar un usuario en la base de datos');
     }
 };
 
@@ -29,7 +30,33 @@ export const obtenerPerfilUsuario = async (idUsuario) => {
         return resultado.rows[0] ?? null;
     } catch (error) {
         console.error('Error al consultar el perfil del usuario', error);
-        throw new Error('Error al consultar el perfil del usuario en la base de datos.');
+        throw crearErrorHttp('Error al consultar el perfil del usuario en la base de datos.');
+    }
+};
+
+export const obtenerClienteParaUsuario = async (idCliente) => {
+    try {
+        const resultado = await pool.query(
+            'SELECT id_cliente, dni, id_usuario FROM clientes WHERE id_cliente = $1;',
+            [idCliente],
+        );
+        return resultado.rows[0] ?? null;
+    } catch (error) {
+        console.error('Error al consultar los datos del cliente para crear el usuario', error);
+        throw crearErrorHttp('Error al consultar el cliente en la base de datos.');
+    }
+};
+
+export const obtenerUsuarioPorId = async (idUsuario) => {
+    try {
+        const resultado = await pool.query(
+            'SELECT id_usuario, dni, rol, nombre FROM usuarios WHERE id_usuario = $1;',
+            [idUsuario],
+        );
+        return resultado.rows[0] ?? null;
+    } catch (error) {
+        console.error('Error al consultar una cuenta para cambiar la contraseña inicial', error);
+        throw crearErrorHttp('Error al consultar la cuenta en la base de datos.');
     }
 };
 
@@ -68,8 +95,26 @@ export const crearUsuarioCliente = async (idCliente, hash) => {
             throw Object.assign(new Error('Ya existe una cuenta con el DNI de este cliente.'), { status: 409 });
         }
         console.error('Error al crear la cuenta del cliente', error);
-        throw new Error('Error al crear la cuenta del cliente en la base de datos.');
+        throw crearErrorHttp('Error al crear la cuenta del cliente en la base de datos.');
     } finally {
         client.release();
+    }
+};
+
+export const cambiarContrasenaInicial = async (idUsuario, hashActual, hashNuevo) => {
+    try {
+        const resultado = await pool.query(
+            `UPDATE usuarios
+             SET nombre = $1
+             WHERE id_usuario = $2
+               AND rol = 'cliente'
+               AND nombre = $3
+             RETURNING id_usuario, dni, rol;`,
+            [hashNuevo, idUsuario, hashActual],
+        );
+        return resultado.rows[0] ?? null;
+    } catch (error) {
+        console.error('Error al actualizar la contraseña inicial', error);
+        throw crearErrorHttp('No se pudo actualizar la contraseña en la base de datos.');
     }
 };

@@ -19,10 +19,6 @@
 .layout-cliente .navbar-cliente .imagen-izquierda { max-width: 260px; width: min(260px, 42vw); }
 .layout-cliente .navbar-cliente .navbar-gestor__account { gap: .75rem; }
 .layout-cliente .navbar-cliente .navbar-gestor__greeting { color: var(--ui-muted); font-size: .9rem; }
-.layout-cliente .navbar-cliente .navbar-gestor__logout { background: var(--ui-accent); border-color: var(--ui-accent); border-radius: .4rem; }
-.layout-cliente .navbar-cliente .navbar-gestor__logout:hover { background: var(--ui-accent-hover); border-color: var(--ui-accent-hover); }
-.layout-cliente .navbar-cliente__inicio { color: var(--ui-ink); font-size: .9rem; font-weight: 600; text-decoration: none; }
-.layout-cliente .navbar-cliente__inicio:hover { color: var(--ui-accent); }
 
 .layout-cliente .main-cliente {
 	background: var(--ui-canvas);
@@ -138,7 +134,6 @@
 @media (max-width: 700px) {
 	.layout-cliente .navbar-cliente .navegacion { min-height: 68px; padding-inline: 1rem; }
 	.layout-cliente .navbar-cliente .imagen-izquierda { max-width: 210px; }
-	.layout-cliente .navbar-cliente__inicio { display: none; }
 	.layout-cliente .cliente-detalle__encabezado { align-items: flex-start !important; flex-wrap: wrap; }
 	.layout-cliente .cliente-detalle__encabezado > .ms-auto { margin-left: auto; }
 	.layout-cliente .cliente-tareas-lista__tarea { grid-template-columns: minmax(0, 1fr) auto; }

@@ -9,6 +9,18 @@ export const crearUsuarioCliente = async (req, res, next) => {
     }
 };
 
+export const cambiarContrasenaInicial = async (req, res, next) => {
+    try {
+        const respuesta = await service.cambiarContrasenaInicial(
+            req.usuario.id_usuario,
+            req.body?.contrasenaNueva,
+        );
+        return res.json(respuesta);
+    } catch (error) {
+        next(error);
+    }
+};
+
 //POST api/auth/login
 
 export const login = async (req,res,next)=>{

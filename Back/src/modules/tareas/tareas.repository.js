@@ -1,4 +1,5 @@
 import {pool} from '../../config/db.js';
+import { crearErrorHttp } from '../../utils/httpError.js';
 
 const CONSULTA_TAREAS = `
     SELECT
@@ -21,7 +22,7 @@ const CONSULTA_TAREAS = `
 const manejarError = (error, mensaje) => {
     console.error(mensaje, error);
     if (error.status) throw error;
-    throw new Error(mensaje);
+    throw crearErrorHttp(mensaje);
 };
 
 export const listarTodos = async () => {

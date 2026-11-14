@@ -1,5 +1,6 @@
 import { NavLink, Outlet, ScrollRestoration, useLoaderData, useNavigate } from 'react-router-dom'
 import NavbarGestor from './NavbarGestor'
+import BotonCerrarSesion from '../components/BotonCerrarSesion.jsx'
 import { cerrarSesion } from '../../features/login'
 import { useFetch } from '../hooks/useFetch'
 import { obtenerDatosRecordatorios } from '../../features/recordatorios/services/recordatoriosService'
@@ -26,6 +27,12 @@ function LayoutGestor({ usuario: usuarioProp }) {
   const handleCerrarSesion = async () => {
     await cerrarSesion()
     navigate('/login', { replace: true })
+  }
+
+  const cerrarMenuMovil = () => {
+    const menu = document.getElementById('menuGestor')
+    if (!menu?.classList.contains('show')) return
+    document.querySelector('[data-bs-target="#menuGestor"]')?.click()
   }
 
   // Lógica de badge para recordatorios
@@ -117,6 +124,7 @@ function LayoutGestor({ usuario: usuarioProp }) {
                     className={`nav-link ${mostrarBadge ? 'd-flex justify-content-between align-items-center' : ''}`}
                     to={enlace.destino}
                     end
+                    onClick={cerrarMenuMovil}
                   >
                     {enlace.texto}
                     {mostrarBadge && (
@@ -130,6 +138,7 @@ function LayoutGestor({ usuario: usuarioProp }) {
                 );
               })}
             </nav>
+            <BotonCerrarSesion className="sidebar-gestor__cerrar-sesion d-lg-none" handleCerrarSesion={handleCerrarSesion} />
           </div>
         </aside>
 

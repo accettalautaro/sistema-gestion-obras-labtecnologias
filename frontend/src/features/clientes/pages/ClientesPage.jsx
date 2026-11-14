@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useFetch } from '../../../shared/hooks/useFetch'
 import { useOutletContext } from 'react-router-dom'
-import { listarClientes, crearCliente, actualizarCliente, eliminarCliente } from '../services/clientesService.js'
+import { listarClientes, crearCliente, actualizarCliente, eliminarCliente, crearUsuarioCliente } from '../services/clientesService.js'
 import '../../../styles/Clientes.css'
 
 const FORMULARIO_VACIO = { nombre: '', apellido: '', dni: '', telefono: '', email: '' }
@@ -14,6 +14,9 @@ function ClientesPage() {
 	const [aviso, setAviso] = useState(null)
 	const [version, setVersion] = useState(0)
 	const [guardando, setGuardando] = useState(false)
+	const [clienteParaUsuario, setClienteParaUsuario] = useState(null)
+	const [generandoUsuario, setGenerandoUsuario] = useState(false)
+	const [errorUsuario, setErrorUsuario] = useState('')
 	const [errorMutacion, setErrorMutacion] = useState('')
 	const { datos, cargando, error } = useFetch(listarClientes, version)
 
@@ -35,6 +38,39 @@ function ClientesPage() {
 	const cancelarEdicion = () => {
 		setClienteEditando(null)
 		setFormulario(FORMULARIO_VACIO)
+	}
+	const abrirGeneracionUsuario = (cliente) => {
+		setClienteParaUsuario(cliente)
+		setErrorUsuario('')
+	}
+	const cancelarGeneracionUsuario = () => {
+		if (generandoUsuario) return
+		setClienteParaUsuario(null)
+		setErrorUsuario('')
+	}
+	const generarUsuario = async (event) => {
+		event.preventDefault()
+		if (!clienteParaUsuario) return
+		const contrasenaInicial = String(clienteParaUsuario.dni ?? '').replace(/\D/g, '').slice(-4)
+		if (contrasenaInicial.length !== 4) {
+			setErrorUsuario('El DNI debe tener al menos cuatro dígitos para generar la contraseña.')
+			return
+		}
+		setGenerandoUsuario(true)
+		setErrorUsuario('')
+		try {
+			await crearUsuarioCliente(clienteParaUsuario['id-cliente'], contrasenaInicial)
+			setClienteParaUsuario(null)
+			setVersion((actual) => actual + 1)
+			setAviso({
+				titulo: 'Usuario generado',
+				mensaje: 'La cuenta se creó y quedó vinculada al cliente. El DNI es su identificador de acceso.',
+			})
+		} catch (motivo) {
+			setErrorUsuario(motivo.message || 'No se pudo generar el usuario.')
+		} finally {
+			setGenerandoUsuario(false)
+		}
 	}
 	const guardar = async (event) => {
 		event.preventDefault()
@@ -68,11 +104,14 @@ function ClientesPage() {
 				<div className="table-responsive"><table className="table table-hover align-middle clientes-page__tabla">
 					<thead><tr><th>Cliente</th><th>DNI</th><th>Teléfono</th><th>Email</th><th>Cuenta</th><th><span className="visually-hidden">Acciones</span></th></tr></thead>
 					<tbody>
-						{clientesFiltrados.map((cliente) => <tr key={cliente['id-cliente']}>
-							<td className="clientes-page__nombre">{cliente.nombre} {cliente.apellido}</td><td>{cliente.dni}</td><td>{cliente.telefono}</td><td>{cliente.email}</td>
-							<td><span className="clientes-page__cuenta">#{cliente['id-usuario']}</span></td>
-							<td><div className="clientes-page__acciones"><button className="btn btn-sm btn-outline-secondary" type="button" onClick={() => editar(cliente)}>Editar</button><button className="btn btn-sm btn-outline-danger" type="button" onClick={() => eliminar(cliente)}>Eliminar</button></div></td>
-						</tr>)}
+						{clientesFiltrados.map((cliente) => {
+							const tieneUsuario = cliente['id-usuario'] != null && cliente['id-usuario'] !== ''
+							return <tr key={cliente['id-cliente']}>
+								<td className="clientes-page__nombre">{cliente.nombre} {cliente.apellido}</td><td>{cliente.dni}</td><td>{cliente.telefono}</td><td>{cliente.email}</td>
+								<td>{tieneUsuario ? <span className="clientes-page__cuenta">#{cliente['id-usuario']}</span> : <span className="text-secondary">Sin usuario</span>}</td>
+								<td><div className="clientes-page__acciones">{!tieneUsuario && <button className="btn btn-sm btn-outline-success" type="button" onClick={() => abrirGeneracionUsuario(cliente)}>Generar usuario</button>}<button className="btn btn-sm btn-outline-secondary" type="button" onClick={() => editar(cliente)}>Editar</button><button className="btn btn-sm btn-outline-danger" type="button" onClick={() => eliminar(cliente)}>Eliminar</button></div></td>
+							</tr>
+						})}
 						{!clientesFiltrados.length && <tr><td colSpan="6" className="clientes-page__vacio">{busqueda ? 'No hay coincidencias.' : 'Todavía no hay perfiles registrados.'}</td></tr>}
 					</tbody>
 				</table></div>
@@ -89,6 +128,29 @@ function ClientesPage() {
 				</div><div className="clientes-page__form-actions">{clienteEditando !== null && <button className="btn btn-outline-secondary" type="button" onClick={cancelarEdicion}>Cancelar</button>}<button className="btn btn-dark" type="submit" disabled={guardando}>{guardando ? 'Guardando...' : clienteEditando === null ? 'Crear cliente' : 'Guardar cambios'}</button></div></form>
 			</section>
 		</div>
+		{clienteParaUsuario && <div className="clientes-page__modal-fondo" onMouseDown={(event) => { if (event.target === event.currentTarget) cancelarGeneracionUsuario() }}>
+			<section className="clientes-page__modal" role="dialog" aria-modal="true" aria-labelledby="generar-usuario-titulo" aria-describedby="generar-usuario-ayuda">
+				<div className="clientes-page__modal-cabecera">
+					<h2 id="generar-usuario-titulo">Generar usuario para {clienteParaUsuario.nombre} {clienteParaUsuario.apellido}</h2>
+					<button className="clientes-page__modal-cerrar" type="button" aria-label="Cerrar" onClick={cancelarGeneracionUsuario} disabled={generandoUsuario}>×</button>
+				</div>
+				<p id="generar-usuario-ayuda">El DNI del cliente será su identificador de acceso. La contraseña inicial se genera con sus últimos cuatro dígitos.</p>
+				<form onSubmit={generarUsuario} aria-busy={generandoUsuario}>
+					<label className="clientes-page__campo-usuario" htmlFor="cliente-dni-usuario">DNI del cliente
+						<input className="form-control" id="cliente-dni-usuario" value={clienteParaUsuario.dni ?? ''} readOnly />
+					</label>
+					<label className="clientes-page__campo-usuario" htmlFor="cliente-contrasena-inicial">Contraseña inicial
+						<input className="form-control" id="cliente-contrasena-inicial" value={String(clienteParaUsuario.dni ?? '').replace(/\D/g, '').slice(-4)} readOnly />
+					</label>
+					{errorUsuario && <p className="alert alert-danger py-2 mt-3 mb-0" role="alert">{errorUsuario}</p>}
+					<p className="text-muted small mt-3 mb-0">La contraseña se almacena cifrada y no puede recuperarse desde la aplicación.</p>
+					<div className="clientes-page__modal-acciones">
+						<button className="btn btn-outline-secondary" type="button" onClick={cancelarGeneracionUsuario} disabled={generandoUsuario}>Cancelar</button>
+						<button className="btn btn-dark" type="submit" disabled={generandoUsuario}>{generandoUsuario ? 'Generando...' : 'Generar usuario'}</button>
+					</div>
+				</form>
+			</section>
+		</div>}
 		{aviso && <div className="clientes-page__modal-fondo" onMouseDown={(event) => { if (event.target === event.currentTarget) setAviso(null) }}><section className="clientes-page__modal" role="dialog" aria-modal="true" aria-labelledby="cliente-modal-titulo"><div className="clientes-page__modal-cabecera"><h2 id="cliente-modal-titulo">{aviso.titulo}</h2><button className="clientes-page__modal-cerrar" type="button" aria-label="Cerrar" onClick={() => setAviso(null)}>×</button></div><p>{aviso.mensaje}</p><div className="clientes-page__modal-acciones"><button className="btn btn-dark" type="button" onClick={() => setAviso(null)}>Entendido</button></div></section></div>}
 	</section>
 }

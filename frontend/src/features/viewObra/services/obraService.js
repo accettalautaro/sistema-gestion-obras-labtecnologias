@@ -1,11 +1,14 @@
 import { resumirAvanceTareas } from '../../../shared/utils/avanceObra.js'
 import { listarObras } from '../../obras/services/obrasService.js'
 import { listarPagosParciales } from '../../pagos/services/pagosService.js'
+import { obtenerPerfilCliente } from '../../clientes/services/clientesService.js'
 
 const numero = (valor) => Number.parseFloat(String(valor ?? 0).replace('%', '').replace(',', '.')) || 0
 
 export async function obtenerDetalleObra(idObra) {
-  const [{ obras, lotes }, pagos] = await Promise.all([listarObras(), listarPagosParciales()])
+  const [{ obras, lotes }, pagos, cliente] = await Promise.all([
+    listarObras(), listarPagosParciales(), obtenerPerfilCliente(),
+  ])
   const obra = obras.find((item) => String(item['id-obra']) === String(idObra))
   if (!obra) throw new Error('Obra no encontrada')
   const lote = lotes.find((item) => String(item['id-lote']) === String(obra['id-lote']))
@@ -34,10 +37,11 @@ export async function obtenerDetalleObra(idObra) {
   }))
   return {
     idObra: obra['id-obra'], nroLote: obra.nrolote, estado: estadoObra,
+    cliente: [cliente.nombre, cliente.apellido].filter(Boolean).join(' '),
     porcentaje: resumen.avance,
     fechaInicioEstimada: obra['fecha-inicio-estimada'], fechaFinEstimada: obra['fecha-fin-estimada'],
     fechaInicioReal: obra['fecha-inicio-real'], fechaFinReal: obra['fecha-fin-real'],
-    direccionCompleta: direccion ? [direccion.calle && `${direccion.calle} ${direccion.altura ?? ''}`.trim(), direccion.localidad, direccion.provincia, direccion.codigo_postal && `CP ${direccion.codigo_postal}`].filter(Boolean).join(', ') : 'Sin dirección cargada',
+    direccionCompleta: direccion ? [direccion.calle && `${direccion.calle} ${direccion.altura ?? ''}`.trim(), direccion.localidad, direccion.provincia].filter(Boolean).join(', ') : 'Sin dirección cargada',
     arquitecto: obra.arquitectoNombre || 'Sin asignar',
     arquitectoTelefono: obra.arquitectoTelefono ?? '', arquitectoMatricula: obra.arquitectoMatricula ?? '',
     costoEstimadoTotal: obra.costoEstimadoTotal,

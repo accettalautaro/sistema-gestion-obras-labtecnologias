@@ -19,6 +19,10 @@ export const verificarToken = (req, res, next) => {
     // 3. Verificar firma y vencimiento. Si algo falla, lanza un error
     const payload = jwt.verify(token, env.JWT_SECRET);
 
+    if (payload.purpose === 'initial-password-change') {
+      return res.status(403).json({ error: 'Este token solo permite cambiar la contraseña inicial.' });
+    }
+
     // 4. Guardar los datos del usuario para que los use el controller
     req.usuario = { id_usuario: payload.id_usuario, dni: payload.dni, rol: payload.rol };
     next(); // token válido: sigue hacia el controller

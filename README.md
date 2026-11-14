@@ -31,6 +31,14 @@ psql -v ON_ERROR_STOP=1 -U postgres -d accettadb -f Back/database/migrations/007
 
 Cada comando se detiene ante un error. La migración 007 transfiere las asignaciones existentes de `lotes.id_obra` a `obras.id_lote`; las obras que no tenían lote quedan sin asignación. Al terminar, un lote puede estar asociado a varias obras. No ejecutes esta secuencia si alguna de estas migraciones ya fue aplicada a la base.
 
+Si una base existente ya tiene la columna `debe_cambiar_contrasena` de la implementación anterior, eliminála con esta migración:
+
+```powershell
+psql -v ON_ERROR_STOP=1 -U postgres -d accettadb -f Back/database/migrations/009_eliminar_marca_cambio_contrasena.sql
+```
+
+El cambio inicial se detecta comparando la contraseña ingresada con el hash guardado y verificando que coincida con los últimos cuatro dígitos del DNI. Las cuentas existentes con otra contraseña no deben cambiarla al iniciar sesión.
+
 
 
 En `.env` dentro de `Back`, configurá `PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD` y `PGDATABASE=accettadb` para que el pool de Node se conecte a esa misma base. También son necesarios `JWT_SECRET` y, opcionalmente, `JWT_EXPIRES_IN`, `PORT` y `CORS_ORIGIN`. No subas el `.env` al repositorio ni compartas sus secretos.

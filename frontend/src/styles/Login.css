@@ -112,6 +112,181 @@
 	text-decoration-color: #ce7a02;
 }
 
+.login-password-modal__fondo {
+	align-items: center;
+	background: rgb(20 25 22 / 68%);
+	display: flex;
+	inset: 0;
+	justify-content: center;
+	padding: 1rem;
+	position: fixed;
+	z-index: 1200;
+}
+
+.login-password-modal {
+	background: var(--color-primario);
+	box-shadow: 0 1rem 3rem rgb(0 0 0 / 28%);
+	max-height: calc(100vh - 2rem);
+	max-width: 34rem;
+	overflow-y: auto;
+	padding: clamp(1.25rem, 4vw, 2rem);
+	width: 100%;
+}
+
+.login-password-modal__eyebrow {
+	color: var(--color-texto3);
+	font-size: .75rem;
+	font-weight: 700;
+	letter-spacing: .06em;
+	margin: 0 0 .35rem;
+	text-transform: uppercase;
+}
+
+.login-password-modal__cabecera {
+	align-items: flex-start;
+	display: flex;
+	gap: 1rem;
+	justify-content: space-between;
+}
+
+.login-password-modal h2 {
+	color: var(--color-seccion);
+	font-size: 1.5rem;
+	margin: 0 0 .5rem;
+}
+
+.login-password-modal__cerrar {
+	background: transparent;
+	border: 0;
+	color: var(--color-texto3);
+	cursor: pointer;
+	font-size: 1.75rem;
+	line-height: 1;
+	padding: 0 .2rem;
+}
+
+.login-password-modal__cerrar:disabled {
+	cursor: wait;
+	opacity: .55;
+}
+
+.login-password-modal > p:not(.login-password-modal__eyebrow) {
+	color: var(--color-texto3);
+	line-height: 1.5;
+}
+
+.login-password-modal__requisitos {
+	display: grid;
+	gap: .35rem;
+	list-style: none;
+	margin: 0 0 1rem;
+	padding: 0;
+}
+
+.login-password-modal__requisitos li {
+	color: #6b625b;
+	font-size: .87rem;
+}
+
+.login-password-modal__requisitos li span {
+	display: inline-block;
+	margin-right: .5rem;
+	width: 1rem;
+}
+
+.login-password-modal__requisitos li.is-cumplido {
+	color: #237443;
+}
+
+.login-password-modal__campo {
+	color: var(--color-texto3);
+	display: block;
+	font-size: .9rem;
+	font-weight: 600;
+	margin-top: .85rem;
+}
+
+.login-password-modal__campo input {
+	font-weight: 400;
+}
+
+.login-password-modal__contrasena-control {
+	display: flex;
+	margin-top: .35rem;
+}
+
+.login-password-modal__contrasena-control input {
+	border-bottom-right-radius: 0;
+	border-top-right-radius: 0;
+}
+
+.login-password-modal__contrasena-control button {
+	align-items: center;
+	background: var(--color-primario);
+	border: 1px solid #c8c8c8;
+	border-left: 0;
+	border-bottom-right-radius: .375rem;
+	border-top-right-radius: .375rem;
+	color: var(--color-texto3);
+	cursor: pointer;
+	display: inline-flex;
+	justify-content: center;
+	padding: 0 .75rem;
+}
+
+.login-password-modal__contrasena-control button svg {
+	fill: none;
+	height: 1.1rem;
+	stroke: currentColor;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+	stroke-width: 1.8;
+	width: 1.1rem;
+}
+
+.login-password-modal__contrasena-control button:disabled {
+	cursor: wait;
+	opacity: .55;
+}
+
+.login-password-modal__error {
+	color: #a32626;
+	font-size: .88rem;
+	margin: .75rem 0 0;
+}
+
+.login-password-modal__guardar,
+.login-password-modal__volver {
+	border: 1px solid var(--color-seccion);
+	cursor: pointer;
+	display: block;
+	font: inherit;
+	margin-top: 1rem;
+	padding: .75rem 1rem;
+	width: 100%;
+}
+
+.login-password-modal__guardar {
+	background: var(--color-seccion);
+	color: var(--color-primario);
+}
+
+.login-password-modal__guardar:hover:not(:disabled),
+.login-password-modal__guardar:focus-visible:not(:disabled) {
+	background: var(--color-primario);
+	color: var(--color-seccion);
+}
+
+.login-password-modal__guardar:disabled {
+	cursor: not-allowed;
+	opacity: .55;
+}
+
+.login-password-modal__volver {
+	background: transparent;
+	color: var(--color-seccion);
+}
+
 .login-form__mensaje {
 	color: #236b3a;
 }

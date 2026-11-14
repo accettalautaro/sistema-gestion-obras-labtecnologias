@@ -1,4 +1,5 @@
 import { pool } from '../../config/db.js';
+import { crearErrorHttp } from '../../utils/httpError.js';
 
 const SELECT_PAGOS = `
     SELECT p.id_pago, p.id_subtarea, p.descripcion, p.monto,
@@ -16,7 +17,7 @@ const manejarError = (error, mensaje) => {
         error.message = 'La subtarea indicada no existe o los datos no cumplen las restricciones.';
         throw error;
     }
-    throw new Error(mensaje);
+    throw crearErrorHttp(mensaje);
 };
 
 export const listarTodos = async () => {
