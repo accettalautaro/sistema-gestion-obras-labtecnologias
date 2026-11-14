@@ -5,7 +5,7 @@ import { obtenerResumenCliente } from '../services/clienteservice'
 // ---------- Constantes ----------
 // Color del badge según el estado devuelto por la API (cualquier otro valor usa el gris)
 const ESTADO_OBRA_BADGE = {
-  'En ejecución': 'text-bg-success',
+  'En ejecución': 'badge-obra-en-ejecucion',
   Atrasada: 'text-bg-danger',
   Pausa: 'text-bg-warning',
   Finalizada: 'text-bg-secondary',
@@ -41,8 +41,8 @@ const etiquetaPlazo = (dias) => {
 }
 
 const estadoRecBadge = (estado) => {
-  if (estado === 'pendiente') return 'text-bg-warning'
-  if (estado === 'atrasado') return 'text-bg-danger'
+  if (estado === 'pendiente') return 'badge-recordatorio-pendiente'
+  if (estado === 'atrasado') return 'badge-recordatorio-atrasado'
   if (estado === 'completado') return 'text-bg-success'
   return 'text-bg-secondary'
 }
@@ -219,7 +219,7 @@ function ClientePage() {
   }, [usuario?.id])
 
   // Las opciones fijas de estado
-  const estadosObra = ['En ejecución', 'Atrasada', 'Pausa', 'Finalizada']
+  const estadosObra = ['No Inicio', 'En ejecución', 'Atrasada', 'Pausa', 'Finalizada']
   const estadosRec = ['pendiente', 'atrasado', 'completado']
 
   // CU Buscar obra: texto libre (dirección, lote, arquitecto), estado y año de inicio

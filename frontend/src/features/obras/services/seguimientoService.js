@@ -55,7 +55,7 @@ export async function obtenerSeguimientoObra(idObra) {
 		: 'Sin dirección registrada'
   const monto = (valor) => Number(valor) || 0
   const pagosObra = pagos.filter((pago) => String(pago['id-obra']) === String(idObra))
-  const costoEstimadoTotal = resumen.unidades.reduce((suma, tarea) => suma + monto(tarea['costo-estimado']), 0)
+  const costoEstimadoTotal = monto(obra.costoEstimadoTotal)
   const montoAbonado = pagosObra.reduce((suma, pago) => suma + monto(pago.monto), 0)
   const diasAtrasoTotal = resumen.unidades.reduce((suma, tarea) => {
     const atraso = monto(tarea['duracion-real']) - monto(tarea['duracion-estimada'])
@@ -66,18 +66,19 @@ export async function obtenerSeguimientoObra(idObra) {
 		id: obra['id-obra'],
 		nrolote: obra.nrolote || '—',
 		estado: obra.Estado ?? 'Sin estado',
-		fechaInicio: obra['fecha-inicio'] ?? '',
-		fechaFin: obra['fecha-fin'] ?? '',
+		fechaInicio: obra['fecha-inicio-estimada'] ?? '',
+		fechaFin: obra['fecha-fin-estimada'] ?? '',
     fechaInicioEstimada: obra['fecha-inicio-estimada'] ?? obra['fecha-inicio'] ?? '',
     fechaFinEstimada: obra['fecha-fin-estimada'] ?? obra['fecha-fin'] ?? '',
-    fechaInicioReal: '', fechaFinReal: '',
+    fechaInicioReal: obra['fecha-inicio-real'] ?? '',
+    fechaFinReal: obra['fecha-fin-real'] ?? '',
 		cliente: obra.clienteNombre || `Cliente #${obra['id-cliente']}`,
 		arquitecto: obra.arquitectoNombre || `Arquitecto #${obra['id-arquitecto']}`,
 		direccion: direccionCompleta,
     costoEstimadoTotal, montoAbonado,
     diasAtrasoTotal,
-    duracionEstimada: resumen.unidades.reduce((suma, tarea) => suma + monto(tarea['duracion-estimada']), 0),
-    duracionReal: resumen.unidades.reduce((suma, tarea) => suma + monto(tarea['duracion-real']), 0),
+    duracionEstimada: obra.duracionEstimada,
+    duracionReal: obra.duracionReal,
 		avance,
 		completadas,
 		total,

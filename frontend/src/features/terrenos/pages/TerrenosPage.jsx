@@ -11,9 +11,9 @@ function mostrar(valor, sufijo = '') {
 	return valor !== undefined && valor !== null && String(valor).trim() !== '' ? `${valor}${sufijo}` : 'Sin información'
 }
 
-function TarjetaPendiente({ titulo, detalle, children }) {
+function TarjetaPendiente({ titulo, detalle, children, tituloAcento = false }) {
 	return <section className="terrenos-page__panel">
-		<div className="terrenos-page__panel-titulo"><div><h3>{titulo}</h3>{detalle && <p>{detalle}</p>}</div></div>
+		<div className={`terrenos-page__panel-titulo${tituloAcento ? ' terrenos-page__panel-titulo--acento' : ''}`}><div><h3>{titulo}</h3>{detalle && <p>{detalle}</p>}</div></div>
 		{children}
 	</section>
 }
@@ -123,16 +123,16 @@ function TerrenosPage() {
 		{terreno ? <>
 			{!ocultarVolverDesdeGestion && <Volver to={destinoVolver}>Volver</Volver>}
 			<div className="terrenos-page__detalle">
-				<section className="terrenos-page__panel"><div className="terrenos-page__panel-titulo"><div><h2>Ubicación</h2><p>Dirección asociada al lote</p></div></div>
+				<section className="terrenos-page__panel"><div className="terrenos-page__panel-titulo terrenos-page__panel-titulo--acento"><div><h2>Ubicación</h2><p>Dirección asociada al lote</p></div></div>
 					{terreno.direcciones.length ? terreno.direcciones.map((direccion) => <dl className="terrenos-page__datos" key={direccion['id-direc'] ?? `${direccion.calle}-${direccion.altura}`}>
 						<div><dt>Calle y altura</dt><dd>{[direccion.calle, direccion.altura].filter(Boolean).join(' ') || 'Sin información'}</dd></div>
 						<div><dt>Localidad</dt><dd>{mostrar(direccion.localidad)}</dd></div><div><dt>Provincia</dt><dd>{mostrar(direccion.provincia)}</dd></div><div><dt>Código postal</dt><dd>{mostrar(direccion.codpos)}</dd></div>
 					</dl>) : <p className="terrenos-page__vacio">Este lote no tiene una dirección registrada.</p>}
 				</section>
-				<section className="terrenos-page__panel"><div className="terrenos-page__panel-titulo"><div><h2>Mensura</h2><p>Medidas registradas del terreno</p></div></div>
+				<section className="terrenos-page__panel"><div className="terrenos-page__panel-titulo terrenos-page__panel-titulo--acento"><div><h2>Mensura</h2><p>Medidas registradas del terreno</p></div></div>
 					{terreno.mensuras.length ? terreno.mensuras.map((mensura) => <dl className="terrenos-page__datos" key={mensura.id ?? `${mensura.ancho}-${mensura.largo}`}><div><dt>Ancho</dt><dd>{mostrar(mensura.ancho, ' m')}</dd></div><div><dt>Largo</dt><dd>{mostrar(mensura.largo, ' m')}</dd></div><div><dt>Superficie</dt><dd>{mensura.ancho && mensura.largo ? `${Number(mensura.ancho) * Number(mensura.largo)} m²` : 'Sin información'}</dd></div></dl>) : <p className="terrenos-page__vacio">Este lote no tiene una mensura registrada.</p>}
 				</section>
-				<TarjetaPendiente titulo="Propietarios" detalle="Personas asociadas a la escritura del lote">
+				<TarjetaPendiente titulo="Propietarios" detalle="Personas asociadas a la escritura del lote" tituloAcento>
 					{terreno.escrituras.some((escritura) => escritura.propietarios.length) ? terreno.escrituras.flatMap((escritura) => escritura.propietarios.map((propietario) => <dl className="terrenos-page__datos terrenos-page__propietario" key={propietario['id-propietario']}><div><dt>Nombre</dt><dd>{[propietario.nombre, propietario.apellido].filter(Boolean).join(' ') || 'Sin información'}</dd></div><div><dt>DNI</dt><dd>{mostrar(propietario.dni)}</dd></div><div><dt>Estado civil</dt><dd>{mostrar(propietario.estadocivil)}</dd></div><div><dt>Porcentaje</dt><dd>{mostrar(propietario.porcentaje)}</dd></div></dl>)) : <p className="terrenos-page__vacio">No hay propietarios asociados en los datos disponibles.</p>}
 					{!modoConsulta && <Link className="btn btn-outline-secondary" to={`/principal/terrenos/${terreno.nrolote}/propietarios`}>Gestionar propietarios</Link>}
 				</TarjetaPendiente>

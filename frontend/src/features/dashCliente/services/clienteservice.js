@@ -22,8 +22,8 @@ export async function obtenerResumenCliente() {
         diasAtraso: atrasadas,
         direccion: direccion ? [direccion.calle, direccion.altura, direccion.localidad, direccion.provincia].filter(Boolean).join(', ') : 'Dirección sin registrar',
         arquitecto: obra.arquitectoNombre || 'Sin asignar',
-        fechaInicioEstimada: obra['fecha-inicio'], fechaFinEstimada: obra['fecha-fin'],
-        fechaInicioReal: '', fechaFinReal: '', tareas,
+        fechaInicioEstimada: obra['fecha-inicio-estimada'], fechaFinEstimada: obra['fecha-fin-estimada'],
+        fechaInicioReal: obra['fecha-inicio-real'], fechaFinReal: obra['fecha-fin-real'], tareas,
       }
     })
   const idsObras = new Map(obrasCliente.map((obra) => [String(obra.idObra), obra]))

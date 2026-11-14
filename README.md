@@ -17,13 +17,19 @@ psql -U postgres -d accettadb -f Back/database/acettadb.sql
 psql -U postgres -d accettadb -f Back/database/semilla_datos.sql
 ```
 
-Para actualizar una base existente desde la relación anterior (`lotes.id_obra`), aplicá una sola vez la migración `Back/database/migrations/001_obra_referencia_lote.sql`:
+`acettadb.sql` ya define el esquema actualizado, por lo que no hay que ejecutar las migraciones sobre una base recién creada con ese archivo. Si tenés una base existente con el esquema anterior (fechas `fecha_inicio`/`fecha_fin`, métricas persistidas y `lotes.id_obra`), ejecutá las migraciones una sola vez y en este orden, desde la raíz del repositorio:
 
 ```powershell
-psql -U postgres -d accettadb -f Back/database/migrations/001_obra_referencia_lote.sql
+psql -v ON_ERROR_STOP=1 -U postgres -d accettadb -f Back/database/migrations/001_fechas_estimadas_y_reales.sql
+psql -v ON_ERROR_STOP=1 -U postgres -d accettadb -f Back/database/migrations/002_duraciones_calculadas.sql
+psql -v ON_ERROR_STOP=1 -U postgres -d accettadb -f Back/database/migrations/003_calculos_jerarquicos.sql
+psql -v ON_ERROR_STOP=1 -U postgres -d accettadb -f Back/database/migrations/004_estado_derivado_de_obra.sql
+psql -v ON_ERROR_STOP=1 -U postgres -d accettadb -f Back/database/migrations/005_notificaciones_programadas_recordatorios.sql
+psql -v ON_ERROR_STOP=1 -U postgres -d accettadb -f Back/database/migrations/006_metricas_calculadas_no_persistidas.sql
+psql -v ON_ERROR_STOP=1 -U postgres -d accettadb -f Back/database/migrations/007_lote_compartido_entre_obras.sql
 ```
 
-La migración conserva las asignaciones actuales y se detiene sin aplicar cambios si encuentra obras sin lote. A partir de este esquema, cada obra referencia un lote mediante `obras.id_lote` y un lote puede tener varias obras.
+Cada comando se detiene ante un error. La migración 007 transfiere las asignaciones existentes de `lotes.id_obra` a `obras.id_lote`; las obras que no tenían lote quedan sin asignación. Al terminar, un lote puede estar asociado a varias obras. No ejecutes esta secuencia si alguna de estas migraciones ya fue aplicada a la base.
 
 
 
@@ -67,7 +73,7 @@ Los módulos siguen el recorrido **ruta → controller → service → repositor
 
 Las rutas no existentes responden `404`. Los cuerpos JSON malformados y los datos de entrada inválidos responden `400`; los errores de autenticación/autorización conservan sus códigos `401`/`403`.
 
-El inventario de los **61 endpoints** montados en el backend, con método, acceso y descripción, está en [docs/endpoints.md](./docs/endpoints.md).
+El inventario de los **63 endpoints** montados en el backend, con método, acceso y descripción, está en [docs/endpoints.md](./docs/endpoints.md).
 
 ## Pruebas con Postman
 

@@ -17,6 +17,14 @@ export const crearUsuarioCliente = async (idCliente, usuario) => {
     return repository.crearUsuarioCliente(id, hash);
 };
 
+export const obtenerPerfilUsuario = async (idUsuario) => {
+    const perfil = await repository.obtenerPerfilUsuario(idUsuario);
+    if (!perfil) {
+        throw Object.assign(new Error('El perfil de usuario no fue encontrado.'), { status: 404 });
+    }
+    return perfil;
+};
+
 export const login = async(usuario)=>{
     const contrasena = usuario?.contrasena ?? usuario?.nombre;
     if (typeof contrasena !== 'string' || !contrasena

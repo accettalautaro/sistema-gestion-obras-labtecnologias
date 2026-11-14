@@ -54,6 +54,9 @@
 .layout-cliente .cliente-dashboard__bienvenida h1 { margin: 0; }
 .layout-cliente .cliente-dashboard__bienvenida > p:last-child { color: var(--ui-muted); margin-top: .35rem; }
 .layout-cliente .cliente-dashboard__titulo-seccion { color: var(--ui-accent); margin: 0 0 .8rem; text-transform: none; }
+.layout-cliente .cliente-dashboard .badge-recordatorio-pendiente { background-color: var(--ui-accent); color: #fff; }
+.layout-cliente .cliente-dashboard .badge-recordatorio-atrasado { background-color: #a24a44; color: #fff; }
+.layout-cliente .cliente-dashboard .badge-obra-en-ejecucion { background-color: #3b7657; color: #fff; }
 
 .layout-cliente .cliente-obra-card {
 	color: var(--ui-ink);

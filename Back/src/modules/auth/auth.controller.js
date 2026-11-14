@@ -30,10 +30,11 @@ export const login = async (req,res,next)=>{
     }
 }
 
-//GET api/auth/perfil
-
-// GET /api/auth/perfil  (ruta protegida) → "¿quién soy?"
-// req.usuario lo cargó el middleware verificarToken a partir del token
-export const perfil = (req, res) => {
-    res.json(req.usuario);
+export const perfil = async (req, res, next) => {
+    try {
+        const perfilUsuario = await service.obtenerPerfilUsuario(req.usuario.id_usuario);
+        return res.json(perfilUsuario);
+    } catch (error) {
+        next(error);
+    }
 };

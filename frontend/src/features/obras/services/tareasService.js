@@ -13,7 +13,6 @@ function fechaISO(valor) {
 }
 
 const fecha = fechaISO
-const porcentaje = (valor) => Number.parseFloat(String(valor ?? 0).replace('%', '').replace(',', '.')) || 0
 
 export async function listarNomenclador() { return NOMENCLADOR_TAREAS }
 
@@ -23,9 +22,9 @@ function mapearObraTareas(datos) {
       'id-obra': String(datos.id_obra), 'id-tarea': String(tarea.id_tarea),
       nombre: tarea.nombre_tarea, descripcion: tarea.descripcion_tarea ?? '',
       porcentaje: `${Number(tarea.porcentaje_tarea) || 0}%`,
-      estado: Number(tarea.porcentaje_tarea) >= 100 ? 'finalizada' : Number(tarea.porcentaje_tarea) > 0 ? 'en ejecucion' : 'sin comenzar',
+      estado: tarea.fecha_fin_real_tarea ? 'finalizada' : tarea.fecha_inicio_real_tarea ? 'en ejecucion' : 'sin comenzar',
       'fecha-inicio-estimada': fecha(tarea.fecha_inicio_tarea), 'fecha-fin-estimada': fecha(tarea.fecha_fin_tarea),
-      'fecha-inicio-real': fecha(tarea.fecha_inicio_tarea), 'fecha-fin-real': fecha(tarea.fecha_fin_tarea),
+      'fecha-inicio-real': fecha(tarea.fecha_inicio_real_tarea), 'fecha-fin-real': fecha(tarea.fecha_fin_real_tarea),
       'fecha-inicio': fecha(tarea.fecha_inicio_tarea), 'fecha-fin': fecha(tarea.fecha_fin_tarea),
       'duracion-estimada': tarea.duracion_estimada_tarea ?? '', 'duracion-real': tarea.duracion_real_tarea ?? '',
       'costo-estimado': tarea.costo_estimado_tarea ?? '', 'costo-real': tarea.costo_real_tarea ?? '',
@@ -36,9 +35,9 @@ function mapearObraTareas(datos) {
       'id-tarea': `${tarea.id_tarea}_${subtarea.id_subtarea}`,
       nombre: subtarea.nombre_subtarea, descripcion: subtarea.descripcion_subtarea ?? '',
       porcentaje: `${Number(subtarea.porcentaje_subtarea) || 0}%`,
-      estado: Number(subtarea.porcentaje_subtarea) >= 100 ? 'finalizada' : Number(subtarea.porcentaje_subtarea) > 0 ? 'en ejecucion' : 'sin comenzar',
+      estado: subtarea.fecha_fin_real_subtarea ? 'finalizada' : subtarea.fecha_inicio_real_subtarea ? 'en ejecucion' : 'sin comenzar',
       'fecha-inicio-estimada': fecha(subtarea.fecha_inicio_subtarea), 'fecha-fin-estimada': fecha(subtarea.fecha_fin_subtarea),
-      'fecha-inicio-real': fecha(subtarea.fecha_inicio_subtarea), 'fecha-fin-real': fecha(subtarea.fecha_fin_subtarea),
+      'fecha-inicio-real': fecha(subtarea.fecha_inicio_real_subtarea), 'fecha-fin-real': fecha(subtarea.fecha_fin_real_subtarea),
       'fecha-inicio': fecha(subtarea.fecha_inicio_subtarea), 'fecha-fin': fecha(subtarea.fecha_fin_subtarea),
       'duracion-estimada': subtarea.duracion_estimada_subtarea ?? '', 'duracion-real': subtarea.duracion_real_subtarea ?? '',
       'costo-estimado': subtarea.costo_estimado_subtarea ?? '', 'costo-real': subtarea.costo_real_subtarea ?? '',
@@ -59,16 +58,16 @@ export async function listarTareas() {
 }
 
 function payloadTarea(tarea, idObra, idPadre = null) {
-  const inicio = fechaISO(tarea['fecha-inicio-real']) || fechaISO(tarea['fecha-inicio-estimada']) || fechaISO(tarea['fecha-inicio']) || null
-  const fin = fechaISO(tarea['fecha-fin-real']) || fechaISO(tarea['fecha-fin-estimada']) || fechaISO(tarea['fecha-fin']) || null
   return {
     ...(idPadre == null ? { id_obra: Number(idObra) } : { id_tarea: Number(idPadre) }),
     nombre: String(tarea.nombre ?? '').trim(), descripcion: tarea.descripcion || null,
-    porcentaje: porcentaje(tarea.porcentaje), fecha_inicio: inicio || null, fecha_fin: fin || null,
-    duracion_estimada: tarea['duracion-estimada'] === '' ? null : Number(tarea['duracion-estimada']) || null,
-    duracion_real: tarea['duracion-real'] === '' ? null : Number(tarea['duracion-real']) || null,
-    costo_estimado: tarea['costo-estimado'] === '' ? null : Number(tarea['costo-estimado']) || null,
-    costo_real: tarea['costo-real'] === '' ? null : Number(tarea['costo-real']) || null,
+    fecha_inicio_estimada: fechaISO(tarea['fecha-inicio-estimada']) || fechaISO(tarea['fecha-inicio']) || null,
+    fecha_fin_estimada: fechaISO(tarea['fecha-fin-estimada']) || fechaISO(tarea['fecha-fin']) || null,
+    ...(idPadre == null ? {} : {
+      costo_estimado: tarea['costo-estimado'] === '' || tarea['costo-estimado'] == null
+        ? null
+        : Number(tarea['costo-estimado']),
+    }),
   }
 }
 
@@ -115,24 +114,12 @@ export async function guardarTareasObra(idObra, lista) {
 }
 
 export async function actualizarEstadoTarea(idObra, tarea, accion) {
-  const nuevaFecha = new Date().toISOString().slice(0, 10)
-  const datos = { ...tarea }
-  if (accion === 'iniciar') {
-    datos['fecha-inicio-real'] = nuevaFecha
-    datos.estado = 'en ejecucion'
-  } else if (accion === 'completar') {
-    datos['fecha-inicio-real'] ||= nuevaFecha
-    datos['fecha-fin-real'] = nuevaFecha
-    datos.porcentaje = '100%'
-    datos.estado = 'finalizada'
-  } else {
-    datos['fecha-fin-real'] = ''
-    datos.porcentaje = '0%'
-    datos.estado = 'sin comenzar'
+  if (tarea._dbSubtareaId == null) {
+    throw new Error('El seguimiento del avance se realiza desde las subtareas.')
   }
-  const esSubtarea = tarea._dbSubtareaId != null
-  const payload = payloadTarea(datos, idObra, esSubtarea ? Number(String(tarea['id-tarea']).split('_')[0]) : null)
-  const ruta = esSubtarea ? `/subtareas/${tarea._dbSubtareaId}` : `/tareas/${tarea['id-tarea']}`
-  await api(ruta, { method: 'PUT', body: jsonBody(payload) })
+  await api(`/subtareas/${tarea._dbSubtareaId}/estado`, {
+    method: 'PATCH',
+    body: jsonBody({ accion }),
+  })
   return listarTareasDeObra(idObra)
 }

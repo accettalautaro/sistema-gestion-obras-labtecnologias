@@ -12,8 +12,8 @@ export async function obtenerDetalleObra(idObra) {
   const tareas = obra.tareas ?? []
   const resumen = resumirAvanceTareas(tareas, pagos)
   const pagosObra = pagos.filter((pago) => String(pago['id-obra']) === String(idObra))
-  const duracionEstimada = resumen.unidades.reduce((suma, tarea) => suma + numero(tarea['duracion-estimada']), 0)
-  const duracionReal = resumen.unidades.reduce((suma, tarea) => suma + numero(tarea['duracion-real']), 0)
+  const duracionEstimada = obra.duracionEstimada
+  const duracionReal = obra.duracionReal
   const diasAtrasoTotal = resumen.unidades.reduce((suma, tarea) => {
     const atraso = numero(tarea['duracion-real']) - numero(tarea['duracion-estimada'])
     return suma + (atraso > 0 && numero(tarea.porcentaje) < 100 ? atraso : 0)
@@ -35,12 +35,12 @@ export async function obtenerDetalleObra(idObra) {
   return {
     idObra: obra['id-obra'], nroLote: obra.nrolote, estado: estadoObra,
     porcentaje: resumen.avance,
-    fechaInicioEstimada: obra['fecha-inicio'], fechaFinEstimada: obra['fecha-fin'],
-    fechaInicioReal: '', fechaFinReal: '',
+    fechaInicioEstimada: obra['fecha-inicio-estimada'], fechaFinEstimada: obra['fecha-fin-estimada'],
+    fechaInicioReal: obra['fecha-inicio-real'], fechaFinReal: obra['fecha-fin-real'],
     direccionCompleta: direccion ? [direccion.calle && `${direccion.calle} ${direccion.altura ?? ''}`.trim(), direccion.localidad, direccion.provincia, direccion.codigo_postal && `CP ${direccion.codigo_postal}`].filter(Boolean).join(', ') : 'Sin dirección cargada',
     arquitecto: obra.arquitectoNombre || 'Sin asignar',
     arquitectoTelefono: obra.arquitectoTelefono ?? '', arquitectoMatricula: obra.arquitectoMatricula ?? '',
-    costoEstimadoTotal: resumen.unidades.reduce((suma, tarea) => suma + numero(tarea['costo-estimado']), 0),
+    costoEstimadoTotal: obra.costoEstimadoTotal,
     montoAbonado: pagosObra.reduce((suma, pago) => suma + numero(pago.monto), 0),
     duracionEstimada, duracionReal, diasAtrasoTotal, tareas: tareasPlanas,
   }

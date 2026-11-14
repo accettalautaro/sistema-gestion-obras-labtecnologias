@@ -3,23 +3,24 @@ SET client_encoding TO 'UTF8';
 BEGIN;
 
 
--- Cuentas de prueba (solo desarrollo): DNI 1234567/admin y 7654321/cliente123.
--- El campo nombre almacena el hash bcrypt que valida la contraseña.
+-- Cuentas de prueba (solo desarrollo): DNI 1234567/admin y 7654321/cliente.
+-- Las credenciales de las cuentas de prueba están guardadas como hashes BCrypt.
+-- Las credenciales heredadas en texto plano se migran al iniciar el backend.
 INSERT INTO usuarios (id_usuario, nombre, dni, rol) OVERRIDING SYSTEM VALUE VALUES
-  (1, '$2b$10$/UzaTeo.TgGKdMK43Azxc.7ql84Lt.6qvlb/doS33IDAqynRlFpdS', '1234567', 'arquitecto'), --Contraseña: admin
-  (2, '$2b$10$4g83Tb5CgsV3FB5nqU3b1ulmQVqeL3yQn4RzgfHRrI0cQaumY0IZ6', '7654321', 'cliente') --Contraseña: cliente123
+  (1, '$2a$10$Py/gDCZQP2w17IT3qEYQueZ6SVcpC3Ij8v7Nt8bzN9lziQbqbb5JS', '1234567', 'arquitecto'), -- Usuario de prueba: admin
+  (2, '$2a$10$Jr7dQkHbCwo3MZlT8CDFuuuCp1M7eQnTZ.HfAt1V4ZSmtrLIwJyi.', '7654321', 'cliente') -- Usuario de prueba: cliente
 ON CONFLICT (id_usuario) DO UPDATE SET nombre=EXCLUDED.nombre, dni=EXCLUDED.dni, rol=EXCLUDED.rol;
 
 
 -- Arquitectos
 INSERT INTO arquitectos (id_arquitecto, nombre, apellido, dni, telefono, email, nro_matricula, id_usuario) OVERRIDING SYSTEM VALUE VALUES
-  (1, 'Marcelo', 'Accetta', '1234567', '2657353535', NULL, 7884566, 1)
+  (1, 'Marcelo', 'Accetta', '1234567', '2664353535', 'marcelo.accetta@example.com', 7884566, 1)
 ON CONFLICT (id_arquitecto) DO UPDATE SET nombre=EXCLUDED.nombre, apellido=EXCLUDED.apellido, dni=EXCLUDED.dni, telefono=EXCLUDED.telefono, email=EXCLUDED.email, nro_matricula=EXCLUDED.nro_matricula, id_usuario=EXCLUDED.id_usuario;
 
 
 -- Clientes
 INSERT INTO clientes (id_cliente, nombre, apellido, dni, telefono, email, id_usuario) OVERRIDING SYSTEM VALUE VALUES
-  (1, 'Juan', 'Perez', '123456789', '2664404040', 'juanperez@gmail.com', 2)
+  (1, 'Juan', 'Perez', '123456789', '2664404040', 'juan.perez@example.com', 2)
 ON CONFLICT (id_cliente) DO UPDATE SET nombre=EXCLUDED.nombre, apellido=EXCLUDED.apellido, dni=EXCLUDED.dni, telefono=EXCLUDED.telefono, email=EXCLUDED.email, id_usuario=EXCLUDED.id_usuario;
 
 
@@ -30,25 +31,28 @@ INSERT INTO direcciones (id_direccion, provincia, codigo_postal, calle, altura, 
 ON CONFLICT (id_direccion) DO UPDATE SET provincia=EXCLUDED.provincia, codigo_postal=EXCLUDED.codigo_postal, calle=EXCLUDED.calle, altura=EXCLUDED.altura, piso=EXCLUDED.piso, departamento=EXCLUDED.departamento, localidad=EXCLUDED.localidad;
 
 
--- Lotes; un lote puede tener varias obras.
+-- Obras (deduplicadas por coincidencia de datos)
+INSERT INTO obras (id_obra, id_cliente, id_arquitecto, fecha_inicio_estimada, fecha_fin_estimada, estado, descripcion) OVERRIDING SYSTEM VALUE VALUES
+  (1, 1, 1, '2026-07-01', '2026-12-13', 'En Ejecución', 'Vivienda unifamiliar de 120 m². Obra en curso, con tareas iniciales y estructura finalizadas.'),
+  (2, 1, 1, '2026-11-10', '2027-01-15', 'No Inicio', 'Ampliación residencial planificada; inicio estimado para noviembre de 2026.')
+ON CONFLICT (id_obra) DO UPDATE SET id_cliente=EXCLUDED.id_cliente, id_arquitecto=EXCLUDED.id_arquitecto, fecha_inicio_estimada=EXCLUDED.fecha_inicio_estimada, fecha_fin_estimada=EXCLUDED.fecha_fin_estimada, estado=EXCLUDED.estado, descripcion=EXCLUDED.descripcion;
+
+
+-- Lotes
 INSERT INTO lotes (id_lote, nro_lote, id_direccion) OVERRIDING SYSTEM VALUE VALUES
   (1, '450', 1),
   (2, '500', 2)
 ON CONFLICT (id_lote) DO UPDATE SET nro_lote=EXCLUDED.nro_lote, id_direccion=EXCLUDED.id_direccion;
 
-
--- Obras vinculadas al lote por id_lote.
-INSERT INTO obras (id_obra, id_cliente, id_arquitecto, id_lote, fecha_inicio, fecha_fin, estado, descripcion) OVERRIDING SYSTEM VALUE VALUES
-  (1, 1, 1, 1, '2026-10-01', NULL, 'En ejecución', NULL),
-  (2, 1, 1, 2, '2026-11-01', '2027-01-01', 'Finalizada', NULL)
-ON CONFLICT (id_obra) DO UPDATE SET id_cliente=EXCLUDED.id_cliente, id_arquitecto=EXCLUDED.id_arquitecto, id_lote=EXCLUDED.id_lote, fecha_inicio=EXCLUDED.fecha_inicio, fecha_fin=EXCLUDED.fecha_fin, estado=EXCLUDED.estado, descripcion=EXCLUDED.descripcion;
+UPDATE obras SET id_lote=CASE id_obra WHEN 1 THEN 1 WHEN 2 THEN 2 END
+WHERE id_obra IN (1, 2);
 
 
 -- Documentos (mensuras y escrituras)
 INSERT INTO documentos (id_documento, id_lote, nombre, descripcion, archivo) OVERRIDING SYSTEM VALUE VALUES
-  (1, 1, 'Mensura', 'Mensura del lote', NULL),
-  (2, 1, 'Escritura', 'Escritura 1', NULL),
-  (3, 2, 'Escritura', 'Escritura 2', NULL)
+  (1, 1, 'Mensura', 'Plano de mensura aprobado del lote 450.', NULL),
+  (2, 1, 'Escritura', 'Escritura traslativa de dominio del lote 450.', NULL),
+  (3, 2, 'Escritura', 'Escritura traslativa de dominio del lote 500.', NULL)
 ON CONFLICT (id_documento) DO UPDATE SET id_lote=EXCLUDED.id_lote, nombre=EXCLUDED.nombre, descripcion=EXCLUDED.descripcion, archivo=EXCLUDED.archivo;
 
 
@@ -81,90 +85,120 @@ ON CONFLICT (id_documento, id_propietario) DO NOTHING;
 
 
 -- Tareas principales
-INSERT INTO tareas (id_tarea, id_obra, nombre, duracion_estimada, porcentaje, descripcion, duracion_real, costo_estimado, costo_real, fecha_inicio, fecha_fin) OVERRIDING SYSTEM VALUE VALUES
-  (1, 1, 'TRABAJOS PRELIMINARES', 15, 100, 'TRABAJOS PRELIMINARES', 15, 542000, 574520, '2026-07-01', '2026-07-15'),
-  (2, 1, 'ESTRUCTURA', 11, 100, 'ESTRUCTURA', 11, 795000, 842700, '2026-07-16', '2026-07-26'),
-  (3, 1, 'LOSA', 14, 100, 'LOSA', 14, 1128000, 1195680, '2026-07-27', '2026-08-09'),
-  (4, 1, 'MAMPOSTERIA', 12, 100, 'MAMPOSTERIA', 12, 1041000, 1103460, '2026-08-10', '2026-08-21'),
-  (5, 1, 'CONTRAPISO Y CARPETAS', 8, 100, 'CONTRAPISO Y CARPETAS', 8, 319000, 338140, '2026-08-22', '2026-08-29'),
-  (6, 1, 'PISOS, ZOCALOS Y UMBRALES', 6, 100, 'PISOS, ZOCALOS Y UMBRALES', 6, 467000, 495020, '2026-08-30', '2026-09-04'),
-  (7, 1, 'REVOQUES', 16, 100, 'REVOQUES', 16, 1378000, 1460680, '2026-09-05', '2026-09-20'),
-  (8, 1, 'CIELORRASO', 4, 100, 'CIELORRASO', 4, 437000, 463220, '2026-09-21', '2026-09-24'),
-  (9, 1, 'REVESTIMIENTOS', 9, 100, 'REVESTIMIENTOS', 9, 565000, 598900, '2026-09-25', '2026-10-03'),
-  (10, 1, 'PINTURAS', 7, 100, 'PINTURAS', 7, 293000, 310580, '2026-10-04', '2026-10-10'),
-  (11, 1, 'MARMOLERIA', 4, 100, 'MARMOLERIA', 4, 202000, 214120, '2026-10-11', '2026-10-14'),
-  (12, 1, 'ABERTURAS', 14, 45, 'ABERTURAS', 0, 828000, 385820, '2026-10-15', '2026-10-28'),
-  (13, 1, 'CARPINTERIA', 15, 0, 'CARPINTERIA', 0, 1622000, 0, '2026-10-29', '2026-11-12'),
-  (14, 1, 'INSTALACION SANITARIA', 5, 0, 'INSTALACION SANITARIA', 0, 498000, 0, '2026-11-13', '2026-11-17'),
-  (15, 1, 'INSTALACION ELECTRICA', 2, 0, 'INSTALACION ELECTRICA', 0, 115000, 0, '2026-11-18', '2026-11-19'),
-  (16, 1, 'EQUIPAMIENTOS', 13, 0, 'EQUIPAMIENTOS', 0, 567000, 0, '2026-11-20', '2026-12-02'),
-  (17, 1, 'VARIOS', 7, 0, 'VARIOS', 0, 563000, 0, '2026-12-03', '2026-12-09'),
-  (18, 1, 'PILETA', 4, 0, 'PILETA', 0, 337000, 0, '2026-12-10', '2026-12-13'),
-  (19, 2, 'Limpieza del terreno', 2, 0, 'Limpieza y nivelación inicial del terreno', 2, 50000, 50000, '2026-11-01', '2026-11-03')
-ON CONFLICT (id_tarea) DO UPDATE SET id_obra=EXCLUDED.id_obra, nombre=EXCLUDED.nombre, duracion_estimada=EXCLUDED.duracion_estimada, porcentaje=EXCLUDED.porcentaje, descripcion=EXCLUDED.descripcion, duracion_real=EXCLUDED.duracion_real, costo_estimado=EXCLUDED.costo_estimado, costo_real=EXCLUDED.costo_real, fecha_inicio=EXCLUDED.fecha_inicio, fecha_fin=EXCLUDED.fecha_fin;
+INSERT INTO tareas (id_tarea, id_obra, nombre, descripcion, fecha_inicio_estimada, fecha_fin_estimada) OVERRIDING SYSTEM VALUE VALUES
+  (1, 1, 'TRABAJOS PRELIMINARES', 'TRABAJOS PRELIMINARES', '2026-07-01', '2026-07-15'),
+  (2, 1, 'ESTRUCTURA', 'ESTRUCTURA', '2026-07-16', '2026-07-26'),
+  (3, 1, 'LOSA', 'LOSA', '2026-07-27', '2026-08-09'),
+  (4, 1, 'MAMPOSTERIA', 'MAMPOSTERIA', '2026-08-10', '2026-08-21'),
+  (5, 1, 'CONTRAPISO Y CARPETAS', 'CONTRAPISO Y CARPETAS', '2026-08-22', '2026-08-29'),
+  (6, 1, 'PISOS, ZOCALOS Y UMBRALES', 'PISOS, ZOCALOS Y UMBRALES', '2026-08-30', '2026-09-04'),
+  (7, 1, 'REVOQUES', 'REVOQUES', '2026-09-05', '2026-09-20'),
+  (8, 1, 'CIELORRASO', 'CIELORRASO', '2026-09-21', '2026-09-24'),
+  (9, 1, 'REVESTIMIENTOS', 'REVESTIMIENTOS', '2026-09-25', '2026-10-03'),
+  (10, 1, 'PINTURAS', 'PINTURAS', '2026-10-04', '2026-10-10'),
+  (11, 1, 'MARMOLERIA', 'MARMOLERIA', '2026-10-11', '2026-10-14'),
+  (12, 1, 'ABERTURAS', 'ABERTURAS', '2026-10-15', '2026-10-28'),
+  (13, 1, 'CARPINTERIA', 'CARPINTERIA', '2026-10-29', '2026-11-12'),
+  (14, 1, 'INSTALACION SANITARIA', 'INSTALACION SANITARIA', '2026-11-13', '2026-11-17'),
+  (15, 1, 'INSTALACION ELECTRICA', 'INSTALACION ELECTRICA', '2026-11-18', '2026-11-19'),
+  (16, 1, 'EQUIPAMIENTOS', 'EQUIPAMIENTOS', '2026-11-20', '2026-12-02'),
+  (17, 1, 'VARIOS', 'VARIOS', '2026-12-03', '2026-12-09'),
+  (18, 1, 'PILETA', 'PILETA', '2026-12-10', '2026-12-13'),
+  (19, 2, 'Limpieza del terreno', 'Limpieza y nivelación inicial del terreno', '2026-11-10', '2026-11-11')
+ON CONFLICT (id_tarea) DO UPDATE SET id_obra=EXCLUDED.id_obra, nombre=EXCLUDED.nombre, descripcion=EXCLUDED.descripcion, fecha_inicio_estimada=EXCLUDED.fecha_inicio_estimada, fecha_fin_estimada=EXCLUDED.fecha_fin_estimada;
 
 
 -- Subtareas
-INSERT INTO subtareas (id_subtarea, id_tarea, nombre, duracion_estimada, porcentaje, descripcion, duracion_real, costo_estimado, costo_real, fecha_inicio, fecha_fin) OVERRIDING SYSTEM VALUE VALUES
-  (1, 1, 'Replanteo', 2, 100, 'Replanteo', 2, 80000, 84800, '2026-07-01', '2026-07-02'),
-  (2, 1, 'Limpieza y nivelación del terreno', 4, 100, NULL, 4, 117000, 124020, '2026-07-03', '2026-07-06'),
-  (3, 1, 'Relleno y compactación del terreno', 6, 100, 'Relleno y compactación del terreno', 6, 154000, 163240, '2026-07-07', '2026-07-12'),
-  (4, 1, 'Excavaciones para fundaciones', 3, 100, 'Excavaciones para fundaciones', 3, 191000, 202460, '2026-07-13', '2026-07-15'),
-  (5, 2, 'Armado de armadura', 5, 100, 'Armado de armadura', 5, 228000, 241680, '2026-07-16', '2026-07-20'),
-  (6, 2, 'Montaje de estructura', 2, 100, 'Montaje de estructura', 2, 265000, 280900, '2026-07-21', '2026-07-22'),
-  (7, 2, 'Colado de hormigón', 4, 100, 'Colado de hormigón', 4, 302000, 320120, '2026-07-23', '2026-07-26'),
-  (8, 3, 'Armado de losa', 6, 100, 'Armado de losa', 6, 339000, 359340, '2026-07-27', '2026-08-01'),
-  (9, 3, 'Colado de hormigón para losa', 3, 100, 'Colado de hormigón para losa', 3, 376000, 398560, '2026-08-02', '2026-08-04'),
-  (10, 3, 'Contratecho (carpeta de nivelación)', 5, 100, 'Contratecho (carpeta de nivelación)', 5, 413000, 437780, '2026-08-05', '2026-08-09'),
-  (11, 4, 'De elevación s/ fundaciones hasta nivel de capa aisladora', 2, 100, 'De elevación s/ fundaciones hasta nivel de capa aisladora', 2, 450000, 477000, '2026-08-10', '2026-08-11'),
-  (12, 4, 'Capa aisladora', 4, 100, 'Capa aisladora', 4, 487000, 516220, '2026-08-12', '2026-08-15'),
-  (13, 4, 'Ladrillo cerámico (levantar paredes)', 6, 100, 'Ladrillo cerámico (levantar paredes)', 6, 104000, 110240, '2026-08-16', '2026-08-21'),
-  (14, 5, 'Contrapiso pb', 3, 100, 'Contrapiso pb', 3, 141000, 149460, '2026-08-22', '2026-08-24'),
-  (15, 5, 'De nivelación de concreto 2cm bajo solados', 5, 100, 'De nivelación de concreto 2cm bajo solados', 5, 178000, 188680, '2026-08-25', '2026-08-29'),
-  (16, 6, 'Porcelanato', 2, 100, 'Porcelanato', 2, 215000, 227900, '2026-08-30', '2026-08-31'),
-  (17, 6, 'Zócalo de porcelanato', 4, 100, 'Zócalo de porcelanato', 4, 252000, 267120, '2026-09-01', '2026-09-04'),
-  (18, 7, 'Revoque grueso interior', 6, 100, 'Revoque grueso interior', 6, 289000, 306340, '2026-09-05', '2026-09-10'),
-  (19, 7, 'Revoque grueso exterior', 3, 100, 'Revoque grueso exterior', 3, 326000, 345560, '2026-09-11', '2026-09-13'),
-  (20, 7, 'Revoque fino o yeso (interior)', 5, 100, 'Revoque fino o yeso (interior)', 5, 363000, 384780, '2026-09-14', '2026-09-18'),
-  (21, 7, 'Revoque plástico exterior o revoque fino exterior', 2, 100, 'Revoque plástico exterior o revoque fino exterior', 2, 400000, 424000, '2026-09-19', '2026-09-20'),
-  (22, 8, 'Cielorraso', 4, 100, 'Cielorraso', 4, 437000, 463220, '2026-09-21', '2026-09-24'),
-  (23, 9, 'Revestimiento cerámico baño', 6, 100, 'Revestimiento cerámico baño', 6, 474000, 502440, '2026-09-25', '2026-09-30'),
-  (24, 9, 'Revestimiento de cocina', 3, 100, 'Revestimiento de cocina', 3, 91000, 96460, '2026-10-01', '2026-10-03'),
-  (25, 10, 'Pintura exterior', 5, 100, 'Pintura exterior', 5, 128000, 135680, '2026-10-04', '2026-10-08'),
-  (26, 10, 'Pintura interior', 2, 100, 'Pintura interior', 2, 165000, 174900, '2026-10-09', '2026-10-10'),
-  (27, 11, 'Marmolería', 4, 100, 'Marmolería', 4, 202000, 214120, '2026-10-11', '2026-10-14'),
-  (28, 12, 'Puertas interiores', 6, 100, 'Puertas interiores', 6, 239000, 253340, '2026-10-15', '2026-10-20'),
-  (29, 12, 'Puertas entrada', 3, 45, 'Puertas entrada', 0, 276000, 132480, '2026-10-21', '2026-10-23'),
-  (30, 12, 'Carpinterías s/planilla (ventanas, paños fijos, etc.)', 5, 0, 'Carpinterías s/planilla (ventanas, paños fijos, etc.)', 0, 313000, 0, '2026-10-24', '2026-10-28'),
-  (31, 13, 'Muebles cocina', 2, 0, 'Muebles cocina', 0, 350000, 0, '2026-10-29', '2026-10-30'),
-  (32, 13, 'Placares/vestidores', 4, 0, 'Placares/vestidores', 0, 387000, 0, '2026-10-31', '2026-11-03'),
-  (33, 13, 'Muebles baños', 6, 0, 'Muebles baños', 0, 424000, 0, '2026-11-04', '2026-11-09'),
-  (34, 13, 'Muebles varios', 3, 0, 'Muebles varios', 0, 461000, 0, '2026-11-10', '2026-11-12'),
-  (35, 14, 'Calefacción (por radiadores o losa radiante)', 5, 0, 'Calefacción (por radiadores o losa radiante)', 0, 498000, 0, '2026-11-13', '2026-11-17'),
-  (36, 15, 'Instalación aire acondicionado', 2, 0, 'Instalación aire acondicionado', 0, 115000, 0, '2026-11-18', '2026-11-19'),
-  (37, 16, 'Termotanque eléctrico 80lts', 4, 0, 'Termotanque eléctrico 80lts', 0, 152000, 0, '2026-11-20', '2026-11-23'),
-  (38, 16, 'Alarma', 6, 0, 'Alarma', 0, 189000, 0, '2026-11-24', '2026-11-29'),
-  (39, 16, 'Portón eléctrico', 3, 0, 'Portón eléctrico', 0, 226000, 0, '2026-11-30', '2026-12-02'),
-  (40, 17, 'Limpieza final fina (de la obra)', 5, 0, 'Limpieza final fina (de la obra)', 0, 263000, 0, '2026-12-03', '2026-12-07'),
-  (41, 17, 'Limpieza de obra', 2, 0, 'Limpieza de obra', 0, 300000, 0, '2026-12-08', '2026-12-09'),
-  (42, 18, 'Pileta', 4, 0, 'Pileta', 0, 337000, 0, '2026-12-10', '2026-12-13')
-ON CONFLICT (id_subtarea) DO UPDATE SET id_tarea=EXCLUDED.id_tarea, nombre=EXCLUDED.nombre, duracion_estimada=EXCLUDED.duracion_estimada, porcentaje=EXCLUDED.porcentaje, descripcion=EXCLUDED.descripcion, duracion_real=EXCLUDED.duracion_real, costo_estimado=EXCLUDED.costo_estimado, costo_real=EXCLUDED.costo_real, fecha_inicio=EXCLUDED.fecha_inicio, fecha_fin=EXCLUDED.fecha_fin;
+INSERT INTO subtareas (id_subtarea, id_tarea, nombre, porcentaje, descripcion, costo_estimado, fecha_inicio_estimada, fecha_fin_estimada) OVERRIDING SYSTEM VALUE VALUES
+  (1, 1, 'Replanteo', 100, 'Replanteo', 80000, '2026-07-01', '2026-07-02'),
+  (2, 1, 'Limpieza y nivelación del terreno', 100, 'Retiro de vegetación y nivelación del terreno.', 117000, '2026-07-03', '2026-07-06'),
+  (3, 1, 'Relleno y compactación del terreno', 100, 'Relleno y compactación del terreno', 154000, '2026-07-07', '2026-07-12'),
+  (4, 1, 'Excavaciones para fundaciones', 100, 'Excavaciones para fundaciones', 191000, '2026-07-13', '2026-07-15'),
+  (5, 2, 'Armado de armadura', 100, 'Armado de armadura', 228000, '2026-07-16', '2026-07-20'),
+  (6, 2, 'Montaje de estructura', 100, 'Montaje de estructura', 265000, '2026-07-21', '2026-07-22'),
+  (7, 2, 'Colado de hormigón', 100, 'Colado de hormigón', 302000, '2026-07-23', '2026-07-26'),
+  (8, 3, 'Armado de losa', 100, 'Armado de losa', 339000, '2026-07-27', '2026-08-01'),
+  (9, 3, 'Colado de hormigón para losa', 100, 'Colado de hormigón para losa', 376000, '2026-08-02', '2026-08-04'),
+  (10, 3, 'Contratecho (carpeta de nivelación)', 100, 'Contratecho (carpeta de nivelación)', 413000, '2026-08-05', '2026-08-09'),
+  (11, 4, 'De elevación s/ fundaciones hasta nivel de capa aisladora', 100, 'De elevación s/ fundaciones hasta nivel de capa aisladora', 450000, '2026-08-10', '2026-08-11'),
+  (12, 4, 'Capa aisladora', 100, 'Capa aisladora', 487000, '2026-08-12', '2026-08-15'),
+  (13, 4, 'Ladrillo cerámico (levantar paredes)', 100, 'Ladrillo cerámico (levantar paredes)', 104000, '2026-08-16', '2026-08-21'),
+  (14, 5, 'Contrapiso pb', 100, 'Contrapiso pb', 141000, '2026-08-22', '2026-08-24'),
+  (15, 5, 'De nivelación de concreto 2cm bajo solados', 100, 'De nivelación de concreto 2cm bajo solados', 178000, '2026-08-25', '2026-08-29'),
+  (16, 6, 'Porcelanato', 100, 'Porcelanato', 215000, '2026-08-30', '2026-08-31'),
+  (17, 6, 'Zócalo de porcelanato', 100, 'Zócalo de porcelanato', 252000, '2026-09-01', '2026-09-04'),
+  (18, 7, 'Revoque grueso interior', 100, 'Revoque grueso interior', 289000, '2026-09-05', '2026-09-10'),
+  (19, 7, 'Revoque grueso exterior', 100, 'Revoque grueso exterior', 326000, '2026-09-11', '2026-09-13'),
+  (20, 7, 'Revoque fino o yeso (interior)', 100, 'Revoque fino o yeso (interior)', 363000, '2026-09-14', '2026-09-18'),
+  (21, 7, 'Revoque plástico exterior o revoque fino exterior', 100, 'Revoque plástico exterior o revoque fino exterior', 400000, '2026-09-19', '2026-09-20'),
+  (22, 8, 'Cielorraso', 100, 'Cielorraso', 437000, '2026-09-21', '2026-09-24'),
+  (23, 9, 'Revestimiento cerámico baño', 100, 'Revestimiento cerámico baño', 474000, '2026-09-25', '2026-09-30'),
+  (24, 9, 'Revestimiento de cocina', 100, 'Revestimiento de cocina', 91000, '2026-10-01', '2026-10-03'),
+  (25, 10, 'Pintura exterior', 100, 'Pintura exterior', 128000, '2026-10-04', '2026-10-08'),
+  (26, 10, 'Pintura interior', 100, 'Pintura interior', 165000, '2026-10-09', '2026-10-10'),
+  (27, 11, 'Marmolería', 100, 'Marmolería', 202000, '2026-10-11', '2026-10-14'),
+  (28, 12, 'Puertas interiores', 100, 'Puertas interiores', 239000, '2026-10-15', '2026-10-20'),
+  (29, 12, 'Puertas entrada', 45, 'Puertas entrada', 276000, '2026-10-21', '2026-10-23'),
+  (30, 12, 'Carpinterías s/planilla (ventanas, paños fijos, etc.)', 0, 'Carpinterías s/planilla (ventanas, paños fijos, etc.)', 313000, '2026-10-24', '2026-10-28'),
+  (31, 13, 'Muebles cocina', 0, 'Muebles cocina', 350000, '2026-10-29', '2026-10-30'),
+  (32, 13, 'Placares/vestidores', 0, 'Placares/vestidores', 387000, '2026-10-31', '2026-11-03'),
+  (33, 13, 'Muebles baños', 0, 'Muebles baños', 424000, '2026-11-04', '2026-11-09'),
+  (34, 13, 'Muebles varios', 0, 'Muebles varios', 461000, '2026-11-10', '2026-11-12'),
+  (35, 14, 'Calefacción (por radiadores o losa radiante)', 0, 'Calefacción (por radiadores o losa radiante)', 498000, '2026-11-13', '2026-11-17'),
+  (36, 15, 'Instalación aire acondicionado', 0, 'Instalación aire acondicionado', 115000, '2026-11-18', '2026-11-19'),
+  (37, 16, 'Termotanque eléctrico 80lts', 0, 'Termotanque eléctrico 80lts', 152000, '2026-11-20', '2026-11-23'),
+  (38, 16, 'Alarma', 0, 'Alarma', 189000, '2026-11-24', '2026-11-29'),
+  (39, 16, 'Portón eléctrico', 0, 'Portón eléctrico', 226000, '2026-11-30', '2026-12-02'),
+  (40, 17, 'Limpieza final fina (de la obra)', 0, 'Limpieza final fina (de la obra)', 263000, '2026-12-03', '2026-12-07'),
+  (41, 17, 'Limpieza de obra', 0, 'Limpieza de obra', 300000, '2026-12-08', '2026-12-09'),
+  (42, 18, 'Pileta', 0, 'Pileta', 337000, '2026-12-10', '2026-12-13')
+ON CONFLICT (id_subtarea) DO UPDATE SET id_tarea=EXCLUDED.id_tarea, nombre=EXCLUDED.nombre, porcentaje=EXCLUDED.porcentaje, descripcion=EXCLUDED.descripcion, costo_estimado=EXCLUDED.costo_estimado, fecha_inicio_estimada=EXCLUDED.fecha_inicio_estimada, fecha_fin_estimada=EXCLUDED.fecha_fin_estimada;
 
-
--- Pagos parciales (3 válidos; 1 referencias inválidas omitidas)
+-- Pagos parciales de demostración; su suma define el costo real de cada subtarea.
 INSERT INTO pagos_parciales (id_pago, id_subtarea, descripcion, monto) OVERRIDING SYSTEM VALUE VALUES
-  (1, 1, 'pago de la primera etapa', 1000000),
-  (2, 5, 'pago de la segunda etapa', 2000000),
-  (3, 5, 'pago de la segunda etapa', 2000000)
+  (1, 1, 'Pago registrado por avance de: ' || (SELECT nombre FROM subtareas WHERE id_subtarea=1), 84800),
+  (2, 2, 'Pago registrado por avance de: ' || (SELECT nombre FROM subtareas WHERE id_subtarea=2), 124020),
+  (3, 3, 'Pago registrado por avance de: ' || (SELECT nombre FROM subtareas WHERE id_subtarea=3), 163240),
+  (4, 4, 'Pago registrado por avance de: ' || (SELECT nombre FROM subtareas WHERE id_subtarea=4), 202460),
+  (5, 5, 'Pago registrado por avance de: ' || (SELECT nombre FROM subtareas WHERE id_subtarea=5), 241680),
+  (6, 6, 'Pago registrado por avance de: ' || (SELECT nombre FROM subtareas WHERE id_subtarea=6), 280900),
+  (7, 7, 'Pago registrado por avance de: ' || (SELECT nombre FROM subtareas WHERE id_subtarea=7), 320120),
+  (8, 8, 'Pago registrado por avance de: ' || (SELECT nombre FROM subtareas WHERE id_subtarea=8), 359340),
+  (9, 9, 'Pago registrado por avance de: ' || (SELECT nombre FROM subtareas WHERE id_subtarea=9), 398560),
+  (10, 10, 'Pago registrado por avance de: ' || (SELECT nombre FROM subtareas WHERE id_subtarea=10), 437780),
+  (11, 11, 'Pago registrado por avance de: ' || (SELECT nombre FROM subtareas WHERE id_subtarea=11), 477000),
+  (12, 12, 'Pago registrado por avance de: ' || (SELECT nombre FROM subtareas WHERE id_subtarea=12), 516220),
+  (13, 13, 'Pago registrado por avance de: ' || (SELECT nombre FROM subtareas WHERE id_subtarea=13), 110240),
+  (14, 14, 'Pago registrado por avance de: ' || (SELECT nombre FROM subtareas WHERE id_subtarea=14), 149460),
+  (15, 15, 'Pago registrado por avance de: ' || (SELECT nombre FROM subtareas WHERE id_subtarea=15), 188680),
+  (16, 16, 'Pago registrado por avance de: ' || (SELECT nombre FROM subtareas WHERE id_subtarea=16), 227900),
+  (17, 17, 'Pago registrado por avance de: ' || (SELECT nombre FROM subtareas WHERE id_subtarea=17), 267120),
+  (18, 18, 'Pago registrado por avance de: ' || (SELECT nombre FROM subtareas WHERE id_subtarea=18), 306340),
+  (19, 19, 'Pago registrado por avance de: ' || (SELECT nombre FROM subtareas WHERE id_subtarea=19), 345560),
+  (20, 20, 'Pago registrado por avance de: ' || (SELECT nombre FROM subtareas WHERE id_subtarea=20), 384780),
+  (21, 21, 'Pago registrado por avance de: ' || (SELECT nombre FROM subtareas WHERE id_subtarea=21), 424000),
+  (22, 22, 'Pago registrado por avance de: ' || (SELECT nombre FROM subtareas WHERE id_subtarea=22), 463220),
+  (23, 23, 'Pago registrado por avance de: ' || (SELECT nombre FROM subtareas WHERE id_subtarea=23), 502440),
+  (24, 24, 'Pago registrado por avance de: ' || (SELECT nombre FROM subtareas WHERE id_subtarea=24), 96460),
+  (25, 25, 'Pago registrado por avance de: ' || (SELECT nombre FROM subtareas WHERE id_subtarea=25), 135680),
+  (26, 26, 'Pago registrado por avance de: ' || (SELECT nombre FROM subtareas WHERE id_subtarea=26), 174900),
+  (27, 27, 'Pago registrado por avance de: ' || (SELECT nombre FROM subtareas WHERE id_subtarea=27), 214120),
+  (28, 28, 'Pago registrado por avance de: ' || (SELECT nombre FROM subtareas WHERE id_subtarea=28), 253340),
+  (29, 29, 'Pago registrado por avance de: ' || (SELECT nombre FROM subtareas WHERE id_subtarea=29), 132480)
 ON CONFLICT (id_pago) DO UPDATE SET id_subtarea=EXCLUDED.id_subtarea, descripcion=EXCLUDED.descripcion, monto=EXCLUDED.monto;
 
 
--- Recordatorios (la fecha JSON se interpreta a medianoche de Argentina)
+-- Fechas reales de ejemplo en las subtareas iniciadas o completadas.
+UPDATE subtareas
+SET fecha_inicio_real = CASE WHEN porcentaje > 0 THEN fecha_inicio_estimada ELSE NULL END,
+    fecha_fin_real = CASE WHEN porcentaje = 100 THEN fecha_fin_estimada ELSE NULL END;
+
+-- Recordatorios de seguimiento con fechas próximas al cronograma de las obras.
 INSERT INTO recordatorios (id_recordatorio, id_obra, fecha, descripcion) OVERRIDING SYSTEM VALUE VALUES
-  (1, 1, '2026-09-29 00:00:00-03', 'Recordatorio de tarea ejemplo 1'),
-  (2, 2, '2026-09-29 00:00:00-03', 'Recordatorio de tarea ejemplo 2'),
-  (3, 2, '2026-10-05 00:00:00-03', 'Recordatorio de tarea ejemplo 3'),
-  (4, 2, '2026-10-29 00:00:00-03', 'Recordatorio de tarea ejemplo 4')
+  (1, 1, '2026-11-09 09:00:00-03', 'Confirmar entrega de carpinterías para la vivienda.'),
+  (2, 2, '2026-11-09 10:00:00-03', 'Coordinar el acceso al lote antes del inicio de obra.'),
+  (3, 2, '2026-11-10 08:00:00-03', 'Verificar limpieza y nivelación del terreno.'),
+  (4, 1, '2026-11-12 16:00:00-03', 'Revisar el avance de carpintería y actualizar el cronograma.')
 ON CONFLICT (id_recordatorio) DO UPDATE SET id_obra=EXCLUDED.id_obra, fecha=EXCLUDED.fecha, descripcion=EXCLUDED.descripcion;
 
 

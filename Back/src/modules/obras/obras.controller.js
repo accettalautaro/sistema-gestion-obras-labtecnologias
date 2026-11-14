@@ -73,6 +73,17 @@ export const actualizarObra = async (req,res,next) => {
 
     }
 }
+export const actualizarEstadoSeguimiento = async (req,res,next) => {
+    try {
+        const resultado = await service.actualizarEstadoSeguimiento(req.params.id, req.body?.accion);
+        if (!resultado) {
+            return res.status(404).json({ error: 'Obra no encontrada' });
+        }
+        return res.status(200).json(resultado);
+    } catch (error) {
+        next(error);
+    }
+}
 //DELETE api/obras/id
 export const eliminarObra = async (req,res,next)=>{
     try{

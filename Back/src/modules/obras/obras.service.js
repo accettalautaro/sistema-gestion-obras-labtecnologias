@@ -1,5 +1,116 @@
 import * as repository from './obras.repository.js';
 
+function fechaISO(valor) {
+    if (!valor) return null;
+    const fecha = valor instanceof Date ? valor.toISOString().slice(0, 10) : String(valor).slice(0, 10);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) return null;
+    const valida = new Date(`${fecha}T00:00:00Z`);
+    return Number.isNaN(valida.getTime()) || valida.toISOString().slice(0, 10) !== fecha ? null : fecha;
+}
+
+function menorFecha(fechas) {
+    return fechas.map(fechaISO).filter(Boolean).sort()[0] ?? null;
+}
+
+function mayorFecha(fechas) {
+    return fechas.map(fechaISO).filter(Boolean).sort().at(-1) ?? null;
+}
+
+export function duracionInclusiva(inicio, fin) {
+    const fechaInicio = fechaISO(inicio);
+    const fechaFin = fechaISO(fin);
+    if (!fechaInicio || !fechaFin || fechaFin < fechaInicio) return null;
+    const inicioUTC = Date.parse(`${fechaInicio}T00:00:00Z`);
+    const finUTC = Date.parse(`${fechaFin}T00:00:00Z`);
+    return Math.floor((finUTC - inicioUTC) / 86400000) + 1;
+}
+
+function sumaDuraciones(items) {
+    if (!items.length) return 0;
+    if (items.some((item) => item.duracion_estimada == null)) return null;
+    return items.reduce((total, item) => total + Number(item.duracion_estimada), 0);
+}
+
+function suma(items, campo) {
+    return items.reduce((total, item) => total + (Number(item[campo]) || 0), 0);
+}
+
+export function derivarSubtarea(subtarea) {
+    const fecha_inicio_estimada = fechaISO(subtarea.fecha_inicio_estimada);
+    const fecha_fin_estimada = fechaISO(subtarea.fecha_fin_estimada);
+    const fecha_inicio_real = fechaISO(subtarea.fecha_inicio_real);
+    const fecha_fin_real = fechaISO(subtarea.fecha_fin_real);
+    return {
+        ...subtarea,
+        porcentaje: Number(subtarea.porcentaje) || 0,
+        fecha_inicio_estimada,
+        fecha_fin_estimada,
+        fecha_inicio_real,
+        fecha_fin_real,
+        duracion_estimada: duracionInclusiva(fecha_inicio_estimada, fecha_fin_estimada),
+        duracion_real: duracionInclusiva(fecha_inicio_real, fecha_fin_real),
+        costo_estimado: Number(subtarea.costo_estimado) || 0,
+        costo_real: Number(subtarea.costo_real) || 0,
+    };
+}
+
+export function derivarTarea(subtareas) {
+    const unidades = subtareas.map(derivarSubtarea);
+    const porcentaje = unidades.length
+        ? Math.floor(suma(unidades, 'porcentaje') / unidades.length)
+        : 0;
+    const completa = unidades.length > 0
+        && unidades.every((unidad) => unidad.porcentaje >= 100 && unidad.fecha_fin_real);
+    const fecha_inicio_real = menorFecha(unidades.map((unidad) => unidad.fecha_inicio_real));
+    const fecha_fin_real = completa
+        ? mayorFecha(unidades.map((unidad) => unidad.fecha_fin_real))
+        : null;
+
+    return {
+        porcentaje,
+        duracion_estimada: sumaDuraciones(unidades),
+        duracion_real: completa ? duracionInclusiva(fecha_inicio_real, fecha_fin_real) : null,
+        costo_estimado: suma(unidades, 'costo_estimado'),
+        costo_real: suma(unidades, 'costo_real'),
+        fecha_inicio_real,
+        fecha_fin_real,
+        subtareas: unidades,
+    };
+}
+
+export function derivarObra(tareas, pausada = false) {
+    const porcentaje = tareas.length
+        ? Math.floor(suma(tareas, 'porcentaje') / tareas.length)
+        : 0;
+    const completa = tareas.length > 0 && tareas.every((tarea) => (
+        tarea.subtareas.length > 0
+        && tarea.porcentaje >= 100
+        && tarea.fecha_fin_real
+    ));
+    const fecha_inicio_real = menorFecha(tareas.map((tarea) => tarea.fecha_inicio_real));
+    const fecha_fin_real = completa
+        ? mayorFecha(tareas.map((tarea) => tarea.fecha_fin_real))
+        : null;
+    const estado = pausada
+        ? 'Pausada'
+        : !fecha_inicio_real
+            ? 'No Inicio'
+            : completa
+                ? 'Finalizada'
+                : 'En ejecución';
+
+    return {
+        porcentaje,
+        costo_estimado: suma(tareas, 'costo_estimado'),
+        costo_real: suma(tareas, 'costo_real'),
+        duracion_estimada: sumaDuraciones(tareas),
+        duracion_real: completa ? duracionInclusiva(fecha_inicio_real, fecha_fin_real) : null,
+        fecha_inicio_real,
+        fecha_fin_real,
+        estado,
+    };
+}
+
 const errorValidacion = (mensaje) => Object.assign(new Error(mensaje), { status: 400 });
 
 const validarFecha = (fecha, campo) => {
@@ -25,12 +136,12 @@ const validarDatosObra = (obra) => {
         || BigInt(obra.id_lote) > 9223372036854775807n) {
         throw errorValidacion('Seleccioná un lote para la obra. Si todavía no existe, primero tenés que crear el lote.');
     }
-    const fecha_inicio = validarFecha(obra.fecha_inicio, 'La fecha de inicio');
-    const fecha_fin = validarFecha(obra.fecha_fin, 'La fecha de finalización');
-    if (fecha_fin < fecha_inicio) {
+    const fecha_inicio_estimada = validarFecha(obra.fecha_inicio_estimada, 'La fecha de inicio estimada');
+    const fecha_fin_estimada = validarFecha(obra.fecha_fin_estimada, 'La fecha de finalización estimada');
+    if (fecha_fin_estimada < fecha_inicio_estimada) {
         throw errorValidacion('La fecha de finalización no puede ser anterior a la fecha de inicio.');
     }
-    return { ...obra, fecha_inicio, fecha_fin };
+    return { ...obra, fecha_inicio_estimada, fecha_fin_estimada };
 };
 
 export const listarObras= async (req)=>{
@@ -46,7 +157,10 @@ export const listarObras= async (req)=>{
             throw errorValidacion(`${nombre} debe ser un identificador válido.`);
         }
     }
-    const obras = await repository.listarTodos();
+    const obras = (await repository.listarTodos()).map((obra) => ({
+        ...obra,
+        estado: obra.estado_calculado ?? obra.estado,
+    }));
     if(id_cliente) {
         return obras.filter(o=> String(o.id_cliente) === String(id_cliente));
     }
@@ -64,16 +178,19 @@ export const listarObras= async (req)=>{
 
 }
 export const crearObra= async (obra)=>{
-    return await repository.crearObra(validarDatosObra(obra));
+    const creada = await repository.crearObra(validarDatosObra(obra));
+    return creada ? { ...creada, estado: creada.estado_calculado ?? creada.estado } : null;
 }
 
 export const obtenerObra= async (id)=>{
-    return await repository.obtenerObra(id);
+    const obra = await repository.obtenerObra(id);
+    return obra ? { ...obra, estado: obra.estado_calculado ?? obra.estado } : null;
 }
 
 export const actualizarObra= async(id,obra)=>{
-    const {id_arquitecto,id_cliente,id_lote,fecha_inicio,fecha_fin,estado,descripcion}=validarDatosObra(obra);
-    return await repository.actualizarObra(id,id_arquitecto,id_cliente,id_lote,fecha_inicio,fecha_fin,estado,descripcion);
+    const {id_arquitecto,id_cliente,id_lote,fecha_inicio_estimada,fecha_fin_estimada,descripcion}=validarDatosObra(obra);
+    const actualizada = await repository.actualizarObra(id,id_arquitecto,id_cliente,id_lote,fecha_inicio_estimada,fecha_fin_estimada,descripcion);
+    return actualizada ? { ...actualizada, estado: actualizada.estado_calculado ?? actualizada.estado } : null;
 }
 
 export const eliminarObra= async (id)=>{
@@ -81,100 +198,127 @@ export const eliminarObra= async (id)=>{
     return await repository.eliminar(id);
 }
 export const  obtenerTareas= async (id)=> {
-    // 1. Traemos los datos planos de la base de datos
     const filas = await repository.obtenerTareas(id);
-    
     if (filas.length === 0) return null;
 
-    // 2. Transformamos el resultado plano a una estructura jerárquica
-    const obra = {
+    const filaObra = filas[0];
+    const mapaTareas = new Map();
+    for (const fila of filas) {
+        if (fila.id_tarea == null) continue;
+        if (!mapaTareas.has(fila.id_tarea)) {
+            mapaTareas.set(fila.id_tarea, {
+                id_tarea: fila.id_tarea,
+                nombre_tarea: fila.nombre_tarea,
+                descripcion_tarea: fila.descripcion_tarea,
+                fecha_inicio_tarea: fila.fecha_inicio_tarea,
+                fecha_fin_tarea: fila.fecha_fin_tarea,
+                subtareas: [],
+            });
+        }
+        if (fila.id_subtarea != null) {
+            mapaTareas.get(fila.id_tarea).subtareas.push({
+                id_subtarea: fila.id_subtarea,
+                nombre_subtarea: fila.nombre_subtarea,
+                porcentaje: Number(fila.porcentaje_subtarea) || 0,
+                descripcion_subtarea: fila.descripcion_subtarea,
+                costo_estimado: fila.costo_estimado_subtarea,
+                costo_real: fila.costo_real_subtarea,
+                fecha_inicio_estimada: fila.fecha_inicio_subtarea,
+                fecha_fin_estimada: fila.fecha_fin_subtarea,
+                fecha_inicio_real: fila.fecha_inicio_real_subtarea,
+                fecha_fin_real: fila.fecha_fin_real_subtarea,
+            });
+        }
+    }
+
+    const tareas = Array.from(mapaTareas.values(), (tarea) => {
+        const derivada = derivarTarea(tarea.subtareas);
+        const subtareas = derivada.subtareas.map((subtarea) => ({
+            id_subtarea: subtarea.id_subtarea,
+            nombre_subtarea: subtarea.nombre_subtarea,
+            porcentaje_subtarea: subtarea.porcentaje,
+            descripcion_subtarea: subtarea.descripcion_subtarea,
+            duracion_estimada_subtarea: subtarea.duracion_estimada,
+            duracion_real_subtarea: subtarea.duracion_real,
+            costo_estimado_subtarea: subtarea.costo_estimado,
+            costo_real_subtarea: subtarea.costo_real,
+            fecha_inicio_subtarea: subtarea.fecha_inicio_estimada,
+            fecha_fin_subtarea: subtarea.fecha_fin_estimada,
+            fecha_inicio_real_subtarea: subtarea.fecha_inicio_real,
+            fecha_fin_real_subtarea: subtarea.fecha_fin_real,
+        }));
+        return {
+            id_tarea: tarea.id_tarea,
+            nombre_tarea: tarea.nombre_tarea,
+            descripcion_tarea: tarea.descripcion_tarea,
+            fecha_inicio_tarea: tarea.fecha_inicio_tarea,
+            fecha_fin_tarea: tarea.fecha_fin_tarea,
+            porcentaje_tarea: derivada.porcentaje,
+            duracion_estimada_tarea: derivada.duracion_estimada,
+            duracion_real_tarea: derivada.duracion_real,
+            costo_estimado_tarea: derivada.costo_estimado,
+            costo_real_tarea: derivada.costo_real,
+            fecha_inicio_real_tarea: derivada.fecha_inicio_real,
+            fecha_fin_real_tarea: derivada.fecha_fin_real,
+            porcentaje: derivada.porcentaje,
+            duracion_estimada: derivada.duracion_estimada,
+            duracion_real: derivada.duracion_real,
+            costo_estimado: derivada.costo_estimado,
+            costo_real: derivada.costo_real,
+            fecha_inicio_real: derivada.fecha_inicio_real,
+            fecha_fin_real: derivada.fecha_fin_real,
+            subtareas,
+        };
+    });
+    const pausada = ['pausa', 'pausada', 'suspendida', 'suspendido'].includes(
+        String(filaObra.estado ?? '').trim().toLowerCase(),
+    );
+    const metricas = derivarObra(tareas.map((tarea) => ({
+        ...tarea,
+        fecha_inicio_real: tarea.fecha_inicio_real_tarea,
+        fecha_fin_real: tarea.fecha_fin_real_tarea,
+    })), pausada);
+
+    return {
         id_obra: filas[0].id_obra,
-        id_cliente:filas[0].id_cliente,
-        id_arquitecto:filas[0].id_arquitecto,
-        id_lote: filas[0].id_lote,
-        fecha_inicio_obra:filas[0].fecha_inicio_obra,
-        fecha_fin_obra:filas[0].fecha_fin_obra,
-        estado:filas[0].estado,
-        arquitecto: filas[0].id_arquitecto ? {
-            id_arquitecto: filas[0].id_arquitecto,
-            nombre: filas[0].arquitecto_nombre,
-            apellido: filas[0].arquitecto_apellido,
-            dni: filas[0].arquitecto_dni,
-            email: filas[0].arquitecto_email,
-            telefono: filas[0].arquitecto_telefono,
-            nro_matricula: filas[0].arquitecto_nro_matricula,
+        id_cliente: filaObra.id_cliente,
+        id_arquitecto: filaObra.id_arquitecto,
+        id_lote: filaObra.id_lote,
+        fecha_inicio_obra: filaObra.fecha_inicio_obra,
+        fecha_fin_obra: filaObra.fecha_fin_obra,
+        fecha_inicio_real_obra: metricas.fecha_inicio_real,
+        fecha_fin_real_obra: metricas.fecha_fin_real,
+        duracion_estimada_obra: metricas.duracion_estimada,
+        duracion_real_obra: metricas.duracion_real,
+        estado: metricas.estado,
+        arquitecto: filaObra.id_arquitecto ? {
+            id_arquitecto: filaObra.id_arquitecto,
+            nombre: filaObra.arquitecto_nombre,
+            apellido: filaObra.arquitecto_apellido,
+            dni: filaObra.arquitecto_dni,
+            email: filaObra.arquitecto_email,
+            telefono: filaObra.arquitecto_telefono,
+            nro_matricula: filaObra.arquitecto_nro_matricula,
         } : null,
-        lote: filas[0].id_lote ? {
-            id_lote: filas[0].id_lote,
-            nro_lote: filas[0].nro_lote,
+        lote: filaObra.id_lote ? {
+            id_lote: filaObra.id_lote,
+            nro_lote: filaObra.nro_lote,
         } : null,
-        costo_estimado:0,
-        total_abonado:0,
-        porcentaje:0,
-        descripcion_obra:filas[0].descripcion_obra,
-        tareas: []
+        costo_estimado: metricas.costo_estimado,
+        total_abonado: metricas.costo_real,
+        porcentaje: metricas.porcentaje,
+        descripcion_obra: filaObra.descripcion_obra,
+        tareas,
     };
-
-    const mapaTareas = new Map();//estructura auxiliar para registrar las tareas que vamos agregando
-
-    for (const row of filas) {
-        // Si la tarea existe y aún no la agregamos al mapa
-        if (row.id_tarea && !mapaTareas.has(row.id_tarea)) {
-            
-            const tarea = {
-                id_tarea: row.id_tarea,
-                nombre_tarea: row.nombre_tarea,
-                duracion_estimada_tarea:row.duracion_estimada_tarea,
-                porcentaje_tarea: 0,
-                descripcion_tarea:row.descripcion_tarea,
-                duracion_real_tarea:row.duracion_real_tarea,
-                costo_estimado_tarea:Number(row.costo_estimado_tarea ?? 0),
-                costo_real_tarea:0,
-                fecha_inicio_tarea:row.fecha_inicio_tarea,
-                fecha_fin_tarea:row.fecha_fin_tarea ,
-                subtareas: []
-            };
-            mapaTareas.set(row.id_tarea, tarea);//registramos la tarea en nuestra estructura auxiliar
-            obra.tareas.push(tarea);//agregamos la tarea a la obra
-        }
-
-        // Si la fila tiene subtarea, la asociamos a su tarea correspondiente
-        if (row.id_subtarea) {
-            const tareaActual = mapaTareas.get(row.id_tarea);//tomamos la tarea de la fila
-            
-            const existeSubtarea = tareaActual.subtareas.some(s => s.id_subtarea === row.id_subtarea);//chequeamos si la subtarea ya existe en el arreglo subtareas de nuestra tarea
-            if (!existeSubtarea) {//si no existe 
-                const costoRealSubtarea = Number(row.costo_real_subtarea ?? 0);
-                
-                tareaActual.subtareas.push({ //agregamos nuestra subtarea al arreglo
-                    id_subtarea: row.id_subtarea,
-                    nombre_subtarea: row.nombre_subtarea,
-                    duracion_estimada_subtarea:row.duracion_estimada_subtarea,
-                    porcentaje_subtarea:Number( row.porcentaje_subtarea),
-                    descripcion_subtarea:row.descripcion_subtarea,
-                    duracion_real_subtarea:row.duracion_real_subtarea,
-                    costo_estimado_subtarea:row.costo_estimado_subtarea,
-                    costo_real_subtarea:costoRealSubtarea,
-                    fecha_inicio_subtarea:row.fecha_inicio_subtarea,
-                    fecha_fin_subtarea:row.fecha_fin_subtarea ,
-                });
-                tareaActual.costo_real_tarea+=costoRealSubtarea;
-                tareaActual.porcentaje_tarea+=Number(row.porcentaje_subtarea);
-            }
-        }
-    }
-    for (const tarea of obra.tareas){
-        obra.costo_estimado += tarea.costo_estimado_tarea;
-        obra.total_abonado += tarea.costo_real_tarea;
-        if(tarea.subtareas.length>0){
-            tarea.porcentaje_tarea=tarea.porcentaje_tarea/tarea.subtareas.length;
-        }
-    }
-    if (obra.tareas.length > 0) {
-    obra.porcentaje =
-        obra.tareas.reduce((suma, tarea) => suma + tarea.porcentaje_tarea, 0) /
-        obra.tareas.length;
 }
-    
-    return obra;//retornamos la obra ya jerarquizada
-}
+
+export const actualizarEstadoSeguimiento = async (id, accion) => {
+    if (!['pausar', 'reanudar'].includes(accion)) {
+        throw errorValidacion('La acción debe ser pausar o reanudar.');
+    }
+    const existente = await repository.obtenerObra(id);
+    if (!existente) return null;
+    if (accion === 'pausar') return repository.actualizarEstado(id, 'Pausada');
+    const resumen = await obtenerTareas(id);
+    return repository.actualizarEstado(id, derivarObra(resumen.tareas, false).estado);
+};

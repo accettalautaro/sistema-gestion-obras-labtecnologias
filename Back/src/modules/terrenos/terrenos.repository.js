@@ -42,7 +42,32 @@ const SELECT_TERRENOS = `
     SELECT l.id_lote, l.nro_lote, l.id_direccion,
            to_jsonb(d) AS direccion,
            COALESCE((
-               SELECT jsonb_agg(jsonb_build_object('id_obra', o.id_obra::text, 'estado', o.estado)
+               SELECT jsonb_agg(jsonb_build_object(
+                   'id_obra', o.id_obra::text,
+                   'estado', CASE
+                       WHEN LOWER(COALESCE(o.estado, '')) IN ('pausa', 'pausada', 'suspendida', 'suspendido') THEN 'Pausada'
+                       WHEN NOT EXISTS (
+                           SELECT 1
+                           FROM subtareas s
+                           JOIN tareas t ON t.id_tarea = s.id_tarea
+                           WHERE t.id_obra = o.id_obra AND s.fecha_inicio_real IS NOT NULL
+                       ) THEN 'No Inicio'
+                       WHEN EXISTS (
+                           SELECT 1
+                           FROM tareas t
+                           WHERE t.id_obra = o.id_obra
+                             AND (
+                                 NOT EXISTS (SELECT 1 FROM subtareas s WHERE s.id_tarea = t.id_tarea)
+                                 OR EXISTS (
+                                     SELECT 1 FROM subtareas s
+                                     WHERE s.id_tarea = t.id_tarea
+                                       AND (s.porcentaje < 100 OR s.fecha_fin_real IS NULL)
+                                 )
+                             )
+                       ) THEN 'En ejecución'
+                       ELSE 'Finalizada'
+                   END
+               )
                                 ORDER BY o.id_obra)
                FROM obras o
                WHERE o.id_lote = l.id_lote

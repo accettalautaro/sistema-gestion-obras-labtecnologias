@@ -45,6 +45,17 @@ export const actualizarSubtarea = async (req,res,next) => {
 
     }
 } 
+export const cambiarEstadoSubtarea = async (req,res,next) => {
+    try {
+        const resultado = await service.cambiarEstadoSubtarea(req.params.id, req.body?.accion);
+        if (!resultado) {
+            return res.status(404).json({ error: 'Subtarea no encontrada' });
+        }
+        return res.status(200).json(resultado);
+    } catch (error) {
+        next(error);
+    }
+}
 //DELETE api/subtareas/id
 export const eliminarSubtarea = async (req,res,next)=>{
     try{

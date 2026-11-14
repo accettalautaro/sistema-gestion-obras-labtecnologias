@@ -53,7 +53,7 @@
 }
 
 .layout-gestor main :is(.obras-page__header p:last-child, .clientes-page__header p:last-child, .terrenos-page__header p:last-child, .pagos-page__header p:last-child, .recordatorios__subtitle) { color: var(--ui-muted); }
-.layout-gestor main :is(.obras-page__count, .clientes-page__count, .clientes-page__cuenta, .terrenos-page__count, .pagos-page__count, .gestionar-tareas__contador) { background: var(--ui-accent-soft); border: 1px solid #ead8c7; border-radius: 999px; color: var(--ui-accent-hover); }
+.layout-gestor main :is(.obras-page__count, .clientes-page__count, .clientes-page__cuenta, .terrenos-page__count, .terrenos-page__porcentaje, .pagos-page__count, .gestionar-tareas__contador) { background: var(--ui-accent-soft); border: 1px solid #ead8c7; border-radius: 999px; color: var(--ui-accent-hover); }
 
 .layout-gestor main .btn {
 	border-radius: .4rem;

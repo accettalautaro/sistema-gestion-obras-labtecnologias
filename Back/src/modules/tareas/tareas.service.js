@@ -1,4 +1,5 @@
 import * as repository from './tareas.repository.js';
+import { derivarTarea } from '../obras/obras.service.js';
 
 const errorCliente = (mensaje) => Object.assign(new Error(mensaje), { status: 400 });
 const MAX_BIGINT = 9223372036854775807n;
@@ -11,6 +12,16 @@ const validarId = (id, campo = 'identificador') => {
     return texto;
 };
 
+const validarFecha = (valor, campo) => {
+    if (valor === null || valor === undefined || valor === '') return null;
+    if (typeof valor !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(valor)
+        || Number.isNaN(Date.parse(`${valor}T00:00:00Z`))
+        || new Date(`${valor}T00:00:00Z`).toISOString().slice(0, 10) !== valor) {
+        throw errorCliente(`${campo} debe ser una fecha válida con formato YYYY-MM-DD.`);
+    }
+    return valor;
+};
+
 const validarDatos = (tarea) => {
     if (!tarea || typeof tarea !== 'object' || Array.isArray(tarea)) {
         throw errorCliente('Los datos de la tarea deben ser un objeto.');
@@ -18,147 +29,75 @@ const validarDatos = (tarea) => {
     if (typeof tarea.nombre !== 'string' || !tarea.nombre.trim()) {
         throw errorCliente('nombre es obligatorio.');
     }
-    const datos = { ...tarea, id_obra: validarId(tarea.id_obra, 'id_obra'), nombre: tarea.nombre.trim() };
-    for (const campo of ['duracion_estimada', 'porcentaje', 'duracion_real', 'costo_estimado', 'costo_real']) {
-        const valor = tarea[campo];
-        if (valor === null || valor === undefined || valor === '') {
-            datos[campo] = campo === 'porcentaje' ? 0 : null;
-            continue;
-        }
-        const numero = Number(valor);
-        if (!Number.isFinite(numero) || numero < 0 || (campo === 'porcentaje' && numero > 100)) {
-            throw errorCliente(`${campo} debe ser un número válido${campo === 'porcentaje' ? ' entre 0 y 100' : ' no negativo'}.`);
-        }
-        datos[campo] = numero;
+    const fecha_inicio_estimada = validarFecha(tarea.fecha_inicio_estimada, 'fecha_inicio_estimada');
+    const fecha_fin_estimada = validarFecha(tarea.fecha_fin_estimada, 'fecha_fin_estimada');
+    if (fecha_inicio_estimada && fecha_fin_estimada && fecha_fin_estimada < fecha_inicio_estimada) {
+        throw errorCliente('fecha_fin_estimada no puede ser anterior a fecha_inicio_estimada.');
     }
-    for (const campo of ['fecha_inicio', 'fecha_fin']) {
-        const valor = tarea[campo];
-        if (valor === null || valor === undefined || valor === '') {
-            datos[campo] = null;
-        } else if (typeof valor !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(valor)
-            || Number.isNaN(Date.parse(`${valor}T00:00:00Z`))
-            || new Date(`${valor}T00:00:00Z`).toISOString().slice(0, 10) !== valor) {
-            throw errorCliente(`${campo} debe ser una fecha válida con formato YYYY-MM-DD.`);
-        }
-    }
-    if (datos.fecha_inicio && datos.fecha_fin && datos.fecha_fin < datos.fecha_inicio) {
-        throw errorCliente('fecha_fin no puede ser anterior a fecha_inicio.');
-    }
-    return datos;
+    return {
+        id_obra: validarId(tarea.id_obra, 'id_obra'),
+        nombre: tarea.nombre.trim(),
+        descripcion: tarea.descripcion ?? null,
+        fecha_inicio_estimada,
+        fecha_fin_estimada,
+    };
 };
 
-export const listarTareas= async ()=>{
-    const filas = await repository.listarTodos();
-    const tareasPorId = new Map();
-
-    for (const fila of filas) {
-        let tarea = tareasPorId.get(fila.id_tarea);
-        if (!tarea) {
-            const {
-                subtarea_id,
-                subtarea_duracion_estimada,
-                subtarea_porcentaje,
-                subtarea_costo_estimado,
-                subtarea_costo_real,
-                subtarea_duracion_real,
-                ...datosTarea
-            } = fila;
-
-            tarea = {
-                ...datosTarea,
-                duracion_estimada: 0,
-                duracion_real: 0,
-                costo_estimado: 0,
-                costo_real: 0,
-                porcentaje: 0,
-                _cantidadSubtareas: 0,
-            };
-            tareasPorId.set(fila.id_tarea, tarea);
-        }
-
-        if (fila.subtarea_id !== null) {
-            tarea.duracion_estimada += Number(fila.subtarea_duracion_estimada ?? 0);
-            tarea.duracion_real += Number(fila.subtarea_duracion_real ?? 0);
-            tarea.costo_estimado += Number(fila.subtarea_costo_estimado ?? 0);
-            tarea.costo_real += Number(fila.subtarea_costo_real ?? 0);
-            tarea.porcentaje += Number(fila.subtarea_porcentaje ?? 0);
-            tarea._cantidadSubtareas += 1;
-        }
-    }
-
-    return Array.from(tareasPorId.values(), (tarea) => {
-        if (tarea._cantidadSubtareas > 0) {
-            tarea.porcentaje /= tarea._cantidadSubtareas;
-        }
-        delete tarea._cantidadSubtareas;
-        return tarea;
-    });
-
-}
-export const crearTarea= async (tarea)=>{
-    return repository.crearTarea(validarDatos(tarea));
-}
-
-export const obtenerTarea= async (id)=>{
-    const filas = await repository.obtenerTarea(id);
-    if (filas.length === 0){
-        throw new Error('Tarea no encontrada');
-        
-    };
-
+function mapearTarea(filas) {
+    const fila = filas[0];
+    const subtareas = filas
+        .filter((item) => item.subtarea_id != null)
+        .map((item) => ({
+            id_subtarea: item.subtarea_id,
+            nombre: item.subtarea_nombre,
+            descripcion: item.subtarea_descripcion,
+            porcentaje: item.subtarea_porcentaje,
+            costo_estimado: item.subtarea_costo_estimado,
+            costo_real: item.subtarea_costo_real,
+            fecha_inicio_estimada: item.subtarea_fecha_inicio_estimada,
+            fecha_fin_estimada: item.subtarea_fecha_fin_estimada,
+            fecha_inicio_real: item.subtarea_fecha_inicio_real,
+            fecha_fin_real: item.subtarea_fecha_fin_real,
+        }));
+    const derivada = derivarTarea(subtareas);
     const {
         subtarea_id,
         subtarea_nombre,
+        subtarea_descripcion,
         subtarea_porcentaje,
-        subtarea_duracion_estimada,
         subtarea_costo_estimado,
+        subtarea_fecha_inicio_estimada,
+        subtarea_fecha_fin_estimada,
+        subtarea_fecha_inicio_real,
+        subtarea_fecha_fin_real,
         subtarea_costo_real,
-        subtarea_duracion_real,
-        ...tarea
-    } = filas[0];
+        ...datosTarea
+    } = fila;
+    return { ...datosTarea, ...derivada };
+}
 
-    tarea.subtareas = [];
-    let sumaDuracionEstimada = 0;
-    let sumaCostoEstimado = 0;
-    let sumaCostoReal = 0;
-    let sumaDuracionReal = 0;
-    let sumaPorcentajes = 0;
-
+export const listarTareas = async () => {
+    const filas = await repository.listarTodos();
+    const grupos = new Map();
     for (const fila of filas) {
-        if (fila.subtarea_id === null) continue;
-
-        const porcentaje = Number(fila.subtarea_porcentaje ?? 0);
-        tarea.subtareas.push({
-            id_subtarea: fila.subtarea_id,
-            nombre: fila.subtarea_nombre,
-            porcentaje,
-        });
-
-        sumaDuracionEstimada += Number(fila.subtarea_duracion_estimada ?? 0);
-        sumaCostoEstimado += Number(fila.subtarea_costo_estimado ?? 0);
-        sumaCostoReal += Number(fila.subtarea_costo_real ?? 0);
-        sumaDuracionReal += Number(fila.subtarea_duracion_real ?? 0);
-        sumaPorcentajes += porcentaje;
+        if (!grupos.has(fila.id_tarea)) grupos.set(fila.id_tarea, []);
+        grupos.get(fila.id_tarea).push(fila);
     }
+    return Array.from(grupos.values(), mapearTarea);
+};
 
-    tarea.duracion_estimada = sumaDuracionEstimada;
-    tarea.costo_estimado = sumaCostoEstimado;
-    tarea.costo_real = sumaCostoReal;
-    tarea.duracion_real = sumaDuracionReal;
-    tarea.porcentaje = tarea.subtareas.length > 0
-        ? sumaPorcentajes / tarea.subtareas.length
-        : 0;
+export const crearTarea = async (tarea) => repository.crearTarea(validarDatos(tarea));
 
-    return tarea;
-}
+export const obtenerTarea = async (id) => {
+    const filas = await repository.obtenerTarea(validarId(id, 'id_tarea'));
+    if (filas.length === 0) {
+        throw Object.assign(new Error('Tarea no encontrada.'), { status: 404 });
+    }
+    return mapearTarea(filas);
+};
 
-export const actualizarTarea= async(id,tarea)=>{
-    const datos = validarDatos(tarea);
-    return repository.actualizarTarea(validarId(id, 'id_tarea'), datos.id_obra, datos.nombre, datos.duracion_estimada,
-        datos.porcentaje, datos.descripcion ?? null, datos.duracion_real, datos.costo_estimado,
-        datos.costo_real, datos.fecha_inicio, datos.fecha_fin);
-}
+export const actualizarTarea = async (id, tarea) => (
+    repository.actualizarTarea(validarId(id, 'id_tarea'), validarDatos(tarea))
+);
 
-export const eliminarTarea= async (id)=>{
-    return repository.eliminar(validarId(id, 'id_tarea'));
-}
+export const eliminarTarea = async (id) => repository.eliminar(validarId(id, 'id_tarea'));

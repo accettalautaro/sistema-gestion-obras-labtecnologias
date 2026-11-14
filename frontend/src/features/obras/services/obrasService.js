@@ -44,63 +44,84 @@ function normalizarFechaTarea(valor) {
 
 function convertirTareas(obraApi) {
 	return (obraApi?.tareas ?? []).flatMap((tarea) => {
+		const inicioRealTarea = normalizarFechaTarea(tarea.fecha_inicio_real_tarea)
+		const finRealTarea = normalizarFechaTarea(tarea.fecha_fin_real_tarea)
 		const principal = {
 			'id-obra': String(obraApi.id_obra), 'id-tarea': String(tarea.id_tarea),
 			nombre: tarea.nombre_tarea, descripcion: tarea.descripcion_tarea,
-			porcentaje: tarea.porcentaje_tarea,
-			estado: Number(tarea.porcentaje_tarea) >= 100 ? 'finalizada' : Number(tarea.porcentaje_tarea) > 0 ? 'en ejecucion' : 'sin comenzar',
+			porcentaje: `${Number(tarea.porcentaje_tarea) || 0}%`,
+			estado: finRealTarea ? 'finalizada' : inicioRealTarea ? 'en ejecucion' : 'sin comenzar',
 			'fecha-inicio': normalizarFechaTarea(tarea.fecha_inicio_tarea), 'fecha-fin': normalizarFechaTarea(tarea.fecha_fin_tarea),
 			'fecha-inicio-estimada': normalizarFechaTarea(tarea.fecha_inicio_tarea), 'fecha-fin-estimada': normalizarFechaTarea(tarea.fecha_fin_tarea),
-			'fecha-inicio-real': normalizarFechaTarea(tarea.fecha_inicio_tarea), 'fecha-fin-real': normalizarFechaTarea(tarea.fecha_fin_tarea),
+			'fecha-inicio-real': inicioRealTarea, 'fecha-fin-real': finRealTarea,
 			'duracion-estimada': tarea.duracion_estimada_tarea, 'duracion-real': tarea.duracion_real_tarea,
 			'costo-estimado': tarea.costo_estimado_tarea, 'costo-real': tarea.costo_real_tarea,
 			_persistida: true,
 		}
-		const subtareas = (tarea.subtareas ?? []).map((subtarea) => ({
-			...principal, 'id-tarea': `${tarea.id_tarea}_${subtarea.id_subtarea}`,
-			nombre: subtarea.nombre_subtarea, descripcion: subtarea.descripcion_subtarea,
-			porcentaje: subtarea.porcentaje_subtarea,
-			estado: Number(subtarea.porcentaje_subtarea) >= 100 ? 'finalizada' : Number(subtarea.porcentaje_subtarea) > 0 ? 'en ejecucion' : 'sin comenzar',
-			'fecha-inicio': normalizarFechaTarea(subtarea.fecha_inicio_subtarea), 'fecha-fin': normalizarFechaTarea(subtarea.fecha_fin_subtarea),
-			'fecha-inicio-estimada': normalizarFechaTarea(subtarea.fecha_inicio_subtarea), 'fecha-fin-estimada': normalizarFechaTarea(subtarea.fecha_fin_subtarea),
-			'fecha-inicio-real': normalizarFechaTarea(subtarea.fecha_inicio_subtarea), 'fecha-fin-real': normalizarFechaTarea(subtarea.fecha_fin_subtarea),
-			'duracion-estimada': subtarea.duracion_estimada_subtarea, 'duracion-real': subtarea.duracion_real_subtarea,
-			'costo-estimado': subtarea.costo_estimado_subtarea, 'costo-real': subtarea.costo_real_subtarea,
-			_dbSubtareaId: subtarea.id_subtarea,
-		}))
+		const subtareas = (tarea.subtareas ?? []).map((subtarea) => {
+			const inicioReal = normalizarFechaTarea(subtarea.fecha_inicio_real_subtarea)
+			const finReal = normalizarFechaTarea(subtarea.fecha_fin_real_subtarea)
+			return {
+				...principal, 'id-tarea': `${tarea.id_tarea}_${subtarea.id_subtarea}`,
+				nombre: subtarea.nombre_subtarea, descripcion: subtarea.descripcion_subtarea,
+				porcentaje: `${Number(subtarea.porcentaje_subtarea) || 0}%`,
+				estado: finReal ? 'finalizada' : inicioReal ? 'en ejecucion' : 'sin comenzar',
+				'fecha-inicio': normalizarFechaTarea(subtarea.fecha_inicio_subtarea), 'fecha-fin': normalizarFechaTarea(subtarea.fecha_fin_subtarea),
+				'fecha-inicio-estimada': normalizarFechaTarea(subtarea.fecha_inicio_subtarea), 'fecha-fin-estimada': normalizarFechaTarea(subtarea.fecha_fin_subtarea),
+				'fecha-inicio-real': inicioReal, 'fecha-fin-real': finReal,
+				'duracion-estimada': subtarea.duracion_estimada_subtarea, 'duracion-real': subtarea.duracion_real_subtarea,
+				'costo-estimado': subtarea.costo_estimado_subtarea, 'costo-real': subtarea.costo_real_subtarea,
+				_dbSubtareaId: subtarea.id_subtarea,
+			}
+		})
 		return [principal, ...subtareas]
 	})
 }
 
-function convertirObra(obra, tareas = []) {
-	const resumenTareas = resumirAvanceTareas(tareas)
-	const avance = resumenTareas.avance
-	const estadoPersistido = String(obra.estado ?? '').trim()
-	const estadoNormalizado = estadoPersistido.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+export function convertirObra(obra, tareas = []) {
+	const resumen = resumirAvanceTareas(tareas)
+	const avance = resumen.avance
+	const estadoOriginal = String(obra.estado ?? '').trim()
+	const estadoNormalizado = estadoOriginal.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+	const unidades = resumen.unidades
+	const fechaInicioEstimada = normalizarFechaTarea(obra.fecha_inicio_estimada)
+	const fechaFinEstimada = normalizarFechaTarea(obra.fecha_fin_estimada)
+	const fechaMinima = (campo) => unidades.map((tarea) => tarea[campo]).filter(Boolean).sort()[0] ?? ''
+	const fechaMaxima = (campo) => unidades.map((tarea) => tarea[campo]).filter(Boolean).sort().at(-1) ?? ''
+	const todasCompletas = resumen.etapas.length > 0 && resumen.etapas.every((tarea) => tarea.avance >= 100)
+	const fechaInicioReal = fechaMinima('fecha-inicio-real')
+	const fechaFinReal = todasCompletas ? fechaMaxima('fecha-fin-real') : ''
+	const duracionInclusiva = (inicio, fin) => {
+		if (!inicio || !fin) return null
+		const dias = (Date.parse(`${fin}T00:00:00Z`) - Date.parse(`${inicio}T00:00:00Z`)) / 86400000
+		return Number.isFinite(dias) && dias >= 0 ? dias + 1 : null
+	}
+	const duracionEstimada = duracionInclusiva(fechaInicioEstimada, fechaFinEstimada)
 	const estado = estadoNormalizado.includes('paus') || estadoNormalizado.includes('suspend')
 		? 'Pausada'
 		: estadoNormalizado.includes('cancel')
 			? 'Cancelada'
-			: resumenTareas.total > 0 && avance >= 100
+			: todasCompletas
 				? 'Finalizada'
-				: avance > 0
+				: fechaInicioReal
 					? 'En ejecución'
-					: 'Pendiente'
-	const fechaParaFormulario = (fecha) => {
-		if (!fecha) return ''
-		const valor = fecha instanceof Date ? fecha.toISOString() : String(fecha)
-		return valor.slice(0, 10)
-	}
+					: 'No Inicio'
 	return {
 		'id-obra': String(obra.id_obra), 'id-cliente': String(obra.id_cliente),
 		'id-arquitecto': obra.id_arquitecto == null ? '' : String(obra.id_arquitecto),
 		'id-lote': obra.id_lote == null ? '' : String(obra.id_lote),
 		_loteId: obra.id_lote == null ? '' : String(obra.id_lote),
-		nrolote: obra.nro_lote ?? '', 'fecha-inicio': fechaParaFormulario(obra.fecha_inicio),
-		'fecha-fin': fechaParaFormulario(obra.fecha_fin),
-		'fecha-inicio-estimada': fechaParaFormulario(obra.fecha_inicio), 'fecha-fin-estimada': fechaParaFormulario(obra.fecha_fin),
+		nrolote: obra.nro_lote ?? '', 'fecha-inicio': fechaInicioEstimada,
+		'fecha-fin': fechaFinEstimada,
+		'fecha-inicio-estimada': fechaInicioEstimada,
+		'fecha-fin-estimada': fechaFinEstimada,
+		'fecha-inicio-real': fechaInicioReal, 'fecha-fin-real': fechaFinReal,
 		Estado: estado, Descripcion: obra.descripcion ?? '',
 		descripcion: obra.descripcion ?? '', porcentaje: `${avance}%`,
+		costoEstimadoTotal: unidades.reduce((total, tarea) => total + (Number(tarea['costo-estimado']) || 0), 0),
+		montoAbonado: unidades.reduce((total, tarea) => total + (Number(tarea['costo-real']) || 0), 0),
+		duracionEstimada: duracionEstimada,
+		duracionReal: duracionInclusiva(fechaInicioReal, fechaFinReal),
 		clienteNombre: [obra.cliente_nombre, obra.cliente_apellido].filter(Boolean).join(' '),
 		arquitectoNombre: [obra.arquitecto_nombre, obra.arquitecto_apellido].filter(Boolean).join(' '),
 		tareas,
@@ -141,9 +162,9 @@ function payloadObra(formulario) {
 	return {
 		id_cliente: Number(formulario['id-cliente']), id_arquitecto: Number(formulario['id-arquitecto']),
 		id_lote: (formulario['id-lote'] ?? formulario.loteId) ? Number(formulario['id-lote'] ?? formulario.loteId) : null,
-		fecha_inicio: formulario['fecha-inicio'] || formulario['fecha-inicio-estimada'] || null,
-		fecha_fin: formulario['fecha-fin'] || formulario['fecha-fin-estimada'] || null,
-		estado: formulario.Estado ?? formulario.estado, descripcion: formulario.descripcion || formulario.Descripcion || null,
+		fecha_inicio_estimada: formulario['fecha-inicio'] || formulario['fecha-inicio-estimada'] || null,
+		fecha_fin_estimada: formulario['fecha-fin'] || formulario['fecha-fin-estimada'] || null,
+		descripcion: formulario.descripcion || formulario.Descripcion || null,
 	}
 }
 
@@ -169,19 +190,9 @@ export async function listarTareasDeObra(id) {
 }
 
 export async function actualizarEstadoSeguimiento(id, accion) {
-	const token = tokenActual()
-	const obra = await solicitar(`/obras/${id}`, { token })
-	if (!obra.fecha_inicio || !obra.fecha_fin || !obra.id_lote) {
-		throw new Error('Para cambiar el estado desde el seguimiento, la obra necesita lote y fechas de inicio y fin.')
-	}
-	const pausada = accion === 'pausar'
-	return solicitar(`/obras/${id}`, {
-		method: 'PUT', token,
-		body: JSON.stringify({
-			id_cliente: Number(obra.id_cliente), id_arquitecto: obra.id_arquitecto == null ? null : Number(obra.id_arquitecto),
-			id_lote: Number(obra.id_lote), fecha_inicio: String(obra.fecha_inicio).slice(0, 10),
-			fecha_fin: String(obra.fecha_fin).slice(0, 10), estado: pausada ? 'Pausada' : 'En ejecución',
-			descripcion: obra.descripcion ?? null,
-		}),
+	return solicitar(`/obras/${id}/estado`, {
+		method: 'PATCH',
+		token: tokenActual(),
+		body: JSON.stringify({ accion }),
 	})
 }

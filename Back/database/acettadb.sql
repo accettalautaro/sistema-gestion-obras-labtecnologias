@@ -40,6 +40,22 @@ CREATE TABLE direcciones (
     localidad VARCHAR(100)
 );
 
+CREATE TABLE obras (
+    id_obra BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id_cliente BIGINT NOT NULL REFERENCES clientes(id_cliente),
+    id_arquitecto BIGINT REFERENCES arquitectos(id_arquitecto),
+    fecha_inicio_estimada DATE,
+    fecha_fin_estimada DATE,
+    fecha_inicio_real DATE,
+    fecha_fin_real DATE,
+    estado VARCHAR(30) NOT NULL DEFAULT 'No Inicio',
+    descripcion TEXT,
+    CONSTRAINT obras_fechas_estimadas_orden_check
+        CHECK (fecha_inicio_estimada IS NULL OR fecha_fin_estimada IS NULL OR fecha_fin_estimada >= fecha_inicio_estimada),
+    CONSTRAINT obras_fechas_reales_orden_check
+        CHECK (fecha_inicio_real IS NULL OR fecha_fin_real IS NULL OR fecha_fin_real >= fecha_inicio_real)
+);
+
 CREATE TABLE lotes (
     id_lote BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     nro_lote VARCHAR(30) NOT NULL,
@@ -47,61 +63,43 @@ CREATE TABLE lotes (
     UNIQUE (id_direccion, nro_lote)
 );
 
-CREATE TABLE obras (
-    id_obra BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    id_cliente BIGINT NOT NULL REFERENCES clientes(id_cliente),
-    id_arquitecto BIGINT REFERENCES arquitectos(id_arquitecto),
-    id_lote BIGINT NOT NULL REFERENCES lotes(id_lote) ON DELETE RESTRICT,
-    fecha_inicio DATE,
-    fecha_fin DATE,
-    estado VARCHAR(30) NOT NULL DEFAULT 'pendiente',
-    descripcion TEXT
-);
-
-CREATE INDEX obras_id_lote_idx ON obras(id_lote);
+ALTER TABLE obras
+    ADD COLUMN id_lote BIGINT REFERENCES lotes(id_lote) ON DELETE SET NULL;
 
 CREATE TABLE tareas (
     id_tarea BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     id_obra BIGINT NOT NULL REFERENCES obras(id_obra) ON DELETE CASCADE,
     nombre VARCHAR(150) NOT NULL,
-    duracion_estimada NUMERIC(10,2),
-    porcentaje NUMERIC(5,2) NOT NULL DEFAULT 0,
     descripcion TEXT,
-    duracion_real NUMERIC(10,2),
-    costo_estimado NUMERIC(14,2),
-    costo_real NUMERIC(14,2),
-    fecha_inicio DATE,
-    fecha_fin DATE,
+    fecha_inicio_estimada DATE,
+    fecha_fin_estimada DATE,
+    fecha_inicio_real DATE,
+    fecha_fin_real DATE,
 
-    CHECK (porcentaje BETWEEN 0 AND 100),
-    CHECK (duracion_estimada IS NULL OR duracion_estimada >= 0),
-    CHECK (duracion_real IS NULL OR duracion_real >= 0),
-    CHECK (costo_estimado IS NULL OR costo_estimado >= 0),
-    CHECK (costo_real IS NULL OR costo_real >= 0),
     CONSTRAINT tareas_fechas_orden_check
-        CHECK (fecha_inicio IS NULL OR fecha_fin IS NULL OR fecha_fin >= fecha_inicio)
+        CHECK (fecha_inicio_estimada IS NULL OR fecha_fin_estimada IS NULL OR fecha_fin_estimada >= fecha_inicio_estimada),
+    CONSTRAINT tareas_fechas_reales_orden_check
+        CHECK (fecha_inicio_real IS NULL OR fecha_fin_real IS NULL OR fecha_fin_real >= fecha_inicio_real)
 );
 
 CREATE TABLE subtareas (
     id_subtarea BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     id_tarea BIGINT NOT NULL REFERENCES tareas(id_tarea) ON DELETE CASCADE,
     nombre VARCHAR(150) NOT NULL,
-    duracion_estimada NUMERIC(10,2),
     porcentaje NUMERIC(5,2) NOT NULL DEFAULT 0,
     descripcion TEXT,
-    duracion_real NUMERIC(10,2),
     costo_estimado NUMERIC(14,2),
-    costo_real NUMERIC(14,2),
-    fecha_inicio DATE,
-    fecha_fin DATE,
+    fecha_inicio_estimada DATE,
+    fecha_fin_estimada DATE,
+    fecha_inicio_real DATE,
+    fecha_fin_real DATE,
 
     CHECK (porcentaje BETWEEN 0 AND 100),
-    CHECK (duracion_estimada IS NULL OR duracion_estimada >= 0),
-    CHECK (duracion_real IS NULL OR duracion_real >= 0),
     CHECK (costo_estimado IS NULL OR costo_estimado >= 0),
-    CHECK (costo_real IS NULL OR costo_real >= 0),
     CONSTRAINT subtareas_fechas_orden_check
-        CHECK (fecha_inicio IS NULL OR fecha_fin IS NULL OR fecha_fin >= fecha_inicio)
+        CHECK (fecha_inicio_estimada IS NULL OR fecha_fin_estimada IS NULL OR fecha_fin_estimada >= fecha_inicio_estimada),
+    CONSTRAINT subtareas_fechas_reales_orden_check
+        CHECK (fecha_inicio_real IS NULL OR fecha_fin_real IS NULL OR fecha_fin_real >= fecha_inicio_real)
 );
 
 CREATE TABLE pagos_parciales (
@@ -117,6 +115,23 @@ CREATE TABLE recordatorios (
     fecha TIMESTAMP WITH TIME ZONE NOT NULL,
     descripcion TEXT NOT NULL
 );
+
+CREATE TABLE notificaciones_recordatorio (
+    id_notificacion BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id_recordatorio BIGINT NOT NULL REFERENCES recordatorios(id_recordatorio) ON DELETE CASCADE,
+    dias_anticipacion SMALLINT NOT NULL CHECK (dias_anticipacion IN (7, 1)),
+    fecha_envio_programada TIMESTAMP WITH TIME ZONE NOT NULL,
+    estado VARCHAR(20) NOT NULL DEFAULT 'pendiente'
+        CHECK (estado IN ('pendiente', 'procesando', 'enviada', 'fallida', 'omitida')),
+    intentos INTEGER NOT NULL DEFAULT 0 CHECK (intentos >= 0),
+    reclamado_en TIMESTAMP WITH TIME ZONE,
+    enviado_en TIMESTAMP WITH TIME ZONE,
+    ultimo_error VARCHAR(1000),
+    UNIQUE (id_recordatorio, dias_anticipacion)
+);
+
+CREATE INDEX notificaciones_recordatorio_pendientes_idx
+    ON notificaciones_recordatorio (estado, fecha_envio_programada);
 
 CREATE TABLE documentos (
     id_documento BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,

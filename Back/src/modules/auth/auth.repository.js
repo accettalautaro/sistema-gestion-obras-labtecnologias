@@ -11,6 +11,28 @@ export const obtenerUsuario = async (dni) => {
     }
 };
 
+export const obtenerPerfilUsuario = async (idUsuario) => {
+    try {
+        const query = `
+            SELECT
+                u.id_usuario,
+                u.dni,
+                u.rol,
+                CASE WHEN u.rol = 'arquitecto' THEN a.nombre ELSE c.nombre END AS nombre,
+                CASE WHEN u.rol = 'arquitecto' THEN a.apellido ELSE c.apellido END AS apellido
+            FROM usuarios u
+            LEFT JOIN arquitectos a ON a.id_usuario = u.id_usuario
+            LEFT JOIN clientes c ON c.id_usuario = u.id_usuario
+            WHERE u.id_usuario = $1;
+        `;
+        const resultado = await pool.query(query, [idUsuario]);
+        return resultado.rows[0] ?? null;
+    } catch (error) {
+        console.error('Error al consultar el perfil del usuario', error);
+        throw new Error('Error al consultar el perfil del usuario en la base de datos.');
+    }
+};
+
 export const crearUsuarioCliente = async (idCliente, hash) => {
     const client = await pool.connect();
     try {

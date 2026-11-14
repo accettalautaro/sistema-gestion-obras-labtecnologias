@@ -102,8 +102,6 @@ function PropietariosPage() {
 				</div>
 			</header>
 			
-			<div className="alert alert-info" role="note">Las asociaciones de propietarios se guardan en PostgreSQL. El porcentaje pertenece al registro de propietario y se refleja en todas sus escrituras.</div>
-
 			<div className="obras-page__workspace">
 				<section className="obras-page__listado" aria-labelledby="props-listado-titulo">
 					<div className="obras-page__toolbar">
@@ -128,7 +126,7 @@ function PropietariosPage() {
 										<td className="obras-page__nombre fw-semibold">{prop.nombre} {prop.apellido}</td>
 										<td>{prop.dni}</td>
 										<td>{prop.estadocivil}</td>
-										<td><span className="badge text-bg-dark">{prop.porcentaje}%</span></td>
+										<td><span className="terrenos-page__porcentaje">{prop.porcentaje}%</span></td>
 										<td>
 											<div className="obras-page__acciones">
 												<button className="btn btn-sm btn-outline-secondary" type="button" onClick={() => editar(prop)}>Editar</button>

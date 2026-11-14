@@ -1,79 +1,123 @@
 import {pool} from '../../config/db.js';
 
+const manejarError = (error, mensaje) => {
+    if (error.status) throw error;
+    console.error(mensaje, error);
+    throw new Error(mensaje);
+};
 
-export const crearSubtarea= async(subtarea)=>{
-    try{
-        const {id_tarea,nombre,duracion_estimada,porcentaje,descripcion,duracion_real,costo_estimado,costo_real,fecha_inicio,fecha_fin}=subtarea;
-        const query= 'INSERT INTO subtareas (id_tarea,nombre,duracion_estimada,porcentaje,descripcion,duracion_real,costo_estimado,costo_real,fecha_inicio,fecha_fin) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *;';
-        const values= [id_tarea,nombre,duracion_estimada,porcentaje,descripcion,duracion_real,costo_estimado,costo_real,fecha_inicio,fecha_fin];
-        const res= await pool.query(query,values);
-        return res.rows[0] ?? null;
-    }catch(error){
-        console.error('Error al intentar crear una subtarea',error);
-        throw new Error('Error al crear una subtarea en la base de datos');
-        
+export const crearSubtarea = async ({ id_tarea, nombre, descripcion, costo_estimado, fecha_inicio_estimada, fecha_fin_estimada }) => {
+    try {
+        const resultado = await pool.query(
+            `INSERT INTO subtareas
+                (id_tarea, nombre, descripcion, costo_estimado, fecha_inicio_estimada, fecha_fin_estimada)
+             VALUES ($1, $2, $3, $4, $5, $6) RETURNING *;`,
+            [id_tarea, nombre, descripcion, costo_estimado, fecha_inicio_estimada, fecha_fin_estimada],
+        );
+        return resultado.rows[0] ?? null;
+    } catch (error) {
+        manejarError(error, 'Error al crear una subtarea en la base de datos.');
     }
+};
 
-}
-// FALTA CAMBIAR EL SET
-export const actualizarSubtarea= async(id,id_tarea,nombre,duracion_estimada,porcentaje,descripcion,duracion_real,costo_estimado,costo_real,fecha_inicio,fecha_fin)=>{
-    try{
-        const query= 'UPDATE subtareas SET id_tarea = $1, nombre = $2, duracion_estimada=$3, porcentaje=$4, descripcion=$5, duracion_real=$6,costo_estimado=$7,costo_real=$8,fecha_inicio=$9,fecha_fin=$10 WHERE id_subtarea=$11 RETURNING *';
-        const values= [id_tarea,nombre,duracion_estimada,porcentaje,descripcion,duracion_real,costo_estimado,costo_real,fecha_inicio,fecha_fin,id];
-        const res= await pool.query(query,values);
-        return res.rows[0] ?? null;
-    }catch(error){
-        console.error('Error al intentar actualizar una subtarea',error);
-        throw new Error('Error al actualizar una subtarea en la base de datos');
-        
+export const actualizarSubtarea = async (id, { id_tarea, nombre, descripcion, costo_estimado, fecha_inicio_estimada, fecha_fin_estimada }) => {
+    try {
+        const resultado = await pool.query(
+            `UPDATE subtareas
+             SET id_tarea = $1, nombre = $2, descripcion = $3, costo_estimado = $4,
+                 fecha_inicio_estimada = $5, fecha_fin_estimada = $6
+             WHERE id_subtarea = $7 RETURNING *;`,
+            [id_tarea, nombre, descripcion, costo_estimado, fecha_inicio_estimada, fecha_fin_estimada, id],
+        );
+        return resultado.rows[0] ?? null;
+    } catch (error) {
+        manejarError(error, 'Error al actualizar una subtarea en la base de datos.');
     }
+};
 
-} 
-
-export const eliminar= async (id)=> {
-    try{
-        const query= 'DELETE FROM subtareas WHERE subtareas.id_subtarea = $1 RETURNING id_subtarea';
-        const res= await pool.query(query,[id]);
-        return res.rowCount > 0;
+export const eliminar = async (id) => {
+    try {
+        const resultado = await pool.query(
+            'DELETE FROM subtareas WHERE id_subtarea = $1 RETURNING id_subtarea;',
+            [id],
+        );
+        return resultado.rowCount > 0;
+    } catch (error) {
+        manejarError(error, 'Error al borrar una subtarea en la base de datos.');
     }
-    catch(error){
-        console.error('Error al intentar borrar una subtarea',error);
-        throw new Error('Error al borrar una subtarea en la base de datos');
-        
-        
-    }
-}
+};
 
-export const obtenerSubtarea = async (id)=> {
-    try{
-        const query = `
-            SELECT
-                s.id_subtarea,
-                s.id_tarea,
-                s.nombre,
-                s.duracion_estimada,
-                s.porcentaje,
-                s.descripcion,
-                CASE
-                    WHEN s.fecha_inicio IS NOT NULL AND s.fecha_fin IS NOT NULL
-                    THEN s.fecha_fin - s.fecha_inicio
-                    ELSE 0
-                END AS duracion_real,
-                s.costo_estimado,
-                s.fecha_inicio,
-                s.fecha_fin,
+export const obtenerSubtarea = async (id) => {
+    try {
+        const resultado = await pool.query(
+            `SELECT
+                s.*,
                 p.id_pago,
                 p.descripcion AS descripcion_pago,
                 p.monto AS monto_pago
-            FROM subtareas s
-            LEFT JOIN pagos_parciales p ON p.id_subtarea = s.id_subtarea
-            WHERE s.id_subtarea = $1;
-        `;
-        const res = await pool.query(query,[id]);
-        return res.rows;
+             FROM subtareas s
+             LEFT JOIN pagos_parciales p ON p.id_subtarea = s.id_subtarea
+             WHERE s.id_subtarea = $1
+             ORDER BY p.id_pago;`,
+            [id],
+        );
+        return resultado.rows;
+    } catch (error) {
+        manejarError(error, 'Error al consultar una subtarea en la base de datos.');
     }
-    catch(error){
-        console.error('Error al intentar obtener una subtarea',error);
-        throw new Error('Error al consultar una subtarea en la base de datos');
+};
+
+export const cambiarEstado = async (id, accion) => {
+    const cliente = await pool.connect();
+    try {
+        await cliente.query('BEGIN');
+        const encontrada = await cliente.query(
+            `SELECT fecha_inicio_real, fecha_fin_real
+             FROM subtareas WHERE id_subtarea = $1 FOR UPDATE;`,
+            [id],
+        );
+        if (!encontrada.rowCount) {
+            await cliente.query('COMMIT');
+            return null;
+        }
+
+        const actual = encontrada.rows[0];
+        let resultado;
+        if (accion === 'iniciar') {
+            if (actual.fecha_inicio_real) {
+                throw Object.assign(new Error('La subtarea ya fue iniciada.'), { status: 409 });
+            }
+            resultado = await cliente.query(
+                `UPDATE subtareas
+                 SET fecha_inicio_real = CURRENT_DATE, fecha_fin_real = NULL, porcentaje = 0
+                 WHERE id_subtarea = $1 RETURNING *;`,
+                [id],
+            );
+        } else if (accion === 'completar') {
+            resultado = await cliente.query(
+                `UPDATE subtareas
+                 SET fecha_inicio_real = COALESCE(fecha_inicio_real, CURRENT_DATE),
+                     fecha_fin_real = CURRENT_DATE, porcentaje = 100
+                 WHERE id_subtarea = $1 RETURNING *;`,
+                [id],
+            );
+        } else {
+            if (!actual.fecha_fin_real) {
+                throw Object.assign(new Error('Solo se puede reabrir una subtarea completada.'), { status: 409 });
+            }
+            resultado = await cliente.query(
+                `UPDATE subtareas
+                 SET fecha_fin_real = NULL, porcentaje = 0
+                 WHERE id_subtarea = $1 RETURNING *;`,
+                [id],
+            );
+        }
+        await cliente.query('COMMIT');
+        return resultado.rows[0] ?? null;
+    } catch (error) {
+        await cliente.query('ROLLBACK');
+        manejarError(error, 'Error al actualizar el estado de la subtarea.');
+    } finally {
+        cliente.release();
     }
-}
+};

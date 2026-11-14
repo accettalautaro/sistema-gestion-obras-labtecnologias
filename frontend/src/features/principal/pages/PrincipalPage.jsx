@@ -29,6 +29,7 @@ const formatearPesos = (valor) => new Intl.NumberFormat('es-AR', {
 
 function PrincipalPage() {
     const { usuario } = useOutletContext()
+    const nombreArquitecto = [usuario?.nombre, usuario?.apellido].filter(Boolean).join(' ')
     
     // 1. Llamamos al Hook. Él se encarga de todo.
     const { datos, cargando, error } = useFetch(obtenerDatosPanel)
@@ -61,11 +62,14 @@ function PrincipalPage() {
         </section>
     )
 
-    const clientePorId = (id) => clientes.find((cliente) => String(cliente.id) === String(id))
+    const clientePorId = (id) => clientes.find((cliente) => (
+        String(cliente['id-cliente'] ?? cliente.id) === String(id)
+    ))
     
     const nombreCliente = (obra) => {
         const cliente = clientePorId(obra.clienteId)
-        return cliente ? `${cliente.nombre || ''} ${cliente.apellido || ''}`.trim() || `Cliente #${cliente.id}` : 'Cliente sin asignar'
+        const nombre = cliente ? `${cliente.nombre || ''} ${cliente.apellido || ''}`.trim() : ''
+        return `Cliente: ${nombre || (cliente ? `#${cliente['id-cliente'] ?? cliente.id}` : 'Sin asignar')}`
     }
     
     const tareasDeObra = (obra) => tareas.filter((tarea) => String(tarea.obraId) === String(obra.id))
@@ -77,7 +81,7 @@ function PrincipalPage() {
             <header className="dashboard__header">
                 <div>
                     <p className="dashboard__eyebrow">Panel de gestión</p>
-                    <h1>Buen día, {usuario.nombre || 'arquitecto'}</h1>
+                    <h1>Buen día, {nombreArquitecto || 'arquitecto'}</h1>
                     <p className="dashboard__subtitle">Este es el estado general de tus obras.</p>
                 </div>
             </header>
@@ -115,8 +119,9 @@ function PrincipalPage() {
                         <div className="dashboard-progress__list">
                             {obras.map((obra) => {
                                 const avance = leerPorcentaje(obra.Porcentaje)
+                                const descripcion = String(obra.descripcion ?? '').trim()
                                 return <div className="dashboard-progress__item" key={obra.id}>
-                                    <div className="dashboard-progress__meta"><div><strong>Obra #{obra.id}</strong><span>{nombreCliente(obra)}</span></div><b>{avance}%</b></div>
+                                    <div className="dashboard-progress__meta"><div><strong>Obra #{obra.id}{descripcion && <span> · {descripcion}</span>}</strong><span>{nombreCliente(obra)}</span></div><b>{avance}%</b></div>
                                     <div className="dashboard-progress__track" role="progressbar" aria-label={`Avance de la obra ${obra.id}`} aria-valuenow={avance} aria-valuemin="0" aria-valuemax="100"><span style={{ width: `${avance}%` }} /></div>
                                     <div className="dashboard-progress__foot"><span>{mostrarEstado(obra.Estado)}</span><span>{tareasDeObra(obra).length} tareas asignadas</span></div>
                                 </div>

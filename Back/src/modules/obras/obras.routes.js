@@ -13,6 +13,7 @@ router.get('/:id/tareas',verificarToken,controller.obtenerTareas);
 //privadas y por rol
 router.post('/',verificarToken,verificarRolArquictecto,controller.crearObra);
 router.put('/:id',verificarToken,verificarRolArquictecto,controller.actualizarObra);
+router.patch('/:id/estado',verificarToken,verificarRolArquictecto,controller.actualizarEstadoSeguimiento);
 router.delete('/:id',verificarToken,verificarRolArquictecto,controller.eliminarObra);
 
 export default router;

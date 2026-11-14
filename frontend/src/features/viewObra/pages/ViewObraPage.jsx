@@ -20,6 +20,17 @@ function fechaCorta(valor) {
   return new Intl.DateTimeFormat('es-AR', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(anio, mes - 1, dia))
 }
 
+function formatoOracion(valor) {
+  const texto = String(valor ?? '').trim().toLocaleLowerCase('es-AR')
+  return texto ? texto.charAt(0).toLocaleUpperCase('es-AR') + texto.slice(1) : ''
+}
+
+function claseAvance(valor) {
+  if (valor >= 100) return 'is-completa'
+  if (valor > 0) return 'is-activa'
+  return 'is-pendiente'
+}
+
 function codigoVisible(id) { return String(id ?? '').replaceAll('-', '.').replaceAll('_', '.').replaceAll(',', '.') }
 
 const formatMoneda = (valor) => {
@@ -134,16 +145,16 @@ function ViewObraPage() {
                 )}
                 <li className="mb-2">
                   <i className="bi bi-calendar-event me-2 text-muted"></i>
-                  <strong>Inicio estimado:</strong> {obra.fechaInicioEstimada || 'Sin fecha'}
+                  <strong>Inicio estimado:</strong> {fechaCorta(obra.fechaInicioEstimada)}
                 </li>
                 {obra.fechaFinEstimada && (
                   <li className="mb-2">
                     <i className="bi bi-calendar-check me-2 text-muted"></i>
-                    <strong>Fin estimado:</strong> {obra.fechaFinEstimada}
+                    <strong>Fin estimado:</strong> {fechaCorta(obra.fechaFinEstimada)}
                   </li>
                 )}
-                {obra.fechaInicioReal && <li className="mb-2"><i className="bi bi-play-circle me-2 text-muted"/><strong>Inicio real:</strong> {obra.fechaInicioReal}</li>}
-                {obra.fechaFinReal && <li className="mb-2"><i className="bi bi-check-circle me-2 text-muted"/><strong>Fin real:</strong> {obra.fechaFinReal}</li>}
+                {obra.fechaInicioReal && <li className="mb-2"><i className="bi bi-play-circle me-2 text-muted"/><strong>Inicio real:</strong> {fechaCorta(obra.fechaInicioReal)}</li>}
+                {obra.fechaFinReal && <li className="mb-2"><i className="bi bi-check-circle me-2 text-muted"/><strong>Fin real:</strong> {fechaCorta(obra.fechaFinReal)}</li>}
               </ul>
             </div>
           </div>
@@ -218,10 +229,33 @@ function ViewObraPage() {
         <div className="seguimiento-obra__panel-encabezado"><div><p className="seguimiento-obra__eyebrow">Diagrama de avance</p><h2 id="cronograma-cliente-titulo">Cronograma de tareas</h2></div><p>El cronograma muestra las tareas principales; el avance se calcula a partir de sus subtareas.</p></div>
         {ganttDatos ? <div className="seguimiento-obra__gantt-scroll"><div className="seguimiento-obra__gantt">
           <div className="seguimiento-obra__gantt-fechas"><span>Tarea</span><div><span>{fechaCorta(ganttDatos.minDate.toISOString().slice(0, 10))}</span><span>{fechaCorta(ganttDatos.maxDate.toISOString().slice(0, 10))}</span></div></div>
-          {ganttDatos.tasks.map((tarea) => <div className="seguimiento-obra__gantt-fila" key={tarea.idTarea}>
-            <div className="seguimiento-obra__gantt-label"><strong>{codigoVisible(tarea.idTarea)} · {tarea.nombre}</strong><span>{tarea.estado === 'finalizada' ? 'Finalizada' : tarea.estado === 'en ejecucion' ? 'En ejecución' : 'Sin comenzar'} · <b>{tarea.avance}%</b></span></div>
-            <div className="seguimiento-obra__gantt-pista"><Link to={`/cliente/obras/${obra.idObra}/tareas/${tarea.idTarea}`} className={`seguimiento-obra__gantt-barra ${tarea.avance >= 100 ? 'is-completa' : tarea.avance > 0 ? 'is-activa' : ''}`} style={{ left: `${tarea.leftPercent}%`, width: `${tarea.widthPercent}%` }} title={`${tarea.nombre}: ${fechaCorta(tarea.fechaInicioEstimada)}–${fechaCorta(tarea.fechaFinEstimada)}`} aria-label={`Ver detalle de ${tarea.nombre}`}><span style={{ width: `${tarea.avance}%` }} /></Link></div>
-          </div>)}
+          {ganttDatos.tasks.map((tarea) => {
+            const estado = tarea.avance >= 100 ? 'Finalizada' : tarea.avance > 0 ? 'En ejecución' : 'Sin comenzar'
+            const detalleUrl = `/cliente/obras/${obra.idObra}/tareas/${tarea.idTarea}`
+            return (
+              <div className="seguimiento-obra__gantt-fila" key={tarea.idTarea}>
+                <div className="seguimiento-obra__gantt-label">
+                  <Link className="seguimiento-obra__tarea-link" to={detalleUrl}>
+                    <strong>{codigoVisible(tarea.idTarea)} · {formatoOracion(tarea.nombre)}</strong>
+                  </Link>
+                  <span className={`seguimiento-obra__gantt-estado ${claseAvance(tarea.avance)}`}>
+                    <span>{estado}</span> · <b>{tarea.avance}%</b>
+                  </span>
+                </div>
+                <div className="seguimiento-obra__gantt-pista">
+                  <Link
+                    to={detalleUrl}
+                    className={`seguimiento-obra__gantt-barra ${claseAvance(tarea.avance)}`}
+                    style={{ left: `${tarea.leftPercent}%`, width: `${tarea.widthPercent}%` }}
+                    title={`${formatoOracion(tarea.nombre)}: ${fechaCorta(tarea.fechaInicioEstimada)}–${fechaCorta(tarea.fechaFinEstimada)}`}
+                    aria-label={`Ver detalle de ${formatoOracion(tarea.nombre)}`}
+                  >
+                    <span style={{ width: `${tarea.avance}%` }} />
+                  </Link>
+                </div>
+              </div>
+            )
+          })}
         </div></div> : <div className="seguimiento-obra__sin-cronograma">No hay tareas con fechas de inicio y fin para dibujar el cronograma. Abajo podés consultar las tareas cargadas.</div>}
       </section>
 
