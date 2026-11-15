@@ -254,7 +254,7 @@ function PagosPage() {
                             pagosDeLaObra={pagosDeLaObra}
                             totalAbonado={totalAbonado}
                             tareas={tareas}
-                            onActualizar={async (pago) => { await actualizarPago(pago); setVersion((actual) => actual + 1) }}
+                            onActualizar={async (pago) => { await actualizarPago(pago['id-pago'], pago); setVersion((actual) => actual + 1) }}
                             onEliminar={setPagoParaEliminar}
                         />
                     )
