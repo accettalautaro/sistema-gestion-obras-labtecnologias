@@ -32,10 +32,12 @@ function RecordatoriosPage() {
 
     const [obraFiltro, setObraFiltro] = useState('')
     const [formulario, setFormulario] = useState(FORMULARIO_VACIO)
+    const [formularioAbierto, setFormularioAbierto] = useState(false)
     const [recordatorioEditando, setRecordatorioEditando] = useState(null)
     const [recordatorioParaEliminar, setRecordatorioParaEliminar] = useState(null)
     const [guardando, setGuardando] = useState(false)
     const [eliminando, setEliminando] = useState(false)
+    const [errorFormulario, setErrorFormulario] = useState('')
     const [errorMutacion, setErrorMutacion] = useState('')
     const [exito, setExito] = useState('')
 
@@ -43,11 +45,34 @@ function RecordatoriosPage() {
         if (!usuario) navigate('/login', { replace: true })
     }, [navigate, usuario])
 
-    const cancelarEdicion = () => {
+    useEffect(() => {
+        if (!formularioAbierto) return
+        const cerrarConEscape = (event) => {
+            if (event.key === 'Escape' && !guardando) {
+                setFormularioAbierto(false)
+                setRecordatorioEditando(null)
+                setFormulario(FORMULARIO_VACIO)
+                setErrorFormulario('')
+            }
+        }
+        window.addEventListener('keydown', cerrarConEscape)
+        return () => window.removeEventListener('keydown', cerrarConEscape)
+    }, [formularioAbierto, guardando])
+
+    const abrirNuevoRecordatorio = () => {
         setRecordatorioEditando(null)
         setFormulario(FORMULARIO_VACIO)
+        setErrorFormulario('')
         setErrorMutacion('')
         setExito('')
+        setFormularioAbierto(true)
+    }
+
+    const cerrarFormulario = () => {
+        setFormularioAbierto(false)
+        setRecordatorioEditando(null)
+        setFormulario(FORMULARIO_VACIO)
+        setErrorFormulario('')
     }
 
     const editar = (recordatorio) => {
@@ -59,13 +84,16 @@ function RecordatoriosPage() {
             fecha: recordatorio.fecha,
             descripcion: recordatorio.descripcion,
         })
+        setErrorFormulario('')
         setErrorMutacion('')
         setExito('')
+        setFormularioAbierto(true)
     }
 
     const guardar = async (event) => {
         event.preventDefault()
         setGuardando(true)
+        setErrorFormulario('')
         setErrorMutacion('')
         setExito('')
         try {
@@ -76,10 +104,9 @@ function RecordatoriosPage() {
             }
             setVersion((actual) => actual + 1)
             setExito(recordatorioEditando ? 'Recordatorio actualizado correctamente.' : 'Recordatorio registrado correctamente.')
-            setRecordatorioEditando(null)
-            setFormulario(FORMULARIO_VACIO)
+            cerrarFormulario()
         } catch (motivo) {
-            setErrorMutacion(motivo.message || 'No se pudo guardar el recordatorio.')
+            setErrorFormulario(motivo.message || 'No se pudo guardar el recordatorio.')
         } finally {
             setGuardando(false)
         }
@@ -92,7 +119,7 @@ function RecordatoriosPage() {
         setExito('')
         try {
             await eliminarRecordatorio(recordatorioParaEliminar.id)
-            if (recordatorioEditando?.id === recordatorioParaEliminar.id) cancelarEdicion()
+            if (recordatorioEditando?.id === recordatorioParaEliminar.id) cerrarFormulario()
             setVersion((actual) => actual + 1)
             setExito('Recordatorio eliminado correctamente.')
             setRecordatorioParaEliminar(null)
@@ -179,20 +206,24 @@ function RecordatoriosPage() {
                             })}
                         </div>
                     )}
+                    <div className="recordatorios__listado-acciones">
+                        <button className="btn btn-dark" type="button" onClick={abrirNuevoRecordatorio}>Crear recordatorio</button>
+                    </div>
                 </section>
-
-                <section className="recordatorios__formulario" aria-labelledby="recordatorio-form-titulo">
-                    <div className="recordatorios__formulario-header">
+            </div>
+            {formularioAbierto && <div className="recordatorios__modal-fondo" onMouseDown={(event) => { if (event.target === event.currentTarget && !guardando) cerrarFormulario() }}>
+                <section className="recordatorios__modal" role="dialog" aria-modal="true" aria-labelledby="recordatorio-form-titulo" aria-describedby="recordatorio-form-ayuda">
+                    <div className="recordatorios__modal-cabecera">
                         <div>
                             <h2 id="recordatorio-form-titulo">{recordatorioEditando ? `Editar recordatorio #${recordatorioEditando.id}` : 'Nuevo recordatorio'}</h2>
-                            <p>Asociado a una obra existente.</p>
+                            <p id="recordatorio-form-ayuda">Asociado a una obra existente.</p>
                         </div>
-                        {recordatorioEditando && <button className="btn btn-sm btn-outline-secondary" type="button" onClick={cancelarEdicion}>Nuevo recordatorio</button>}
+                        <button className="recordatorios__modal-cerrar" type="button" aria-label="Cerrar" onClick={cerrarFormulario} disabled={guardando}>×</button>
                     </div>
-                    <form onSubmit={guardar}>
+                    <form onSubmit={guardar} aria-busy={guardando}>
                         <div className="recordatorios__campos">
                             <label>Cliente
-                                <select className="form-select" name="id-cliente" value={formulario['id-cliente']} onChange={(event) => setFormulario({ ...formulario, 'id-cliente': event.target.value, 'id-obra': '' })} required disabled={Boolean(recordatorioEditando)}>
+                                <select className="form-select" name="id-cliente" value={formulario['id-cliente']} onChange={(event) => setFormulario({ ...formulario, 'id-cliente': event.target.value, 'id-obra': '' })} required disabled={Boolean(recordatorioEditando)} autoFocus>
                                     <option value="">Seleccioná un cliente</option>
                                     {clientes.map(cliente => <option key={cliente.id} value={cliente.id}>{cliente.nombre} {cliente.apellido}</option>)}
                                 </select>
@@ -208,19 +239,20 @@ function RecordatoriosPage() {
                             <label>Fecha
                                 <input className="form-control" name="fecha" type="date" value={formulario.fecha} onChange={(event) => setFormulario({ ...formulario, fecha: event.target.value })} required />
                             </label>
-                            <label>Descripción
+                            <label className="recordatorios__campo-completo">Descripción
                                 <input className="form-control" name="descripcion" type="text" value={formulario.descripcion} onChange={(event) => setFormulario({ ...formulario, descripcion: event.target.value })} required placeholder="Ej: Llamar al proveedor de materiales" />
                             </label>
                         </div>
+                        {errorFormulario && <p className="alert alert-danger py-2 mt-3 mb-0" role="alert">{errorFormulario}</p>}
                         <div className="recordatorios__form-actions">
-                            {recordatorioEditando && <button className="btn btn-outline-secondary" type="button" onClick={cancelarEdicion}>Cancelar</button>}
+                            <button className="btn btn-outline-secondary" type="button" onClick={cerrarFormulario} disabled={guardando}>Cancelar</button>
                             <button className="btn btn-dark" type="submit" disabled={guardando}>
                                 {guardando ? 'Guardando...' : recordatorioEditando ? 'Guardar cambios' : 'Crear recordatorio'}
                             </button>
                         </div>
                     </form>
                 </section>
-            </div>
+            </div>}
             {recordatorioParaEliminar && <ConfirmacionEliminar titulo="Eliminar recordatorio" mensaje={`¿Querés eliminar el recordatorio "${recordatorioParaEliminar.descripcion}"?`} onCancelar={() => setRecordatorioParaEliminar(null)} onConfirmar={eliminar} eliminando={eliminando} />}
         </div>
     )
