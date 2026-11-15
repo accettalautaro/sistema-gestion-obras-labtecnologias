@@ -32,10 +32,10 @@ ON CONFLICT (id_direccion) DO UPDATE SET provincia=EXCLUDED.provincia, codigo_po
 
 
 -- Obras (deduplicadas por coincidencia de datos)
-INSERT INTO obras (id_obra, id_cliente, id_arquitecto, fecha_inicio_estimada, fecha_fin_estimada, estado, descripcion) OVERRIDING SYSTEM VALUE VALUES
-  (1, 1, 1, '2026-07-01', '2026-12-13', 'En Ejecución', 'Vivienda unifamiliar de 120 m². Obra en curso, con tareas iniciales y estructura finalizadas.'),
-  (2, 1, 1, '2026-11-10', '2027-01-15', 'No Inicio', 'Ampliación residencial planificada; inicio estimado para noviembre de 2026.')
-ON CONFLICT (id_obra) DO UPDATE SET id_cliente=EXCLUDED.id_cliente, id_arquitecto=EXCLUDED.id_arquitecto, fecha_inicio_estimada=EXCLUDED.fecha_inicio_estimada, fecha_fin_estimada=EXCLUDED.fecha_fin_estimada, estado=EXCLUDED.estado, descripcion=EXCLUDED.descripcion;
+INSERT INTO obras (id_obra, nombre, id_cliente, id_arquitecto, fecha_inicio_estimada, fecha_fin_estimada, estado, descripcion) OVERRIDING SYSTEM VALUE VALUES
+  (1, 'Vivienda unifamiliar', 1, 1, '2026-07-01', '2026-12-13', 'En Ejecución', 'Vivienda unifamiliar de 120 m². Obra en curso, con tareas iniciales y estructura finalizadas.'),
+  (2, 'Ampliación residencial', 1, 1, '2026-11-10', '2027-01-15', 'No Inicio', 'Ampliación residencial planificada; inicio estimado para noviembre de 2026.')
+ON CONFLICT (id_obra) DO UPDATE SET nombre=EXCLUDED.nombre, id_cliente=EXCLUDED.id_cliente, id_arquitecto=EXCLUDED.id_arquitecto, fecha_inicio_estimada=EXCLUDED.fecha_inicio_estimada, fecha_fin_estimada=EXCLUDED.fecha_fin_estimada, estado=EXCLUDED.estado, descripcion=EXCLUDED.descripcion;
 
 
 -- Lotes

@@ -115,9 +115,9 @@ export const crearObra= async(obra)=>{
     const client = await pool.connect();
     try{
         await client.query('BEGIN');
-        const {id_arquitecto,id_cliente,id_lote,fecha_inicio_estimada,fecha_fin_estimada,descripcion}=obra;
-        const query= 'INSERT INTO obras (id_cliente,id_arquitecto,id_lote,fecha_inicio_estimada,fecha_fin_estimada,descripcion) VALUES ($1,$2,$3,$4,$5,$6) RETURNING *;';
-        const values= [id_cliente,id_arquitecto,id_lote,fecha_inicio_estimada,fecha_fin_estimada,descripcion];
+        const {nombre,id_arquitecto,id_cliente,id_lote,fecha_inicio_estimada,fecha_fin_estimada,descripcion}=obra;
+        const query= 'INSERT INTO obras (nombre,id_cliente,id_arquitecto,id_lote,fecha_inicio_estimada,fecha_fin_estimada,descripcion) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *;';
+        const values= [nombre,id_cliente,id_arquitecto,id_lote,fecha_inicio_estimada,fecha_fin_estimada,descripcion];
         const res= await client.query(query,values);
         const creada = res.rows[0];
         await client.query('COMMIT');
@@ -131,12 +131,12 @@ export const crearObra= async(obra)=>{
 
 }
 
-export const actualizarObra= async(id,id_arquitecto,id_cliente,id_lote,fecha_inicio_estimada,fecha_fin_estimada,descripcion)=>{
+export const actualizarObra= async(id,nombre,id_arquitecto,id_cliente,id_lote,fecha_inicio_estimada,fecha_fin_estimada,descripcion)=>{
     const client = await pool.connect();
     try{
         await client.query('BEGIN');
-        const query= 'UPDATE obras SET id_arquitecto = $1, id_cliente = $2, id_lote = $3, fecha_inicio_estimada=$4, fecha_fin_estimada=$5, descripcion=$6 WHERE id_obra=$7 RETURNING *';
-        const values= [id_arquitecto,id_cliente,id_lote,fecha_inicio_estimada,fecha_fin_estimada,descripcion,id];
+        const query= 'UPDATE obras SET nombre=$1, id_arquitecto = $2, id_cliente = $3, id_lote = $4, fecha_inicio_estimada=$5, fecha_fin_estimada=$6, descripcion=$7 WHERE id_obra=$8 RETURNING *';
+        const values= [nombre,id_arquitecto,id_cliente,id_lote,fecha_inicio_estimada,fecha_fin_estimada,descripcion,id];
         const res= await client.query(query,values);
         if (!res.rows[0]) { await client.query('ROLLBACK'); return null; }
         await client.query('COMMIT');

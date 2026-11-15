@@ -116,7 +116,7 @@ export function convertirObra(obra, tareas = []) {
 		'fecha-inicio-estimada': fechaInicioEstimada,
 		'fecha-fin-estimada': fechaFinEstimada,
 		'fecha-inicio-real': fechaInicioReal, 'fecha-fin-real': fechaFinReal,
-		Estado: estado, Descripcion: obra.descripcion ?? '',
+		Estado: estado, nombre: obra.nombre ?? '', Descripcion: obra.descripcion ?? '',
 		descripcion: obra.descripcion ?? '', porcentaje: `${avance}%`,
 		costoEstimadoTotal: unidades.reduce((total, tarea) => total + (Number(tarea['costo-estimado']) || 0), 0),
 		montoAbonado: unidades.reduce((total, tarea) => total + (Number(tarea['costo-real']) || 0), 0),
@@ -160,6 +160,7 @@ export async function listarObras() {
 
 function payloadObra(formulario) {
 	return {
+		nombre: String(formulario.nombre ?? '').trim(),
 		id_cliente: Number(formulario['id-cliente']), id_arquitecto: Number(formulario['id-arquitecto']),
 		id_lote: (formulario['id-lote'] ?? formulario.loteId) ? Number(formulario['id-lote'] ?? formulario.loteId) : null,
 		fecha_inicio_estimada: formulario['fecha-inicio'] || formulario['fecha-inicio-estimada'] || null,

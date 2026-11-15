@@ -1,0 +1,2 @@
+ALTER TABLE obras
+    ADD COLUMN nombre VARCHAR(150);

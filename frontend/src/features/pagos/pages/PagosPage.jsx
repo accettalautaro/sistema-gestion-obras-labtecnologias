@@ -271,7 +271,7 @@ function PagosPage() {
                                     <select className="form-select" name="id-obra" value={formulario['id-obra']} onChange={(event) => setFormulario({ ...formulario, 'id-obra': event.target.value })} required>
                                         <option value="" disabled>Seleccionar obra</option>
                                         {obras.map(obra => (
-                                            <option key={obra['id-obra']} value={obra['id-obra']}>Obra #{obra['id-obra']}</option>
+                                            <option key={obra['id-obra']} value={obra['id-obra']}>Obra #{obra['id-obra']} · {obra.nombre || 'Sin nombre'}</option>
                                         ))}
                                     </select>
                                 </label>

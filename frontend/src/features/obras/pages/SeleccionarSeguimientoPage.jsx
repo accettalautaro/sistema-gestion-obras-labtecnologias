@@ -21,8 +21,8 @@ function SeleccionarSeguimientoPage() {
 		{obras.length ? <div className="row g-3">{obras.map((obra) => <div className="col-12 col-md-6 col-xl-4" key={obra['id-obra']}>
 			<article className="card h-100">
 				<div className="card-body d-flex flex-column">
-					<p className="seguimiento-obra__eyebrow mb-1">Obra #{obra['id-obra']}</p>
-					<h2 className="h5">Lote {obra.nrolote ?? '—'}</h2>
+					<p className="seguimiento-obra__eyebrow mb-1">Obra #{obra['id-obra']} · Lote {obra.nrolote ?? '—'}</p>
+					<h2 className="h5">{obra.nombre || 'Sin nombre'}</h2>
 					<p className="text-secondary mb-2">{obra.Estado ?? 'Sin estado'}</p>
 					<div className="progress mb-2" role="progressbar" aria-label={`Avance de obra ${obra['id-obra']}`} aria-valuenow={Number.parseFloat(obra.porcentaje) || 0} aria-valuemin="0" aria-valuemax="100"><div className="progress-bar" style={{ width: obra.porcentaje }} /></div>
 					<p className="small text-secondary">Avance: {obra.porcentaje}</p>

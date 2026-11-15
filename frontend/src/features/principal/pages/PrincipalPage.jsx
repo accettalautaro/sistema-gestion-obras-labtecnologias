@@ -119,9 +119,9 @@ function PrincipalPage() {
                         <div className="dashboard-progress__list">
                             {obras.map((obra) => {
                                 const avance = leerPorcentaje(obra.Porcentaje)
-                                const descripcion = String(obra.descripcion ?? '').trim()
+                                const nombre = String(obra.nombre ?? '').trim()
                                 return <div className="dashboard-progress__item" key={obra.id}>
-                                    <div className="dashboard-progress__meta"><div><strong>Obra #{obra.id}{descripcion && <span> · {descripcion}</span>}</strong><span>{nombreCliente(obra)}</span></div><b>{avance}%</b></div>
+                                    <div className="dashboard-progress__meta"><div><strong>Obra #{obra.id}{nombre && <span> · {nombre}</span>}</strong><span>{nombreCliente(obra)}</span></div><b>{avance}%</b></div>
                                     <div className="dashboard-progress__track" role="progressbar" aria-label={`Avance de la obra ${obra.id}`} aria-valuenow={avance} aria-valuemin="0" aria-valuemax="100"><span style={{ width: `${avance}%` }} /></div>
                                     <div className="dashboard-progress__foot"><span>{mostrarEstado(obra.Estado)}</span><span>{tareasDeObra(obra).length} tareas asignadas</span></div>
                                 </div>

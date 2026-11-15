@@ -42,6 +42,7 @@ CREATE TABLE direcciones (
 
 CREATE TABLE obras (
     id_obra BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    nombre VARCHAR(150),
     id_cliente BIGINT NOT NULL REFERENCES clientes(id_cliente),
     id_arquitecto BIGINT REFERENCES arquitectos(id_arquitecto),
     fecha_inicio_estimada DATE,

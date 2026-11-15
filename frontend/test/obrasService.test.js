@@ -25,3 +25,13 @@ test('deja la duración estimada sin datos si falta alguna fecha de la obra', ()
 
 	assert.equal(obra.duracionEstimada, null)
 })
+
+test('conserva el nombre de la obra para mostrarlo en el seguimiento', () => {
+	const obra = convertirObra({
+		id_obra: 1,
+		id_cliente: 2,
+		nombre: 'Vivienda unifamiliar',
+	}, [])
+
+	assert.equal(obra.nombre, 'Vivienda unifamiliar')
+})

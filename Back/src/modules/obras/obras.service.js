@@ -131,6 +131,13 @@ const validarDatosObra = (obra) => {
     if (!obra || typeof obra !== 'object' || Array.isArray(obra)) {
         throw errorValidacion('Los datos de la obra son obligatorios.');
     }
+    const nombre = typeof obra.nombre === 'string' ? obra.nombre.trim() : '';
+    if (!nombre) {
+        throw errorValidacion('El nombre de la obra es obligatorio.');
+    }
+    if (nombre.length > 150) {
+        throw errorValidacion('El nombre de la obra no puede superar los 150 caracteres.');
+    }
     if (!/^\d{1,19}$/.test(String(obra.id_lote ?? ''))
         || BigInt(obra.id_lote) <= 0n
         || BigInt(obra.id_lote) > 9223372036854775807n) {
@@ -141,7 +148,7 @@ const validarDatosObra = (obra) => {
     if (fecha_fin_estimada < fecha_inicio_estimada) {
         throw errorValidacion('La fecha de finalización no puede ser anterior a la fecha de inicio.');
     }
-    return { ...obra, fecha_inicio_estimada, fecha_fin_estimada };
+    return { ...obra, nombre, fecha_inicio_estimada, fecha_fin_estimada };
 };
 
 export const listarObras= async (req)=>{
@@ -190,8 +197,8 @@ export const obtenerObra= async (id)=>{
 }
 
 export const actualizarObra= async(id,obra)=>{
-    const {id_arquitecto,id_cliente,id_lote,fecha_inicio_estimada,fecha_fin_estimada,descripcion}=validarDatosObra(obra);
-    const actualizada = await repository.actualizarObra(id,id_arquitecto,id_cliente,id_lote,fecha_inicio_estimada,fecha_fin_estimada,descripcion);
+    const {nombre,id_arquitecto,id_cliente,id_lote,fecha_inicio_estimada,fecha_fin_estimada,descripcion}=validarDatosObra(obra);
+    const actualizada = await repository.actualizarObra(id,nombre,id_arquitecto,id_cliente,id_lote,fecha_inicio_estimada,fecha_fin_estimada,descripcion);
     if (!actualizada) return null;
     const resumen = await obtenerTareas(id);
     return { ...actualizada, estado: resumen?.estado ?? actualizada.estado };

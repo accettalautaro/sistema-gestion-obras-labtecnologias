@@ -153,7 +153,7 @@ function RecordatoriosPage() {
                             <select className="form-select" value={obraFiltro} onChange={(event) => setObraFiltro(event.target.value)}>
                                 <option value="">Todas las obras</option>
                                 {obras.map((obra) => (
-                                    <option key={obra.id} value={obra.id}>Obra #{obra.id}</option>
+                                    <option key={obra.id} value={obra.id}>Obra #{obra.id} · {obra.nombre || 'Sin nombre'}</option>
                                 ))}
                             </select>
                         </label>
@@ -161,19 +161,22 @@ function RecordatoriosPage() {
 
                     {recordatoriosFiltrados.length === 0 ? <p className="recordatorios__vacio">{obraFiltro ? 'No hay recordatorios para esta obra.' : 'Todavía no hay recordatorios registrados.'}</p> : (
                         <div className="recordatorios__lista">
-                            {recordatoriosFiltrados.map(rec => (
-                                <article className={`recordatorios__item recordatorios__item--${rec.tipo}`} key={rec.id}>
-                                    <div className="recordatorios__item-contenido">
-                                        <strong>{rec.descripcion}</strong>
-                                        <span>Obra #{rec.obraId}</span>
-                                        <span>{rec.fecha} {rec.diasRestantes === null ? '' : rec.diasRestantes < 0 ? '(Atrasado)' : rec.diasRestantes === 0 ? '(Hoy)' : `(En ${rec.diasRestantes} días)`}</span>
-                                    </div>
-                                    <div className="recordatorios__acciones">
-                                        <button className="btn btn-sm btn-outline-secondary" type="button" onClick={() => editar(rec)}>Editar</button>
-                                        <button className="btn btn-sm btn-outline-danger" type="button" onClick={() => setRecordatorioParaEliminar(rec)}>Eliminar</button>
-                                    </div>
-                                </article>
-                            ))}
+                            {recordatoriosFiltrados.map(rec => {
+                                const obra = obras.find((item) => String(item.id) === String(rec.obraId))
+                                return (
+                                    <article className={`recordatorios__item recordatorios__item--${rec.tipo}`} key={rec.id}>
+                                        <div className="recordatorios__item-contenido">
+                                            <strong>{rec.descripcion}</strong>
+                                            <span>Obra #{rec.obraId} · {obra?.nombre || 'Sin nombre'}</span>
+                                            <span>{rec.fecha} {rec.diasRestantes === null ? '' : rec.diasRestantes < 0 ? '(Atrasado)' : rec.diasRestantes === 0 ? '(Hoy)' : `(En ${rec.diasRestantes} días)`}</span>
+                                        </div>
+                                        <div className="recordatorios__acciones">
+                                            <button className="btn btn-sm btn-outline-secondary" type="button" onClick={() => editar(rec)}>Editar</button>
+                                            <button className="btn btn-sm btn-outline-danger" type="button" onClick={() => setRecordatorioParaEliminar(rec)}>Eliminar</button>
+                                        </div>
+                                    </article>
+                                )
+                            })}
                         </div>
                     )}
                 </section>
@@ -198,7 +201,7 @@ function RecordatoriosPage() {
                                 <select className="form-select" name="id-obra" value={formulario['id-obra']} onChange={(event) => setFormulario({ ...formulario, 'id-obra': event.target.value })} required disabled={!formulario['id-cliente'] || Boolean(recordatorioEditando)}>
                                     <option value="">Seleccioná una obra</option>
                                     {obras.filter(o => String(o.clienteId) === String(formulario['id-cliente'])).map(obra => (
-                                        <option key={obra.id} value={obra.id}>Obra #{obra.id} ({obra.estado})</option>
+                                        <option key={obra.id} value={obra.id}>Obra #{obra.id} · {obra.nombre || 'Sin nombre'}</option>
                                     ))}
                                 </select>
                             </label>

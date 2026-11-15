@@ -17,7 +17,7 @@ psql -U postgres -d accettadb -f Back/database/acettadb.sql
 psql -U postgres -d accettadb -f Back/database/semilla_datos.sql
 ```
 
-`acettadb.sql` ya define el esquema actualizado, por lo que no hay que ejecutar las migraciones sobre una base recién creada con ese archivo. Si tenés una base existente con el esquema anterior (fechas `fecha_inicio`/`fecha_fin`, métricas persistidas y `lotes.id_obra`), ejecutá las migraciones una sola vez y en este orden, desde la raíz del repositorio:
+`acettadb.sql` ya define el esquema actualizado, por lo que no hay que ejecutar las migraciones sobre una base recién creada con ese archivo. Si tenés una base existente con el esquema anterior (fechas `fecha_inicio`/`fecha_fin`, métricas persistidas y `lotes.id_obra`), ejecutá las migraciones una sola vez y en este orden, desde la raíz del repositorio. La migración 009 es segura aunque la columna que elimina no exista; la 010 agrega `obras.nombre`:
 
 ```powershell
 psql -v ON_ERROR_STOP=1 -U postgres -d accettadb -f Back/database/migrations/001_fechas_estimadas_y_reales.sql
@@ -27,17 +27,13 @@ psql -v ON_ERROR_STOP=1 -U postgres -d accettadb -f Back/database/migrations/004
 psql -v ON_ERROR_STOP=1 -U postgres -d accettadb -f Back/database/migrations/005_notificaciones_programadas_recordatorios.sql
 psql -v ON_ERROR_STOP=1 -U postgres -d accettadb -f Back/database/migrations/006_metricas_calculadas_no_persistidas.sql
 psql -v ON_ERROR_STOP=1 -U postgres -d accettadb -f Back/database/migrations/007_lote_compartido_entre_obras.sql
+psql -v ON_ERROR_STOP=1 -U postgres -d accettadb -f Back/database/migrations/009_eliminar_marca_cambio_contrasena.sql
+psql -v ON_ERROR_STOP=1 -U postgres -d accettadb -f Back/database/migrations/010_agregar_nombre_a_obras.sql
 ```
 
 Cada comando se detiene ante un error. La migración 007 transfiere las asignaciones existentes de `lotes.id_obra` a `obras.id_lote`; las obras que no tenían lote quedan sin asignación. Al terminar, un lote puede estar asociado a varias obras. No ejecutes esta secuencia si alguna de estas migraciones ya fue aplicada a la base.
 
-Si una base existente ya tiene la columna `debe_cambiar_contrasena` de la implementación anterior, eliminála con esta migración:
-
-```powershell
-psql -v ON_ERROR_STOP=1 -U postgres -d accettadb -f Back/database/migrations/009_eliminar_marca_cambio_contrasena.sql
-```
-
-El cambio inicial se detecta comparando la contraseña ingresada con el hash guardado y verificando que coincida con los últimos cuatro dígitos del DNI. Las cuentas existentes con otra contraseña no deben cambiarla al iniciar sesión.
+La migración 009 elimina la columna heredada `debe_cambiar_contrasena` si existe. El cambio inicial se detecta comparando la contraseña ingresada con el hash guardado y verificando que coincida con los últimos cuatro dígitos del DNI. Las cuentas existentes con otra contraseña no deben cambiarla al iniciar sesión.
 
 
 

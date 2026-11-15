@@ -2,7 +2,14 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 if (!process.env.JWT_SECRET) process.env.JWT_SECRET = 'test-only-secret';
-const { derivarObra, derivarTarea, duracionInclusiva } = await import('../src/modules/obras/obras.service.js');
+const { crearObra, derivarObra, derivarTarea, duracionInclusiva } = await import('../src/modules/obras/obras.service.js');
+
+test('requiere un nombre para crear una obra', async () => {
+    await assert.rejects(
+        crearObra({ id_lote: 1, fecha_inicio_estimada: '2026-07-01', fecha_fin_estimada: '2026-07-02' }),
+        { status: 400, message: 'El nombre de la obra es obligatorio.' },
+    );
+});
 
 test('calcula duraciones contando el día inicial y final', () => {
     assert.equal(duracionInclusiva('2026-07-01', '2026-07-01'), 1);
