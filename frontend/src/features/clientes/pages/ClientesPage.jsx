@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { useFetch } from '../../../shared/hooks/useFetch'
 import { useOutletContext } from 'react-router-dom'
 import { listarClientes, crearCliente, actualizarCliente, eliminarCliente, crearUsuarioCliente } from '../services/clientesService.js'
+import ConfirmacionEliminar from '../../../shared/components/ConfirmacionEliminar.jsx'
+import { soloLetras, soloNumeros } from '../../../shared/utils/filtrosEntrada.js'
 import '../../../styles/Clientes.css'
 
 const FORMULARIO_VACIO = { nombre: '', apellido: '', dni: '', telefono: '', email: '' }
@@ -11,6 +13,8 @@ function ClientesPage() {
 	const [busqueda, setBusqueda] = useState('')
 	const [formulario, setFormulario] = useState(FORMULARIO_VACIO)
 	const [clienteEditando, setClienteEditando] = useState(null)
+	const [clienteParaEliminar, setClienteParaEliminar] = useState(null)
+	const [eliminando, setEliminando] = useState(false)
 	const [aviso, setAviso] = useState(null)
 	const [version, setVersion] = useState(0)
 	const [guardando, setGuardando] = useState(false)
@@ -83,11 +87,13 @@ function ClientesPage() {
 		} catch (motivo) { setErrorMutacion(motivo.message || 'No se pudo guardar el cliente.') }
 		finally { setGuardando(false) }
 	}
-	const eliminar = async (cliente) => {
-		if (!window.confirm(`¿Eliminar el perfil de ${cliente.nombre} ${cliente.apellido}?`)) return
+	const eliminar = async () => {
+		if (!clienteParaEliminar) return
+		setEliminando(true)
 		setErrorMutacion('')
-		try { await eliminarCliente(cliente['id-cliente']); setVersion((actual) => actual + 1) }
-		catch (motivo) { setErrorMutacion(motivo.message || 'No se pudo eliminar el cliente.') }
+		try { await eliminarCliente(clienteParaEliminar['id-cliente']); setVersion((actual) => actual + 1); setClienteParaEliminar(null) }
+		catch (motivo) { setErrorMutacion(motivo.message || 'No se pudo eliminar el cliente.'); setClienteParaEliminar(null) }
+		finally { setEliminando(false) }
 	}
 
 	return <section className="clientes-page">
@@ -109,7 +115,7 @@ function ClientesPage() {
 							return <tr key={cliente['id-cliente']}>
 								<td className="clientes-page__nombre">{cliente.nombre} {cliente.apellido}</td><td>{cliente.dni}</td><td>{cliente.telefono}</td><td>{cliente.email}</td>
 								<td>{tieneUsuario ? <span className="clientes-page__cuenta">#{cliente['id-usuario']}</span> : <span className="text-secondary">Sin usuario</span>}</td>
-								<td><div className="clientes-page__acciones">{!tieneUsuario && <button className="btn btn-sm btn-outline-success" type="button" onClick={() => abrirGeneracionUsuario(cliente)}>Generar usuario</button>}<button className="btn btn-sm btn-outline-secondary" type="button" onClick={() => editar(cliente)}>Editar</button><button className="btn btn-sm btn-outline-danger" type="button" onClick={() => eliminar(cliente)}>Eliminar</button></div></td>
+								<td><div className="clientes-page__acciones">{!tieneUsuario && <button className="btn btn-sm btn-outline-success" type="button" onClick={() => abrirGeneracionUsuario(cliente)}>Generar usuario</button>}<button className="btn btn-sm btn-outline-secondary" type="button" onClick={() => editar(cliente)}>Editar</button><button className="btn btn-sm btn-outline-danger" type="button" onClick={() => setClienteParaEliminar(cliente)}>Eliminar</button></div></td>
 							</tr>
 						})}
 						{!clientesFiltrados.length && <tr><td colSpan="6" className="clientes-page__vacio">{busqueda ? 'No hay coincidencias.' : 'Todavía no hay perfiles registrados.'}</td></tr>}
@@ -120,10 +126,10 @@ function ClientesPage() {
 			<section className="clientes-page__formulario" aria-labelledby="cliente-form-titulo">
 				<div className="clientes-page__formulario-header"><div><h2 id="cliente-form-titulo">{clienteEditando === null ? 'Nuevo cliente' : `Editar cliente #${clienteEditando}`}</h2><p>Los cambios se guardan en PostgreSQL.</p></div>{clienteEditando !== null && <button className="btn btn-sm btn-outline-secondary" type="button" onClick={cancelarEdicion}>Nuevo cliente</button>}</div>
 				<form onSubmit={guardar}><div className="clientes-page__campos">
-					<label>Nombre<input className="form-control" name="nombre" autoComplete="given-name" value={formulario.nombre} onChange={(event) => setFormulario({ ...formulario, nombre: event.target.value })} required /></label>
-					<label>Apellido<input className="form-control" name="apellido" autoComplete="family-name" value={formulario.apellido} onChange={(event) => setFormulario({ ...formulario, apellido: event.target.value })} required /></label>
-					<label>DNI<input className="form-control" name="dni" inputMode="numeric" value={formulario.dni} onChange={(event) => setFormulario({ ...formulario, dni: event.target.value })} required /></label>
-					<label>Teléfono<input className="form-control" name="telefono" autoComplete="tel" value={formulario.telefono} onChange={(event) => setFormulario({ ...formulario, telefono: event.target.value })} required /></label>
+					<label>Nombre<input className="form-control" name="nombre" autoComplete="given-name" maxLength="100" value={formulario.nombre} onChange={(event) => setFormulario({ ...formulario, nombre: soloLetras(event.target.value) })} required /></label>
+					<label>Apellido<input className="form-control" name="apellido" autoComplete="family-name" maxLength="100" value={formulario.apellido} onChange={(event) => setFormulario({ ...formulario, apellido: soloLetras(event.target.value) })} required /></label>
+					<label>DNI<input className="form-control" name="dni" type="text" inputMode="numeric" pattern="[0-9]{7,8}" minLength="7" maxLength="8" title="El DNI debe tener entre 7 y 8 números." value={formulario.dni} onChange={(event) => setFormulario({ ...formulario, dni: soloNumeros(event.target.value).slice(0, 8) })} required /></label>
+					<label>Teléfono<input className="form-control" name="telefono" type="tel" inputMode="numeric" autoComplete="tel" pattern="[0-9]{10}" minLength="10" maxLength="10" title="El teléfono debe tener exactamente 10 números." value={formulario.telefono} onChange={(event) => setFormulario({ ...formulario, telefono: soloNumeros(event.target.value).slice(0, 10) })} required /></label>
 					<label className="clientes-page__campo-completo">Email<input className="form-control" name="email" type="email" autoComplete="email" value={formulario.email} onChange={(event) => setFormulario({ ...formulario, email: event.target.value })} required /></label>
 				</div><div className="clientes-page__form-actions">{clienteEditando !== null && <button className="btn btn-outline-secondary" type="button" onClick={cancelarEdicion}>Cancelar</button>}<button className="btn btn-dark" type="submit" disabled={guardando}>{guardando ? 'Guardando...' : clienteEditando === null ? 'Crear cliente' : 'Guardar cambios'}</button></div></form>
 			</section>
@@ -152,6 +158,7 @@ function ClientesPage() {
 			</section>
 		</div>}
 		{aviso && <div className="clientes-page__modal-fondo" onMouseDown={(event) => { if (event.target === event.currentTarget) setAviso(null) }}><section className="clientes-page__modal" role="dialog" aria-modal="true" aria-labelledby="cliente-modal-titulo"><div className="clientes-page__modal-cabecera"><h2 id="cliente-modal-titulo">{aviso.titulo}</h2><button className="clientes-page__modal-cerrar" type="button" aria-label="Cerrar" onClick={() => setAviso(null)}>×</button></div><p>{aviso.mensaje}</p><div className="clientes-page__modal-acciones"><button className="btn btn-dark" type="button" onClick={() => setAviso(null)}>Entendido</button></div></section></div>}
+		{clienteParaEliminar && <ConfirmacionEliminar titulo="Eliminar cliente" mensaje={`¿Querés eliminar el perfil de ${clienteParaEliminar.nombre} ${clienteParaEliminar.apellido}?`} onCancelar={() => setClienteParaEliminar(null)} onConfirmar={eliminar} eliminando={eliminando} />}
 	</section>
 }
 

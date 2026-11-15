@@ -38,6 +38,8 @@
 .obras-page__ayuda { color: var(--color-verde-muted); font-size: .85rem; margin: .5rem 0 1rem; }
 .obras-page__campos { display: grid; gap: .85rem; }
 .obras-page__campos label { color: var(--color-verde-label); display: grid; font-size: .85rem; font-weight: 600; gap: .35rem; }
+.obras-page__formulario input[name="porcentaje"] { -moz-appearance: textfield; }
+.obras-page__formulario input[name="porcentaje"]::-webkit-inner-spin-button, .obras-page__formulario input[name="porcentaje"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 .obras-page__form-actions { display: flex; gap: .5rem; justify-content: flex-end; margin-top: 1rem; }
 .obras-page__modal-fondo { align-items: center; background: rgba(24, 37, 32, .55); display: flex; inset: 0; justify-content: center; padding: 1rem; position: fixed; z-index: 1100; }
 .obras-page__modal { background: var(--color-primario); border-radius: .4rem; box-shadow: 0 1rem 3rem rgba(0, 0, 0, .2); max-width: 32rem; padding: 1.35rem; width: 100%; }

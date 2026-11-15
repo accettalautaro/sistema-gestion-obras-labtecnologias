@@ -35,6 +35,10 @@
 .terrenos-page__grupo-campos legend { border-bottom: 1px solid #e3e8e5; color: var(--color-verde-acento); float: none; font-size: 1rem; font-weight: 600; margin-bottom: .8rem; padding-bottom: .45rem; width: 100%; }
 .terrenos-page__campos { display: grid; gap: .85rem; grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .terrenos-page__campos label { color: var(--color-verde-label); display: grid; font-size: .85rem; font-weight: 600; gap: .35rem; min-width: 0; }
+.terrenos-page input[name="porcentajePropietario"] { -moz-appearance: textfield; }
+.terrenos-page input[name="porcentajePropietario"]::-webkit-inner-spin-button, .terrenos-page input[name="porcentajePropietario"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.terrenos-page input[name="ancho"], .terrenos-page input[name="largo"] { -moz-appearance: textfield; }
+.terrenos-page input[name="ancho"]::-webkit-inner-spin-button, .terrenos-page input[name="ancho"]::-webkit-outer-spin-button, .terrenos-page input[name="largo"]::-webkit-inner-spin-button, .terrenos-page input[name="largo"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 .terrenos-page__campos-dos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .terrenos-page__documento-pendiente { background: #f5f7f5; color: var(--color-verde-muted); font-size: .9rem; padding: .8rem 1rem; }
 .terrenos-page__form-acciones { display: flex; gap: .5rem; justify-content: flex-end; margin-top: 1rem; }

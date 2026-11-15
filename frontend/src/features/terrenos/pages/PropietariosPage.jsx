@@ -3,6 +3,7 @@ import { useParams, useOutletContext } from 'react-router-dom'
 import { listarDatosPropietarios, crearPropietario, actualizarPropietario, eliminarPropietario } from '../services/propietariosService.js'
 import Volver from '../../../shared/components/Volver.jsx'
 import { useFetch } from '../../../shared/hooks/useFetch.js'
+import { soloLetras, soloNumeros } from '../../../shared/utils/filtrosEntrada.js'
 
 const FORMULARIO_VACIO = { dniUnico: '', nombre: '', apellido: '', dni: '', estadocivil: '', porcentaje: '', nroescritura: '' }
 const listarDatosPropietariosPorVersion = (clave) => listarDatosPropietarios(clave.slice(0, clave.lastIndexOf('|')))
@@ -68,11 +69,16 @@ function PropietariosPage() {
 
 	const guardar = async (e) => {
 		e.preventDefault()
+		const porcentaje = Number(formulario.porcentaje)
+		if (!Number.isFinite(porcentaje) || porcentaje < 0 || porcentaje > 100) {
+			setAviso({ titulo: 'Porcentaje inválido', mensaje: 'El porcentaje de titularidad debe estar entre 0 y 100.' })
+			return
+		}
 		setGuardando(true)
 		try {
 			const escritura = escriturasLote.find((item) => String(item.nroescritura) === nroEscrituraSeleccionada)
 			if (!escritura) throw new Error('Seleccioná una escritura del lote.')
-			const entrada = { nombre: formulario.nombre.trim(), apellido: formulario.apellido.trim(), dni: formulario.dni.trim(), estadoCivil: formulario.estadocivil || null, porcentaje: Number(formulario.porcentaje) }
+			const entrada = { nombre: formulario.nombre.trim(), apellido: formulario.apellido.trim(), dni: formulario.dni.trim(), estadoCivil: formulario.estadocivil || null, porcentaje }
 			if (editando === null) await crearPropietario(lote.id, escritura.documentoId, entrada)
 			else await actualizarPropietario(lote.id, escritura.documentoId, editando, entrada)
 			setVersion((actual) => actual + 1); nuevo()
@@ -180,23 +186,29 @@ function PropietariosPage() {
 
 							<label>
 								Nombre
-								<input className="form-control" value={formulario.nombre} onChange={(e) => setFormulario({...formulario, nombre: e.target.value})} required />
+								<input className="form-control" maxLength="100" pattern="[A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s'-]+" title="Ingresá solo letras." value={formulario.nombre} onChange={(e) => setFormulario({...formulario, nombre: soloLetras(e.target.value)})} required />
 							</label>
 							<label>
 								Apellido
-								<input className="form-control" value={formulario.apellido} onChange={(e) => setFormulario({...formulario, apellido: e.target.value})} required />
+								<input className="form-control" maxLength="100" pattern="[A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s'-]+" title="Ingresá solo letras." value={formulario.apellido} onChange={(e) => setFormulario({...formulario, apellido: soloLetras(e.target.value)})} required />
 							</label>
 							<label>
 								DNI
-								<input className="form-control" type="text" inputMode="numeric" value={formulario.dni} onChange={(e) => setFormulario({...formulario, dni: e.target.value})} required />
+								<input className="form-control" type="text" inputMode="numeric" pattern="[0-9]{7,8}" minLength="7" maxLength="8" title="El DNI debe tener entre 7 y 8 números." value={formulario.dni} onChange={(e) => setFormulario({...formulario, dni: soloNumeros(e.target.value).slice(0, 8)})} required />
 							</label>
 							<label>
 								Estado Civil
-								<input className="form-control" value={formulario.estadocivil} onChange={(e) => setFormulario({...formulario, estadocivil: e.target.value})} />
+								<select className="form-select" value={String(formulario.estadocivil ?? '').toLowerCase()} onChange={(e) => setFormulario({...formulario, estadocivil: e.target.value})}>
+									<option value="">Seleccioná estado civil</option>
+									<option value="casado">Casado/a</option>
+									<option value="soltero">Soltero/a</option>
+									<option value="viudo">Viudo/a</option>
+									<option value="divorciado">Divorciado/a</option>
+								</select>
 							</label>
 							<label>
 								Porcentaje (%)
-								<input className="form-control" type="number" min="0" max="100" step="any" value={formulario.porcentaje} onChange={(e) => setFormulario({...formulario, porcentaje: e.target.value})} required />
+								<input className="form-control" name="porcentaje" type="number" min="0" max="100" step="any" value={formulario.porcentaje} onChange={(e) => setFormulario({...formulario, porcentaje: e.target.value})} required />
 							</label>
 						</div>
 						<div className="obras-page__form-actions mt-3">

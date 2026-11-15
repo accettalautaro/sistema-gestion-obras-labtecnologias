@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 // Importa tus validaciones reales aquí
 import { esRequerido, esDniValido } from '../../../shared/utils/validacion'
+import { soloNumeros } from '../../../shared/utils/filtrosEntrada.js'
 
 function validar(valores) {
   const errores = {}
@@ -32,7 +33,8 @@ function FormularioContacto({ onIngresar }) {
   const formularioRef = useRef(null)
 
   function handleChange(e) {
-    const { name, value } = e.target
+    const { name } = e.target
+    const value = name === 'dni' ? soloNumeros(e.target.value).slice(0, 8) : e.target.value
     setValores({ ...valores, [name]: value })
     // Borrar el error específico cuando el usuario empieza a tipear de nuevo
     if (errores[name]) setErrores({ ...errores, [name]: undefined })
@@ -77,7 +79,11 @@ function FormularioContacto({ onIngresar }) {
         <input 
           id="dni" 
           name="dni" 
-          type="number"
+          type="text"
+          inputMode="numeric"
+          pattern="[0-9]{7,8}"
+          minLength="7"
+          maxLength="8"
           autoComplete='dni'
           className={`form-control ${errores.dni ? 'is-invalid' : ''}`}  
           value={valores.dni}

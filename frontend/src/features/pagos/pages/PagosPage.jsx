@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { useFetch } from '../../../shared/hooks/useFetch'
 import { useOutletContext } from 'react-router-dom'
 import { listarPagos, crearPago, actualizarPago, eliminarPago } from '../services/pagosService.js'
+import ConfirmacionEliminar from '../../../shared/components/ConfirmacionEliminar.jsx'
+import { soloDecimal } from '../../../shared/utils/filtrosEntrada.js'
 import '../../../styles/Pagos.css'
 
 const FORMULARIO_VACIO = { 'id-obra': '', 'id-tarea': '', descripcion: '', monto: '' }
@@ -63,9 +65,10 @@ function FilaPago({ pago, tareas, onActualizar, onEliminar }) {
                         <span className="input-group-text">$</span>
                         <input
                             type="number"
+                            name="monto"
                             className="form-control"
                             value={datosEdicion.monto}
-                            onChange={e => setDatosEdicion({ ...datosEdicion, monto: e.target.value })}
+                            onChange={e => { const monto = soloDecimal(e.target.value); if (monto !== null) setDatosEdicion({ ...datosEdicion, monto }) }}
                         />
                     </div>
                 </td>
@@ -174,7 +177,9 @@ function PagosPage() {
     const { datos, cargando, error } = useFetch(listarPagos, version)
 
     const [formulario, setFormulario] = useState(FORMULARIO_VACIO)
+    const [pagoParaEliminar, setPagoParaEliminar] = useState(null)
     const [guardando, setGuardando] = useState(false)
+    const [eliminando, setEliminando] = useState(false)
     const [errorMutacion, setErrorMutacion] = useState('')
     const [exito, setExito] = useState('')
 
@@ -189,6 +194,22 @@ function PagosPage() {
     }
 
     const { pagos = [], obras = [], tareas = [] } = datos || {}
+
+    const eliminar = async () => {
+        if (!pagoParaEliminar) return
+        setEliminando(true)
+        setErrorMutacion('')
+        try {
+            await eliminarPago(pagoParaEliminar)
+            setVersion((actual) => actual + 1)
+            setPagoParaEliminar(null)
+        } catch (motivo) {
+            setErrorMutacion(motivo.message || 'No se pudo eliminar el pago.')
+            setPagoParaEliminar(null)
+        } finally {
+            setEliminando(false)
+        }
+    }
 
     const guardar = async (event) => {
         event.preventDefault()
@@ -234,11 +255,7 @@ function PagosPage() {
                             totalAbonado={totalAbonado}
                             tareas={tareas}
                             onActualizar={async (pago) => { await actualizarPago(pago); setVersion((actual) => actual + 1) }}
-                            onEliminar={async (pago) => {
-                                if (!window.confirm(`¿Eliminar el pago #${pago['id-pago']}?`)) return
-                                try { await eliminarPago(pago); setVersion((actual) => actual + 1) }
-                                catch (motivo) { setErrorMutacion(motivo.message || 'No se pudo eliminar el pago.') }
-                            }}
+                            onEliminar={setPagoParaEliminar}
                         />
                     )
                 })}
@@ -266,7 +283,7 @@ function PagosPage() {
                                         ))}
                                     </select>
                                 </label>
-                                <label>Monto ($)<input className="form-control" name="monto" type="number" min="1" step="0.01" value={formulario.monto} onChange={(event) => setFormulario({ ...formulario, monto: event.target.value })} required placeholder="Ej: 500000" /></label>
+                                <label>Monto ($)<input className="form-control" name="monto" type="number" min="1" step="0.01" value={formulario.monto} onChange={(event) => { const monto = soloDecimal(event.target.value); if (monto !== null) setFormulario({ ...formulario, monto }) }} required placeholder="Ej: 500000" /></label>
                                 <label className="pagos-page__campo-completo">Descripción<input className="form-control" name="descripcion" value={formulario.descripcion} onChange={(event) => setFormulario({ ...formulario, descripcion: event.target.value })} required placeholder="Ej: Adelanto de materiales" /></label>
                             </div>
                             <div className="pagos-page__form-actions">
@@ -276,6 +293,7 @@ function PagosPage() {
                     </section>
                 )}
             </div>
+            {pagoParaEliminar && <ConfirmacionEliminar titulo="Eliminar pago" mensaje={`¿Querés eliminar el pago #${pagoParaEliminar['id-pago']}?`} onCancelar={() => setPagoParaEliminar(null)} onConfirmar={eliminar} eliminando={eliminando} />}
         </section>
     )
 }

@@ -7,6 +7,16 @@
 	padding: clamp(1.25rem, 3vw, 2.5rem);
 }
 
+.pagos-page input[name="monto"] {
+	-moz-appearance: textfield;
+}
+
+.pagos-page input[name="monto"]::-webkit-inner-spin-button,
+.pagos-page input[name="monto"]::-webkit-outer-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
 .pagos-page__header {
 	display: flex;
 	justify-content: space-between;

@@ -5,6 +5,8 @@ import { useFetch } from '../../../shared/hooks/useFetch'
 import { listarTerrenos, crearTerreno, actualizarTerreno, eliminarTerreno } from '../services/terrenosService.js'
 import { crearObra } from '../../obras/services/obrasService.js'
 import Volver from '../../../shared/components/Volver.jsx'
+import ConfirmacionEliminar from '../../../shared/components/ConfirmacionEliminar.jsx'
+import { soloLetras, soloNumeros } from '../../../shared/utils/filtrosEntrada.js'
 import '../../../styles/Terrenos.css'
 
 function mostrar(valor, sufijo = '') {
@@ -19,7 +21,7 @@ function TarjetaPendiente({ titulo, detalle, children, tituloAcento = false }) {
 }
 
 const FORMULARIO_TERRENO_VACIO = {
-	nrolote: '', calle: '', altura: '', localidad: '', provincia: '', codpos: '', numeroEscritura: '',
+	nrolote: '', calle: '', altura: '', localidad: '', provincia: '', codpos: '', numeroEscritura: '', estadoCivilPropietario: '',
 	ancho: '', largo: '', nombrePropietario: '', apellidoPropietario: '', dniPropietario: '', porcentajePropietario: '',
 }
 
@@ -36,8 +38,10 @@ function TerrenosPage() {
 	const [loteCreadoId, setLoteCreadoId] = useState(null)
 	const [mostrarFormulario, setMostrarFormulario] = useState(() => Boolean(location.state?.obraPendiente))
 	const [loteEditando, setLoteEditando] = useState(null)
+	const [loteParaEliminar, setLoteParaEliminar] = useState(null)
 	const [version, setVersion] = useState(0)
 	const [guardando, setGuardando] = useState(false)
+	const [eliminando, setEliminando] = useState(false)
 	const [errorMutacion, setErrorMutacion] = useState('')
 	const [formulario, setFormulario] = useState(FORMULARIO_TERRENO_VACIO)
 	const { datos: lotes = [], cargando, error } = useFetch(listarTerrenos, version)
@@ -84,8 +88,10 @@ function TerrenosPage() {
 			}
 			const quierePropietario = [formulario.nombrePropietario, formulario.apellidoPropietario, formulario.dniPropietario, formulario.porcentajePropietario].some((valor) => String(valor || '').trim())
 			if (quierePropietario && (!formulario.numeroEscritura.trim() || !formulario.nombrePropietario.trim() || !formulario.apellidoPropietario.trim() || !formulario.dniPropietario.trim() || formulario.porcentajePropietario === '')) throw new Error('Para registrar un propietario completá escritura, nombre, apellido, DNI y porcentaje.')
+			const porcentajePropietario = Number(formulario.porcentajePropietario)
+			if (quierePropietario && (!Number.isFinite(porcentajePropietario) || porcentajePropietario < 0 || porcentajePropietario > 100)) throw new Error('El porcentaje de titularidad debe estar entre 0 y 100.')
 			const entrada = { numero: formulario.nrolote.trim(), calle: formulario.calle.trim(), altura: formulario.altura || null, localidad: formulario.localidad || null, provincia: formulario.provincia || null, codigoPostal: formulario.codpos || null, ancho: Number(formulario.ancho), largo: Number(formulario.largo), numeroEscritura: formulario.numeroEscritura || null,
-				propietario: quierePropietario ? { nombre: formulario.nombrePropietario.trim(), apellido: formulario.apellidoPropietario.trim(), dni: formulario.dniPropietario.trim(), estadoCivil: null, porcentaje: Number(formulario.porcentajePropietario) } : null }
+				propietario: quierePropietario ? { nombre: formulario.nombrePropietario.trim(), apellido: formulario.apellidoPropietario.trim(), dni: formulario.dniPropietario.trim(), estadoCivil: formulario.estadoCivilPropietario || null, porcentaje: porcentajePropietario } : null }
 			if (loteEditando === null) {
 				const lote = await crearTerreno(entrada)
 				if (obraPendiente) {
@@ -108,11 +114,13 @@ function TerrenosPage() {
 		}
 		finally { setGuardando(false) }
 	}
-	const eliminar = async (lote) => {
-		if (!window.confirm(`¿Eliminar el lote ${lote.nrolote}? Se quitarán también su dirección y documentos asociados.`)) return
+	const eliminar = async () => {
+		if (!loteParaEliminar) return
+		setEliminando(true)
 		setErrorMutacion('')
-		try { await eliminarTerreno(lote.id); setVersion((actual) => actual + 1) }
-		catch (motivo) { setErrorMutacion(motivo.message || 'No se pudo eliminar el lote.') }
+		try { await eliminarTerreno(loteParaEliminar.id); setVersion((actual) => actual + 1); setLoteParaEliminar(null) }
+		catch (motivo) { setErrorMutacion(motivo.message || 'No se pudo eliminar el lote.'); setLoteParaEliminar(null) }
+		finally { setEliminando(false) }
 	}
 
 	return <section className="terrenos-page">
@@ -149,22 +157,23 @@ function TerrenosPage() {
 				{loteCreadoId !== null && <div className="alert alert-info" role="status">El lote se creó correctamente. Reintentá la creación de la obra; no se volverá a crear el lote.</div>}
 				<form onSubmit={enviarFormulario}>
 					<fieldset className="terrenos-page__grupo-campos" disabled={guardando || loteCreadoId !== null}><legend>Identificación y ubicación</legend><div className="terrenos-page__campos">
-						<label>Número de lote<input className="form-control" name="nrolote" value={formulario.nrolote} onChange={cambiarCampo} required /></label>
-						<label>Calle<input className="form-control" name="calle" value={formulario.calle} onChange={cambiarCampo} required /></label>
-						<label>Altura<input className="form-control" name="altura" value={formulario.altura} onChange={cambiarCampo} /></label>
-						<label>Localidad<input className="form-control" name="localidad" value={formulario.localidad} onChange={cambiarCampo} required /></label>
-						<label>Provincia<input className="form-control" name="provincia" value={formulario.provincia} onChange={cambiarCampo} required /></label>
-						<label>Código postal<input className="form-control" name="codpos" value={formulario.codpos} onChange={cambiarCampo} /></label>
+						<label>Número de lote<input className="form-control" name="nrolote" maxLength="30" value={formulario.nrolote} onChange={cambiarCampo} required /></label>
+						<label>Calle<input className="form-control" name="calle" maxLength="150" pattern="[A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s'-]+" title="Ingresá solo letras." value={formulario.calle} onChange={(event) => setFormulario({ ...formulario, calle: soloLetras(event.target.value) })} required /></label>
+						<label>Altura<input className="form-control" name="altura" maxLength="20" value={formulario.altura} onChange={cambiarCampo} /></label>
+						<label>Localidad<input className="form-control" name="localidad" maxLength="100" pattern="[A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s'-]+" title="Ingresá solo letras." value={formulario.localidad} onChange={(event) => setFormulario({ ...formulario, localidad: soloLetras(event.target.value) })} required /></label>
+						<label>Provincia<input className="form-control" name="provincia" maxLength="100" pattern="[A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s'-]+" title="Ingresá solo letras." value={formulario.provincia} onChange={(event) => setFormulario({ ...formulario, provincia: soloLetras(event.target.value) })} required /></label>
+						<label>Código postal<input className="form-control" name="codpos" maxLength="20" value={formulario.codpos} onChange={cambiarCampo} /></label>
 					</div></fieldset>
 					<fieldset className="terrenos-page__grupo-campos" disabled={guardando || loteCreadoId !== null}><legend>Mensura</legend><div className="terrenos-page__campos terrenos-page__campos-dos">
-						<label>Ancho (m)<input className="form-control" name="ancho" type="number" min="0" step="any" value={formulario.ancho} onChange={cambiarCampo} required /></label>
-						<label>Largo (m)<input className="form-control" name="largo" type="number" min="0" step="any" value={formulario.largo} onChange={cambiarCampo} required /></label>
+						<label>Ancho (m)<input className="form-control" name="ancho" type="number" inputMode="decimal" min="0" max="99999999.99" step="0.01" value={formulario.ancho} onChange={cambiarCampo} required /></label>
+						<label>Largo (m)<input className="form-control" name="largo" type="number" inputMode="decimal" min="0" max="99999999.99" step="0.01" value={formulario.largo} onChange={cambiarCampo} required /></label>
 					</div></fieldset>
 					{loteEditando === null && <fieldset className="terrenos-page__grupo-campos" disabled={guardando || loteCreadoId !== null}><legend>Escritura y propietario opcional</legend><div className="terrenos-page__campos">
-						<label>Número de escritura<input className="form-control" name="numeroEscritura" value={formulario.numeroEscritura} onChange={cambiarCampo} /></label>
-						<label>Nombre<input className="form-control" name="nombrePropietario" value={formulario.nombrePropietario} onChange={cambiarCampo} /></label>
-						<label>Apellido<input className="form-control" name="apellidoPropietario" value={formulario.apellidoPropietario} onChange={cambiarCampo} /></label>
-						<label>DNI<input className="form-control" name="dniPropietario" inputMode="numeric" value={formulario.dniPropietario} onChange={cambiarCampo} /></label>
+						<label>Número de escritura<input className="form-control" name="numeroEscritura" maxLength="50" value={formulario.numeroEscritura} onChange={cambiarCampo} /></label>
+						<label>Nombre<input className="form-control" name="nombrePropietario" maxLength="100" pattern="[A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s'-]*" title="Ingresá solo letras." value={formulario.nombrePropietario} onChange={(event) => setFormulario({ ...formulario, nombrePropietario: soloLetras(event.target.value) })} /></label>
+						<label>Apellido<input className="form-control" name="apellidoPropietario" maxLength="100" pattern="[A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s'-]*" title="Ingresá solo letras." value={formulario.apellidoPropietario} onChange={(event) => setFormulario({ ...formulario, apellidoPropietario: soloLetras(event.target.value) })} /></label>
+						<label>DNI<input className="form-control" name="dniPropietario" type="text" inputMode="numeric" pattern="[0-9]{7,8}" minLength="7" maxLength="8" title="El DNI debe tener entre 7 y 8 números." value={formulario.dniPropietario} onChange={(event) => setFormulario({ ...formulario, dniPropietario: soloNumeros(event.target.value).slice(0, 8) })} /></label>
+						<label>Estado civil<select className="form-select" name="estadoCivilPropietario" value={formulario.estadoCivilPropietario} onChange={cambiarCampo}><option value="">Seleccioná estado civil</option><option value="casado">Casado/a</option><option value="soltero">Soltero/a</option><option value="viudo">Viudo/a</option><option value="divorciado">Divorciado/a</option></select></label>
 						<label>Porcentaje de titularidad<input className="form-control" name="porcentajePropietario" type="number" min="0" max="100" step="any" value={formulario.porcentajePropietario} onChange={cambiarCampo} /></label>
 					</div></fieldset>}
 					{loteEditando !== null && <div className="alert alert-info">La edición actualiza ubicación y mensura; la escritura y sus propietarios se administran en su pantalla.</div>}
@@ -177,13 +186,14 @@ function TerrenosPage() {
 				{lotesFiltrados.map((lote) => {
 					const direccion = lote.direcciones[0]
 					const ubicacion = direccion ? [direccion.calle, direccion.altura, direccion.localidad, direccion.provincia].filter(Boolean).join(', ') : 'Ubicación sin información'
-					return <article className="terrenos-page__tarjeta" key={lote.nrolote}><div><span className="terrenos-page__etiqueta">Lote</span><h2>{lote.nrolote}</h2><p>{ubicacion}</p><small>{lote.mensuras.length ? `${lote.mensuras[0].ancho ?? '—'} × ${lote.mensuras[0].largo ?? '—'} m` : 'Sin mensura registrada'}</small></div><div className="d-flex gap-2"><Link className="btn btn-dark" state={esArquitecto ? { desdeGestionTerrenos: true } : undefined} to={`${esCliente ? '/cliente/lotes/' : '/principal/terrenos/'}${lote.nrolote}`}>Consultar terreno</Link>{!modoConsulta && <><button className="btn btn-outline-secondary" type="button" onClick={() => iniciarEdicionLote(lote)}>Editar</button><button className="btn btn-outline-danger" type="button" onClick={() => eliminar(lote)}>Eliminar</button></>}</div></article>
+					return <article className="terrenos-page__tarjeta" key={lote.nrolote}><div><span className="terrenos-page__etiqueta">Lote</span><h2>{lote.nrolote}</h2><p>{ubicacion}</p><small>{lote.mensuras.length ? `${lote.mensuras[0].ancho ?? '—'} × ${lote.mensuras[0].largo ?? '—'} m` : 'Sin mensura registrada'}</small></div><div className="d-flex gap-2"><Link className="btn btn-dark" state={esArquitecto ? { desdeGestionTerrenos: true } : undefined} to={`${esCliente ? '/cliente/lotes/' : '/principal/terrenos/'}${lote.nrolote}`}>Consultar terreno</Link>{!modoConsulta && <><button className="btn btn-outline-secondary" type="button" onClick={() => iniciarEdicionLote(lote)}>Editar</button><button className="btn btn-outline-danger" type="button" onClick={() => setLoteParaEliminar(lote)}>Eliminar</button></>}</div></article>
 				})}
 				{!lotesFiltrados.length && <p className="terrenos-page__vacio">{busqueda ? 'No hay terrenos que coincidan con la búsqueda.' : 'Todavía no hay lotes registrados.'}</p>}
 			</div>
 			{!modoConsulta && <div className="terrenos-page__carga"><div><h2>¿Necesitás registrar otro terreno?</h2><p>Podés registrar un lote con su dirección y mensura.</p></div><button className="btn btn-outline-secondary" type="button" onClick={() => { setLoteEditando(null); setFormulario(FORMULARIO_TERRENO_VACIO); setMostrarFormulario(true) }}>Cargar terreno</button></div>}
 		</>}
 		{errorMutacion && !mostrarFormulario && <div className="alert alert-danger mt-3" role="alert">{errorMutacion}</div>}
+		{loteParaEliminar && <ConfirmacionEliminar titulo={`Eliminar lote ${loteParaEliminar.nrolote}`} mensaje="Se quitarán también la dirección y los documentos asociados a este terreno. ¿Querés continuar?" onCancelar={() => setLoteParaEliminar(null)} onConfirmar={eliminar} eliminando={eliminando} />}
 	</section>
 }
 

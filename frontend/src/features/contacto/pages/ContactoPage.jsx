@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import casanieve from '../../../assets/casanieve.jpg'
 import logoSimple from '../../../assets/logosimple.png'
+import { soloLetras, soloNumeros } from '../../../shared/utils/filtrosEntrada.js'
 import '../../../styles/Contacto.css'
 
 const initialForm = {
@@ -17,7 +18,8 @@ function ContactoPage() {
 
 	const handleChange = (event) => {
 		const { name, value } = event.target
-		setFormulario((actual) => ({ ...actual, [name]: value }))
+		const valor = name === 'nombre' ? soloLetras(value) : name === 'telefono' ? soloNumeros(value) : value
+		setFormulario((actual) => ({ ...actual, [name]: valor }))
 		setEnviado(false)
 	}
 
@@ -63,7 +65,7 @@ function ContactoPage() {
 
 					<div className="contacto-formulario__campo">
 						<label htmlFor="telefono">Teléfono</label>
-						<input id="telefono" name="telefono" type="tel" value={formulario.telefono} onChange={handleChange} minLength="10" maxLength="10" pattern="[0-9]{10}" placeholder="2664123456" required />
+						<input id="telefono" name="telefono" type="tel" inputMode="numeric" value={formulario.telefono} onChange={handleChange} minLength="10" maxLength="10" pattern="[0-9]{10}" title="El teléfono debe tener exactamente 10 números." placeholder="2664123456" required />
 					</div>
 
 					<div className="contacto-formulario__campo">

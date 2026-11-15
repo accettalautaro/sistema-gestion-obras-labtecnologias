@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useLocation, useNavigate, useOutletContext } from 'react-router-dom'
 import { useFetch } from '../../../shared/hooks/useFetch'
 import { listarObras, crearObra, actualizarObra, eliminarObra } from '../services/obrasService.js'
+import ConfirmacionEliminar from '../../../shared/components/ConfirmacionEliminar.jsx'
 import '../../../styles/Obras.css'
 
 const FORMULARIO_VACIO = { 'id-cliente': '', 'id-arquitecto': '', loteId: '', Descripcion: '', 'fecha-inicio-estimada': '', 'fecha-fin-estimada': '' }
@@ -25,6 +26,8 @@ function ObrasPage() {
 	const [busqueda, setBusqueda] = useState('')
 	const [formulario, setFormulario] = useState(() => location.state?.obraBorrador ?? FORMULARIO_VACIO)
 	const [obraEditando, setObraEditando] = useState(null)
+	const [obraParaEliminar, setObraParaEliminar] = useState(null)
+	const [eliminando, setEliminando] = useState(false)
 	const [aviso, setAviso] = useState(null)
 	const [version, setVersion] = useState(0)
 	const [guardando, setGuardando] = useState(false)
@@ -66,11 +69,13 @@ function ObrasPage() {
 		} catch (motivo) { setErrorMutacion(motivo.message || 'No se pudo guardar la obra.') }
 		finally { setGuardando(false) }
 	}
-	const eliminar = async (obra) => {
-		if (!window.confirm(`¿Eliminar la obra #${obra['id-obra']}?`)) return
+	const eliminar = async () => {
+		if (!obraParaEliminar) return
+		setEliminando(true)
 		setErrorMutacion('')
-		try { await eliminarObra(obra['id-obra']); setVersion((actual) => actual + 1) }
-		catch (motivo) { setErrorMutacion(motivo.message || 'No se pudo eliminar la obra.') }
+		try { await eliminarObra(obraParaEliminar['id-obra']); setVersion((actual) => actual + 1); setObraParaEliminar(null) }
+		catch (motivo) { setErrorMutacion(motivo.message || 'No se pudo eliminar la obra.'); setObraParaEliminar(null) }
+		finally { setEliminando(false) }
 	}
 
 	return <section className="obras-page">
@@ -83,7 +88,7 @@ function ObrasPage() {
 						const cliente = buscarPorId(clientes, 'id-cliente', obra['id-cliente'])
 						const arquitecto = buscarPorId(arquitectos, 'id-arquitecto', obra['id-arquitecto'])
 						const avance = porcentajeNumero(obra.porcentaje)
-						return <tr key={obra['id-obra']}><td><div className="obras-page__nombre">#{obra['id-obra']}</div><div className="obras-page__acciones-tarea"><Link className="btn btn-sm obras-page__boton-seguimiento" to={`/principal/obras/${obra['id-obra']}/avance`}>Ver seguimiento</Link><Link className="btn btn-sm btn-outline-secondary" to={`/principal/obras/${obra['id-obra']}/tareas`}>Gestionar tareas</Link></div></td><td>{cliente ? nombrePersona(cliente) : `Cliente #${obra['id-cliente']}`}</td><td>{arquitecto ? nombrePersona(arquitecto) : `Arquitecto #${obra['id-arquitecto']}`}</td><td><Link to={`/principal/terrenos/${obra.nrolote}`}>{obra.nrolote ?? '—'}</Link></td><td><span className={`obras-page__estado-badge ${claseEstadoObra(obra.Estado)}`}><span aria-hidden="true" />{obra.Estado}</span></td><td><div className="obras-page__avance"><span>{avance}%</span><div className="progress" role="progressbar" aria-label={`Avance de obra ${obra['id-obra']}`} aria-valuenow={avance} aria-valuemin="0" aria-valuemax="100"><div className="progress-bar" style={{ width: `${avance}%` }} /></div></div></td><td><div className="obras-page__acciones"><button className="btn btn-sm btn-outline-secondary" type="button" onClick={() => editar(obra)}>Editar</button><button className="btn btn-sm btn-outline-danger" type="button" onClick={() => eliminar(obra)}>Eliminar</button></div></td></tr>
+						return <tr key={obra['id-obra']}><td><div className="obras-page__nombre">#{obra['id-obra']}</div><div className="obras-page__acciones-tarea"><Link className="btn btn-sm obras-page__boton-seguimiento" to={`/principal/obras/${obra['id-obra']}/avance`}>Ver seguimiento</Link><Link className="btn btn-sm btn-outline-secondary" to={`/principal/obras/${obra['id-obra']}/tareas`}>Gestionar tareas</Link></div></td><td>{cliente ? nombrePersona(cliente) : `Cliente #${obra['id-cliente']}`}</td><td>{arquitecto ? nombrePersona(arquitecto) : `Arquitecto #${obra['id-arquitecto']}`}</td><td><Link to={`/principal/terrenos/${obra.nrolote}`}>{obra.nrolote ?? '—'}</Link></td><td><span className={`obras-page__estado-badge ${claseEstadoObra(obra.Estado)}`}><span aria-hidden="true" />{obra.Estado}</span></td><td><div className="obras-page__avance"><span>{avance}%</span><div className="progress" role="progressbar" aria-label={`Avance de obra ${obra['id-obra']}`} aria-valuenow={avance} aria-valuemin="0" aria-valuemax="100"><div className="progress-bar" style={{ width: `${avance}%` }} /></div></div></td><td><div className="obras-page__acciones"><button className="btn btn-sm btn-outline-secondary" type="button" onClick={() => editar(obra)}>Editar</button><button className="btn btn-sm btn-outline-danger" type="button" onClick={() => setObraParaEliminar(obra)}>Eliminar</button></div></td></tr>
 					})}
 					{!obrasFiltradas.length && <tr><td colSpan="7" className="obras-page__vacio">{busqueda ? 'No hay coincidencias.' : 'Todavía no hay obras registradas.'}</td></tr>}
 				</tbody></table></div>
@@ -101,6 +106,7 @@ function ObrasPage() {
 			</section>
 		</div>
 		{aviso && <div className="obras-page__modal-fondo" onMouseDown={(event) => { if (event.target === event.currentTarget) setAviso(null) }}><section className="obras-page__modal" role="dialog" aria-modal="true" aria-labelledby="obra-modal-titulo"><div className="obras-page__modal-cabecera"><h2 id="obra-modal-titulo">{aviso.titulo}</h2><button className="obras-page__modal-cerrar" type="button" aria-label="Cerrar" onClick={() => setAviso(null)}>×</button></div><p>{aviso.mensaje}</p><div className="obras-page__modal-acciones"><button className="btn btn-dark" type="button" onClick={() => setAviso(null)}>Entendido</button></div></section></div>}
+		{obraParaEliminar && <ConfirmacionEliminar titulo="Eliminar obra" mensaje={`¿Querés eliminar la obra #${obraParaEliminar['id-obra']}?`} onCancelar={() => setObraParaEliminar(null)} onConfirmar={eliminar} eliminando={eliminando} />}
 	</section>
 }
 

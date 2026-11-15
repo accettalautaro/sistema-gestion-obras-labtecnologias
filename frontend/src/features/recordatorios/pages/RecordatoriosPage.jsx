@@ -7,6 +7,7 @@ import {
     eliminarRecordatorio,
     obtenerDatosRecordatorios,
 } from '../services/recordatoriosService'
+import ConfirmacionEliminar from '../../../shared/components/ConfirmacionEliminar.jsx'
 import '../../../styles/Recordatorios.css'
 
 const FORMULARIO_VACIO = { 'id-cliente': '', 'id-obra': '', fecha: '', descripcion: '' }
@@ -32,7 +33,9 @@ function RecordatoriosPage() {
     const [obraFiltro, setObraFiltro] = useState('')
     const [formulario, setFormulario] = useState(FORMULARIO_VACIO)
     const [recordatorioEditando, setRecordatorioEditando] = useState(null)
+    const [recordatorioParaEliminar, setRecordatorioParaEliminar] = useState(null)
     const [guardando, setGuardando] = useState(false)
+    const [eliminando, setEliminando] = useState(false)
     const [errorMutacion, setErrorMutacion] = useState('')
     const [exito, setExito] = useState('')
 
@@ -82,17 +85,22 @@ function RecordatoriosPage() {
         }
     }
 
-    const eliminar = async (recordatorio) => {
-        if (!window.confirm(`¿Eliminar el recordatorio "${recordatorio.descripcion}"?`)) return
+    const eliminar = async () => {
+        if (!recordatorioParaEliminar) return
+        setEliminando(true)
         setErrorMutacion('')
         setExito('')
         try {
-            await eliminarRecordatorio(recordatorio.id)
-            if (recordatorioEditando?.id === recordatorio.id) cancelarEdicion()
+            await eliminarRecordatorio(recordatorioParaEliminar.id)
+            if (recordatorioEditando?.id === recordatorioParaEliminar.id) cancelarEdicion()
             setVersion((actual) => actual + 1)
             setExito('Recordatorio eliminado correctamente.')
+            setRecordatorioParaEliminar(null)
         } catch (motivo) {
             setErrorMutacion(motivo.message || 'No se pudo eliminar el recordatorio.')
+            setRecordatorioParaEliminar(null)
+        } finally {
+            setEliminando(false)
         }
     }
 
@@ -162,7 +170,7 @@ function RecordatoriosPage() {
                                     </div>
                                     <div className="recordatorios__acciones">
                                         <button className="btn btn-sm btn-outline-secondary" type="button" onClick={() => editar(rec)}>Editar</button>
-                                        <button className="btn btn-sm btn-outline-danger" type="button" onClick={() => eliminar(rec)}>Eliminar</button>
+                                        <button className="btn btn-sm btn-outline-danger" type="button" onClick={() => setRecordatorioParaEliminar(rec)}>Eliminar</button>
                                     </div>
                                 </article>
                             ))}
@@ -210,6 +218,7 @@ function RecordatoriosPage() {
                     </form>
                 </section>
             </div>
+            {recordatorioParaEliminar && <ConfirmacionEliminar titulo="Eliminar recordatorio" mensaje={`¿Querés eliminar el recordatorio "${recordatorioParaEliminar.descripcion}"?`} onCancelar={() => setRecordatorioParaEliminar(null)} onConfirmar={eliminar} eliminando={eliminando} />}
         </div>
     )
 }
