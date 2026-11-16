@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useOutletContext } from 'react-router-dom'
 import { listarDatosPropietarios, crearPropietario, actualizarPropietario, eliminarPropietario } from '../services/propietariosService.js'
 import Volver from '../../../shared/components/Volver.jsx'
+import ConfirmacionEliminar from '../../../shared/components/ConfirmacionEliminar.jsx'
 import { useFetch } from '../../../shared/hooks/useFetch.js'
 import { soloLetras, soloNumeros } from '../../../shared/utils/filtrosEntrada.js'
 import '../../../styles/Obras.css'
@@ -23,7 +24,9 @@ function PropietariosPage() {
 	const [formularioAbierto, setFormularioAbierto] = useState(false)
 	const [errorFormulario, setErrorFormulario] = useState('')
 	const [aviso, setAviso] = useState(null)
+	const [propietarioParaEliminar, setPropietarioParaEliminar] = useState(null)
 	const [guardando, setGuardando] = useState(false)
+	const [eliminando, setEliminando] = useState(false)
 	const { datos, cargando, error } = useFetch(listarDatosPropietariosPorVersion, `${nrolote}|${version}`)
 
 	useEffect(() => {
@@ -121,12 +124,19 @@ function PropietariosPage() {
 		finally { setGuardando(false) }
 	}
 
-	const eliminar = async (prop) => {
-		if (!window.confirm(`¿Quitar a ${prop.nombre} ${prop.apellido} de esta escritura?`)) return
+	const eliminar = async () => {
+		if (!propietarioParaEliminar) return
+		setEliminando(true)
 		try {
-			await eliminarPropietario(lote.id, prop.documentoId, prop['id-propietario'])
+			await eliminarPropietario(
+				lote.id, propietarioParaEliminar.documentoId, propietarioParaEliminar['id-propietario'],
+			)
 			setVersion((actual) => actual + 1)
-		} catch (motivo) { setAviso({ titulo: 'No se pudo quitar el propietario', mensaje: motivo.message || 'Ocurrió un error.' }) }
+			setPropietarioParaEliminar(null)
+		} catch (motivo) {
+			setAviso({ titulo: 'No se pudo quitar el propietario', mensaje: motivo.message || 'Ocurrió un error.' })
+			setPropietarioParaEliminar(null)
+		} finally { setEliminando(false) }
 	}
 
 	return (
@@ -161,7 +171,7 @@ function PropietariosPage() {
 							</thead>
 							<tbody>
 								{propietariosLote.map((prop) => (
-									<tr key={prop['id-propietario']}>
+									<tr key={`${prop.documentoId}-${prop['id-propietario']}`}>
 										<td>N.º {prop.nroescritura}</td>
 										<td className="obras-page__nombre fw-semibold">{prop.nombre} {prop.apellido}</td>
 										<td>{prop.dni}</td>
@@ -170,7 +180,7 @@ function PropietariosPage() {
 										<td>
 											<div className="obras-page__acciones">
 												<button className="btn btn-sm btn-outline-secondary" type="button" onClick={() => editar(prop)}>Editar</button>
-												<button className="btn btn-sm btn-outline-danger" type="button" onClick={() => eliminar(prop)}>Eliminar</button>
+												<button className="btn btn-sm btn-outline-danger" type="button" onClick={() => setPropietarioParaEliminar(prop)}>Quitar</button>
 											</div>
 										</td>
 									</tr>
@@ -243,7 +253,7 @@ function PropietariosPage() {
 								</label>
 								<label>
 									Porcentaje (%)
-									<input className="form-control" name="porcentaje" type="number" min="0" max="100" step="any" value={formulario.porcentaje} onChange={(e) => setFormulario({...formulario, porcentaje: e.target.value})} required />
+									<input className="form-control" name="porcentaje" type="number" min="0" max="100" step="0.01" value={formulario.porcentaje} onChange={(e) => setFormulario({...formulario, porcentaje: e.target.value})} required />
 								</label>
 							</div>
 							{errorFormulario && <p className="alert alert-danger py-2 mt-3 mb-0" role="alert">{errorFormulario}</p>}
@@ -269,6 +279,15 @@ function PropietariosPage() {
 						</div>
 					</section>
 				</div>
+			)}
+			{propietarioParaEliminar && (
+				<ConfirmacionEliminar
+					titulo="Quitar propietario"
+					mensaje={`¿Querés quitar a ${propietarioParaEliminar.nombre} ${propietarioParaEliminar.apellido} de la escritura N.º ${propietarioParaEliminar.nroescritura}?`}
+					onCancelar={() => setPropietarioParaEliminar(null)}
+					onConfirmar={eliminar}
+					eliminando={eliminando}
+				/>
 			)}
 		</section>
 	)

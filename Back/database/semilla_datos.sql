@@ -71,18 +71,18 @@ ON CONFLICT (id_documento) DO UPDATE SET nro_escritura=EXCLUDED.nro_escritura;
 
 
 -- Propietarios (un registro por DNI)
-INSERT INTO propietarios (id_propietario, apellido, dni, estado_civil, porcentaje, nombre) OVERRIDING SYSTEM VALUE VALUES
-  (1, 'Perez', '123456789', 'Casado', 50, 'Juan'),
-  (2, 'Rios', '987654321', 'Casado', 50, 'Maria')
-ON CONFLICT (id_propietario) DO UPDATE SET apellido=EXCLUDED.apellido, dni=EXCLUDED.dni, estado_civil=EXCLUDED.estado_civil, porcentaje=EXCLUDED.porcentaje, nombre=EXCLUDED.nombre;
+INSERT INTO propietarios (id_propietario, apellido, dni, estado_civil, nombre) OVERRIDING SYSTEM VALUE VALUES
+  (1, 'Perez', '123456789', 'Casado', 'Juan'),
+  (2, 'Rios', '987654321', 'Casado', 'Maria')
+ON CONFLICT (id_propietario) DO UPDATE SET apellido=EXCLUDED.apellido, dni=EXCLUDED.dni, estado_civil=EXCLUDED.estado_civil, nombre=EXCLUDED.nombre;
 
 
 -- Relación entre escrituras y propietarios
-INSERT INTO escritura_propietarios (id_documento, id_propietario) VALUES
-  (2, 1),
-  (2, 2),
-  (3, 2)
-ON CONFLICT (id_documento, id_propietario) DO NOTHING;
+INSERT INTO escritura_propietarios (id_documento, id_propietario, porcentaje) VALUES
+  (2, 1, 50),
+  (2, 2, 50),
+  (3, 2, 100)
+ON CONFLICT (id_documento, id_propietario) DO UPDATE SET porcentaje=EXCLUDED.porcentaje;
 
 
 -- Tareas principales

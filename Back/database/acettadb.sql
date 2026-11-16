@@ -163,12 +163,12 @@ CREATE TABLE propietarios (
     apellido VARCHAR(100) NOT NULL,
     dni VARCHAR(20) UNIQUE NOT NULL,
     estado_civil VARCHAR(30),
-    porcentaje NUMERIC(5,2) NOT NULL CHECK (porcentaje BETWEEN 0 AND 100),
     nombre VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE escritura_propietarios (
     id_documento BIGINT NOT NULL REFERENCES escrituras(id_documento) ON DELETE CASCADE,
     id_propietario BIGINT NOT NULL REFERENCES propietarios(id_propietario),
+    porcentaje NUMERIC(5,2) NOT NULL CHECK (porcentaje BETWEEN 0 AND 100),
     PRIMARY KEY (id_documento, id_propietario)
 );

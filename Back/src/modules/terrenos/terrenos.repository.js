@@ -89,7 +89,10 @@ const SELECT_TERRENOS = `
                    'descripcion', doc.descripcion, 'archivo', doc.archivo,
                    'nro_escritura', e.nro_escritura,
                    'propietarios', COALESCE((
-                       SELECT jsonb_agg(to_jsonb(p) ORDER BY p.id_propietario)
+                       SELECT jsonb_agg(
+                           to_jsonb(p) || jsonb_build_object('porcentaje', ep.porcentaje)
+                           ORDER BY p.id_propietario
+                       )
                        FROM escritura_propietarios ep
                        JOIN propietarios p ON p.id_propietario = ep.id_propietario
                        WHERE ep.id_documento = e.id_documento
@@ -415,7 +418,7 @@ export const listarPropietarios = async (id_documento) => {
     if (id_documento) values.push(id_documento);
     try {
         const resultado = await pool.query(
-            `SELECT p.*, ep.id_documento
+            `SELECT p.*, ep.id_documento, ep.porcentaje
              FROM escritura_propietarios ep
              JOIN propietarios p ON p.id_propietario = ep.id_propietario
              ${filtro}
@@ -446,41 +449,72 @@ export const obtenerPropietario = async (id) => {
     }
 };
 
-export const crearPropietario = async (propietario) => ejecutarTransaccion(async (client) => {
+const bloquearEscritura = async (client, id_documento) => {
     const resultado = await client.query(
-        `INSERT INTO propietarios (apellido, dni, estado_civil, porcentaje, nombre)
-         VALUES ($1, $2, $3, $4, $5) RETURNING *;`,
-        [propietario.apellido, propietario.dni, propietario.estado_civil ?? null,
-            propietario.porcentaje, propietario.nombre],
+        'SELECT id_documento FROM escrituras WHERE id_documento = $1 FOR UPDATE;',
+        [id_documento],
     );
-    const vinculo = await client.query(
-        `INSERT INTO escritura_propietarios (id_documento, id_propietario)
-         SELECT id_documento, $2 FROM escrituras
-         WHERE id_documento = $1 RETURNING id_documento;`,
-        [propietario.id_documento, resultado.rows[0].id_propietario],
-    );
-    if (!vinculo.rowCount) {
-        const error = new Error('La escritura indicada no existe.');
-        error.status = 400;
-        throw error;
-    }
-    return { ...resultado.rows[0], id_documento: String(propietario.id_documento) };
-}, 'Error al crear el propietario.');
+    return resultado.rowCount > 0;
+};
 
-export const actualizarPropietario = async (id, propietario) => {
-    try {
-        const resultado = await pool.query(
-            `UPDATE propietarios SET apellido = $1, dni = $2, estado_civil = $3,
-             porcentaje = $4, nombre = $5
-             WHERE id_propietario = $6 RETURNING *;`,
-            [propietario.apellido, propietario.dni, propietario.estado_civil ?? null,
-                propietario.porcentaje, propietario.nombre, id],
-        );
-        return resultado.rows[0] ?? null;
-    } catch (error) {
-        manejarError(error, 'Error al actualizar el propietario.');
+const validarSumaPorcentajes = async (client, id_documento, porcentaje, id_propietarioExcluido = null) => {
+    const resultado = await client.query(
+        `SELECT COALESCE(SUM(porcentaje), 0) AS total
+         FROM escritura_propietarios
+         WHERE id_documento = $1
+           AND ($2::bigint IS NULL OR id_propietario <> $2);`,
+        [id_documento, id_propietarioExcluido],
+    );
+    const totalCentimos = Math.round(Number(resultado.rows[0].total) * 100)
+        + Math.round(Number(porcentaje) * 100);
+    if (totalCentimos > 10000) {
+        throw crearErrorHttp('La suma de los porcentajes de los propietarios no puede superar el 100%.', 400);
     }
 };
+
+export const crearPropietario = async (propietario) => ejecutarTransaccion(async (client) => {
+    if (!await bloquearEscritura(client, propietario.id_documento)) {
+        throw crearErrorHttp('La escritura indicada no existe.', 400);
+    }
+    await validarSumaPorcentajes(client, propietario.id_documento, propietario.porcentaje);
+    const resultado = await client.query(
+        `INSERT INTO propietarios (apellido, dni, estado_civil, nombre)
+         VALUES ($1, $2, $3, $4) RETURNING *;`,
+        [propietario.apellido, propietario.dni, propietario.estado_civil ?? null, propietario.nombre],
+    );
+    const vinculo = await client.query(
+        `INSERT INTO escritura_propietarios (id_documento, id_propietario, porcentaje)
+         VALUES ($1, $2, $3)
+         RETURNING id_documento, porcentaje;`,
+        [propietario.id_documento, resultado.rows[0].id_propietario, propietario.porcentaje],
+    );
+    return { ...resultado.rows[0], ...vinculo.rows[0] };
+}, 'Error al crear el propietario.');
+
+export const actualizarPropietario = async (id, propietario) => ejecutarTransaccion(async (client) => {
+    if (!await bloquearEscritura(client, propietario.id_documento)) return null;
+    const vinculoExistente = await client.query(
+        `SELECT id_propietario FROM escritura_propietarios
+         WHERE id_documento = $1 AND id_propietario = $2 FOR UPDATE;`,
+        [propietario.id_documento, id],
+    );
+    if (!vinculoExistente.rowCount) return null;
+    await validarSumaPorcentajes(client, propietario.id_documento, propietario.porcentaje, id);
+
+    const resultado = await client.query(
+        `UPDATE propietarios SET apellido = $1, dni = $2, estado_civil = $3, nombre = $4
+         WHERE id_propietario = $5 RETURNING *;`,
+        [propietario.apellido, propietario.dni, propietario.estado_civil ?? null, propietario.nombre, id],
+    );
+    if (!resultado.rowCount) return null;
+    const vinculo = await client.query(
+        `UPDATE escritura_propietarios SET porcentaje = $1
+         WHERE id_documento = $2 AND id_propietario = $3
+         RETURNING id_documento, porcentaje;`,
+        [propietario.porcentaje, propietario.id_documento, id],
+    );
+    return { ...resultado.rows[0], ...vinculo.rows[0] };
+}, 'Error al actualizar el propietario.');
 
 export const eliminarPropietario = async (id) => ejecutarTransaccion(async (client) => {
     await client.query('DELETE FROM escritura_propietarios WHERE id_propietario = $1;', [id]);
@@ -491,22 +525,23 @@ export const eliminarPropietario = async (id) => ejecutarTransaccion(async (clie
     return resultado.rowCount > 0;
 }, 'Error al eliminar el propietario.');
 
-export const vincularPropietario = async (id_documento, id_propietario) => {
-    try {
-        const resultado = await pool.query(
-            `INSERT INTO escritura_propietarios (id_documento, id_propietario)
-             SELECT e.id_documento, p.id_propietario
-             FROM escrituras e CROSS JOIN propietarios p
-             WHERE e.id_documento = $1 AND p.id_propietario = $2
-             RETURNING *;`,
-            [id_documento, id_propietario],
+export const vincularPropietario = async (id_documento, id_propietario, porcentaje) =>
+    ejecutarTransaccion(async (client) => {
+        if (!await bloquearEscritura(client, id_documento)) return null;
+        const propietario = await client.query(
+            'SELECT id_propietario FROM propietarios WHERE id_propietario = $1;',
+            [id_propietario],
         );
-        if (!resultado.rowCount) return null;
-        return resultado.rows[0];
-    } catch (error) {
-        manejarError(error, 'Error al asociar el propietario a la escritura.');
-    }
-};
+        if (!propietario.rowCount) return null;
+        await validarSumaPorcentajes(client, id_documento, porcentaje);
+        const resultado = await client.query(
+            `INSERT INTO escritura_propietarios (id_documento, id_propietario, porcentaje)
+             VALUES ($1, $2, $3)
+             RETURNING id_documento, id_propietario, porcentaje;`,
+            [id_documento, id_propietario, porcentaje],
+        );
+        return resultado.rows[0] ?? null;
+    }, 'Error al asociar el propietario a la escritura.');
 
 export const desvincularPropietario = async (id_documento, id_propietario) => {
     try {

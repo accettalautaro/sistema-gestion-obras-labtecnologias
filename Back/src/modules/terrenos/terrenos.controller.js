@@ -131,7 +131,9 @@ export const eliminarPropietario = controlar(async (req, res) => {
 });
 
 export const vincularPropietario = controlar(async (req, res) => {
-    const vinculo = await service.vincularPropietario(req.params.id, req.params.id_propietario);
+    const vinculo = await service.vincularPropietario(
+        req.params.id, req.params.id_propietario, req.body?.porcentaje,
+    );
     if (!vinculo) return res.status(404).json({ error: 'Escritura o propietario no encontrado.' });
     return res.status(201).json(vinculo);
 });

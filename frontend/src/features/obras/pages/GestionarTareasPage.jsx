@@ -4,6 +4,7 @@ import { listarObras } from '../services/obrasService.js'
 import { listarTareas, guardarTareasObra } from '../services/tareasService.js'
 import { NOMENCLADOR_TAREAS } from '../data/nomencladorTareas.js'
 import Volver from '../../../shared/components/Volver.jsx'
+import ConfirmacionEliminar from '../../../shared/components/ConfirmacionEliminar.jsx'
 import '../../../styles/GestionarTareas.css'
 
 const NUEVA = { nombre: '', descripcion: '', estado: 'sin comenzar', 'fecha-inicio-estimada': '', 'fecha-fin-estimada': '', 'fecha-inicio-real': '', 'fecha-fin-real': '', 'costo-estimado': '', 'costo-real': '' }
@@ -32,6 +33,8 @@ function GestionarTareasPage() {
 	const [idPadreSubtarea, setIdPadreSubtarea] = useState('')
 	const [editando, setEditando] = useState(null)
 	const [aviso, setAviso] = useState('')
+	const [tareaParaEliminar, setTareaParaEliminar] = useState(null)
+	const [eliminando, setEliminando] = useState(false)
 	const contadorIdsTemporales = useRef(0)
 
 	useEffect(() => {
@@ -53,7 +56,9 @@ function GestionarTareasPage() {
 			const guardadas = await guardarTareasObra(id, lista)
 			setTareasBase((actuales) => [...actuales.filter((tarea) => String(tarea['id-obra']) !== String(id)), ...guardadas])
 			setAviso(mensaje)
-		} catch (motivo) { setError(motivo.message || 'No se pudieron guardar los cambios en la base de datos.') }
+		} catch (motivo) {
+			setError(motivo.message || 'No se pudieron guardar los cambios en la base de datos.')
+		}
 	}
 
 	if (esArquitecto === null) return <p role="status">Verificando acceso de arquitecto...</p>
@@ -80,11 +85,24 @@ function GestionarTareasPage() {
 		cancelar()
 	}
 	const seleccionarPadre = (valor) => { setIdPadreSubtarea(valor); setFormulario((actual) => ({ ...actual, nombre: '' })) }
-	const eliminar = (tarea) => {
-		const idTarea = String(tarea['id-tarea'])
+	const confirmarEliminacion = async () => {
+		if (!tareaParaEliminar) return
+		setEliminando(true)
+		const idTarea = String(tareaParaEliminar['id-tarea'])
 		const eliminados = idTarea.includes('_') ? [idTarea] : tareas.filter((item) => String(item['id-tarea']).startsWith(`${idTarea}_`)).map((item) => String(item['id-tarea'])).concat(idTarea)
-		guardarLista(tareas.filter((item) => !eliminados.includes(String(item['id-tarea']))), eliminados.length > 1 ? 'Etapa y subtareas eliminadas.' : 'Tarea eliminada.')
+		try {
+			await guardarLista(
+				tareas.filter((item) => !eliminados.includes(String(item['id-tarea']))),
+				eliminados.length > 1 ? 'Etapa y subtareas eliminadas.' : 'Tarea eliminada.',
+			)
+		} finally {
+			setTareaParaEliminar(null)
+			setEliminando(false)
+		}
 	}
+	const subtareasParaEliminar = tareaParaEliminar && !String(tareaParaEliminar['id-tarea']).includes('_')
+		? tareas.filter((item) => String(item['id-tarea']).startsWith(`${tareaParaEliminar['id-tarea']}_`))
+		: []
 
 	return <section className="gestionar-tareas">
 		<header className="gestionar-tareas__header"><div><p className="gestionar-tareas__eyebrow">Gestión de obras / Obra #{id}</p><h1>Gestionar tareas</h1><p>Lote {obra.nrolote ?? '—'} · {obra.Estado}</p></div><Volver to="/principal/obras">Volver a gestión de obras</Volver></header>
@@ -108,15 +126,26 @@ function GestionarTareasPage() {
 		<section className="gestionar-tareas__panel gestionar-tareas__listado"><div className="gestionar-tareas__panel-titulo"><div><p className="gestionar-tareas__eyebrow">Obra #{id}</p><h2>Tareas asignadas <span className="gestionar-tareas__contador">{tareas.length}</span></h2></div></div>
 			{etapas.length ? <div className="gestionar-tareas__etapas">{etapas.map((etapa) => {
 				const subtareas = tareas.filter((tarea) => String(tarea['id-tarea']).startsWith(`${etapa['id-tarea']}_`))
-				const filaTarea = (tarea) => <div className="gestionar-tareas__tarea" key={tarea['id-tarea']}><div><span>{codigoNomenclador(tarea, tareas)}</span><strong>{tarea.nombre}</strong><small>Avance: {tarea.porcentaje}</small></div><div className="gestionar-tareas__acciones"><button className="btn btn-sm btn-outline-secondary" type="button" onClick={() => iniciarEdicion(tarea)}>Modificar</button><button className="btn btn-sm btn-outline-danger" type="button" onClick={() => eliminar(tarea)}>Eliminar</button></div></div>
+				const filaTarea = (tarea) => <div className="gestionar-tareas__tarea" key={tarea['id-tarea']}><div><span>{codigoNomenclador(tarea, tareas)}</span><strong>{tarea.nombre}</strong><small>Avance: {tarea.porcentaje}</small></div><div className="gestionar-tareas__acciones"><button className="btn btn-sm btn-outline-secondary" type="button" onClick={() => iniciarEdicion(tarea)}>Modificar</button><button className="btn btn-sm btn-outline-danger" type="button" onClick={() => setTareaParaEliminar(tarea)}>Eliminar</button></div></div>
 				if (!subtareas.length) return <article className="gestionar-tareas__etapa" key={etapa['id-tarea']}>{filaTarea(etapa)}</article>
 				return <details className="gestionar-tareas__etapa gestionar-tareas__desplegable" key={etapa['id-tarea']}>
 					<summary className="gestionar-tareas__etapa-cabecera"><div><span>{codigoNomenclador(etapa, tareas)}</span><h3>{etapa.nombre}</h3><small>{subtareas.length} {subtareas.length === 1 ? 'subtarea' : 'subtareas'}</small></div><span className="gestionar-tareas__indicador">Ver subtareas⌄</span></summary>
 					<div className="gestionar-tareas__subtareas">{subtareas.map(filaTarea)}</div>
-					<div className="gestionar-tareas__acciones gestionar-tareas__acciones-etapa"><button className="btn btn-sm btn-outline-secondary" type="button" onClick={() => iniciarEdicion(etapa)}>Modificar tarea</button><button className="btn btn-sm btn-outline-danger" type="button" onClick={() => eliminar(etapa)}>Eliminar tarea y subtareas</button></div>
+					<div className="gestionar-tareas__acciones gestionar-tareas__acciones-etapa"><button className="btn btn-sm btn-outline-secondary" type="button" onClick={() => iniciarEdicion(etapa)}>Modificar tarea</button><button className="btn btn-sm btn-outline-danger" type="button" onClick={() => setTareaParaEliminar(etapa)}>Eliminar tarea y subtareas</button></div>
 				</details>
 			})}</div> : <p className="gestionar-tareas__vacio">Esta obra todavía no tiene tareas.</p>}
 		</section>
+		{tareaParaEliminar && (
+			<ConfirmacionEliminar
+				titulo={subtareasParaEliminar.length ? 'Eliminar tarea y subtareas' : 'Eliminar tarea'}
+				mensaje={subtareasParaEliminar.length
+					? `¿Querés eliminar la tarea "${tareaParaEliminar.nombre}" y sus subtareas?`
+					: `¿Querés eliminar la tarea "${tareaParaEliminar.nombre}"?`}
+				onCancelar={() => setTareaParaEliminar(null)}
+				onConfirmar={confirmarEliminacion}
+				eliminando={eliminando}
+			/>
+		)}
 	</section>
 }
 

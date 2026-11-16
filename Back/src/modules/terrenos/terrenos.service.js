@@ -26,6 +26,12 @@ const numeroOpcional = (valor, nombre, minimo = 0, maximo = Number.MAX_VALUE) =>
     return numero;
 };
 
+const validarPorcentaje = (valor) => {
+    const porcentaje = numeroOpcional(valor, 'porcentaje', 0, 100);
+    if (porcentaje === null) throw errorCliente('porcentaje es obligatorio.');
+    return porcentaje;
+};
+
 const validarDireccion = (direccion) => {
     if (!direccion || typeof direccion !== 'object' || Array.isArray(direccion)) {
         throw errorCliente('direccion debe ser un objeto.');
@@ -78,9 +84,8 @@ const validarPropietario = (propietario, requiereEscritura = false) => {
         apellido: textoObligatorio(propietario.apellido, 'apellido'),
         dni: textoObligatorio(propietario.dni, 'dni'),
         estado_civil: propietario.estado_civil ?? null,
-        porcentaje: numeroOpcional(propietario.porcentaje, 'porcentaje', 0, 100),
+        porcentaje: validarPorcentaje(propietario.porcentaje),
     };
-    if (resultado.porcentaje === null) throw errorCliente('porcentaje es obligatorio.');
     if (requiereEscritura) resultado.id_documento = validarId(propietario.id_documento, 'id_documento');
     return resultado;
 };
@@ -167,11 +172,12 @@ export const crearPropietario = (propietario) => repository.crearPropietario(
     validarPropietario(propietario, true),
 );
 export const actualizarPropietario = (id, propietario) => repository.actualizarPropietario(
-    validarId(id, 'id_propietario'), validarPropietario(propietario),
+    validarId(id, 'id_propietario'), validarPropietario(propietario, true),
 );
 export const eliminarPropietario = (id) => repository.eliminarPropietario(validarId(id, 'id_propietario'));
-export const vincularPropietario = (id_documento, id_propietario) => repository.vincularPropietario(
+export const vincularPropietario = (id_documento, id_propietario, porcentaje) => repository.vincularPropietario(
     validarId(id_documento, 'id_documento'), validarId(id_propietario, 'id_propietario'),
+    validarPorcentaje(porcentaje),
 );
 export const desvincularPropietario = (id_documento, id_propietario) => repository.desvincularPropietario(
     validarId(id_documento, 'id_documento'), validarId(id_propietario, 'id_propietario'),

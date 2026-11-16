@@ -1869,7 +1869,12 @@
               "name": "POST vincular propietario 2 a escritura temporal",
               "request": {
                 "method": "POST",
-                "header": [],
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
                 "url": "{{baseUrl}}/api/terrenos/escrituras/{{idNuevoDocumento}}/propietarios/{{idPropietarioSemilla}}",
                 "auth": {
                   "type": "bearer",
@@ -1880,6 +1885,15 @@
                       "type": "string"
                     }
                   ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"porcentaje\": 10\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
                 }
               },
               "event": [
@@ -1924,9 +1938,9 @@
               ]
             },
             {
-              "name": "DELETE /terrenos/escrituras/{{idNuevoDocumento}} - eliminar escritura temporal",
+              "name": "GET /terrenos/escrituras/{{idNuevoDocumento}} - escritura temporal para propietarios",
               "request": {
-                "method": "DELETE",
+                "method": "GET",
                 "header": [],
                 "url": "{{baseUrl}}/api/terrenos/escrituras/{{idNuevoDocumento}}",
                 "auth": {
@@ -1946,7 +1960,7 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "pm.test('HTTP 204', () => pm.response.to.have.status(204));"
+                      "pm.test('HTTP 200', () => pm.response.to.have.status(200));"
                     ]
                   }
                 }
@@ -2016,7 +2030,7 @@
               ]
             },
             {
-              "name": "POST /terrenos/propietarios - crear propietario temporal para escritura 2",
+              "name": "POST /terrenos/propietarios - crear propietario temporal para escritura temporal",
               "request": {
                 "method": "POST",
                 "header": [
@@ -2038,7 +2052,7 @@
                 },
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"id_documento\": 2,\n  \"nombre\": \"Propietario temporal\",\n  \"apellido\": \"Postman\",\n  \"dni\": \"99887766\",\n  \"estado_civil\": \"Soltero\",\n  \"porcentaje\": 10\n}",
+                  "raw": "{\n  \"id_documento\": {{idNuevoDocumento}},\n  \"nombre\": \"Propietario temporal\",\n  \"apellido\": \"Postman\",\n  \"dni\": \"99887766\",\n  \"estado_civil\": \"Soltero\",\n  \"porcentaje\": 10\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -2111,7 +2125,7 @@
                 },
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"nombre\": \"Propietario temporal actualizado\",\n  \"apellido\": \"Postman\",\n  \"dni\": \"99887766\",\n  \"estado_civil\": \"Casado\",\n  \"porcentaje\": 15\n}",
+                  "raw": "{\n  \"id_documento\": {{idNuevoDocumento}},\n  \"nombre\": \"Propietario temporal actualizado\",\n  \"apellido\": \"Postman\",\n  \"dni\": \"99887766\",\n  \"estado_civil\": \"Casado\",\n  \"porcentaje\": 15\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -2137,6 +2151,35 @@
                 "method": "DELETE",
                 "header": [],
                 "url": "{{baseUrl}}/api/terrenos/propietarios/{{idNuevoPropietario}}",
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{tokenArquitecto}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('HTTP 204', () => pm.response.to.have.status(204));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "DELETE /terrenos/escrituras/{{idNuevoDocumento}} - eliminar escritura temporal",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": "{{baseUrl}}/api/terrenos/escrituras/{{idNuevoDocumento}}",
                 "auth": {
                   "type": "bearer",
                   "bearer": [

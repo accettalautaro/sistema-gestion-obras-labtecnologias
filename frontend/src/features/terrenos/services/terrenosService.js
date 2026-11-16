@@ -43,17 +43,26 @@ export async function crearTerreno(datos) {
       id_lote: creado.id_lote, nombre: `Escritura ${datos.numeroEscritura}`,
       nro_escritura: String(datos.numeroEscritura),
     }) })
-    if (datos.propietario) {
+    const propietarios = Array.isArray(datos.propietarios)
+      ? datos.propietarios
+      : datos.propietario ? [datos.propietario] : []
+    if (propietarios.length) {
       const personas = await api('/terrenos/propietarios')
-      const existente = personas.find((p) => String(p.dni) === String(datos.propietario.dni))
-      if (existente) {
-        await api(`/terrenos/escrituras/${escritura.id_documento}/propietarios/${existente.id_propietario}`, { method: 'POST' })
-      } else {
-        await api('/terrenos/propietarios', { method: 'POST', body: jsonBody({
-          id_documento: escritura.id_documento, nombre: datos.propietario.nombre,
-          apellido: datos.propietario.apellido, dni: datos.propietario.dni,
-          estado_civil: datos.propietario.estadoCivil ?? null, porcentaje: Number(datos.propietario.porcentaje),
-        }) })
+      if (!Array.isArray(personas)) throw new Error('El servidor devolvió una lista de propietarios inválida.')
+      for (const propietario of propietarios) {
+        const existente = personas.find((p) => String(p.dni) === String(propietario.dni))
+        if (existente) {
+          await api(`/terrenos/escrituras/${escritura.id_documento}/propietarios/${existente.id_propietario}`, {
+            method: 'POST', body: jsonBody({ porcentaje: Number(propietario.porcentaje) }),
+          })
+        } else {
+          const creadoPropietario = await api('/terrenos/propietarios', { method: 'POST', body: jsonBody({
+            id_documento: escritura.id_documento, nombre: propietario.nombre,
+            apellido: propietario.apellido, dni: propietario.dni,
+            estado_civil: propietario.estadoCivil ?? null, porcentaje: Number(propietario.porcentaje),
+          }) })
+          personas.push(creadoPropietario)
+        }
       }
     }
   }
