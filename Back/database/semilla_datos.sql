@@ -34,7 +34,8 @@ ON CONFLICT (id_direccion) DO UPDATE SET provincia=EXCLUDED.provincia, codigo_po
 -- Obras (deduplicadas por coincidencia de datos)
 INSERT INTO obras (id_obra, nombre, id_cliente, id_arquitecto, fecha_inicio_estimada, fecha_fin_estimada, estado, descripcion) OVERRIDING SYSTEM VALUE VALUES
   (1, 'Vivienda unifamiliar', 1, 1, '2026-07-01', '2026-12-13', 'En Ejecución', 'Vivienda unifamiliar de 120 m². Obra en curso, con tareas iniciales y estructura finalizadas.'),
-  (2, 'Ampliación residencial', 1, 1, '2026-11-10', '2027-01-15', 'No Inicio', 'Ampliación residencial planificada; inicio estimado para noviembre de 2026.')
+  (2, 'Ampliación residencial', 1, 1, '2026-11-10', '2027-01-15', 'No Inicio', 'Ampliación residencial planificada; inicio estimado para noviembre de 2026.'),
+  (3, 'Vivienda terminada con sobrecostos', 1, 1, '2026-09-01', '2026-10-20', 'Finalizada', 'Obra de demostración: finalizada con atraso y por encima del presupuesto.')
 ON CONFLICT (id_obra) DO UPDATE SET nombre=EXCLUDED.nombre, id_cliente=EXCLUDED.id_cliente, id_arquitecto=EXCLUDED.id_arquitecto, fecha_inicio_estimada=EXCLUDED.fecha_inicio_estimada, fecha_fin_estimada=EXCLUDED.fecha_fin_estimada, estado=EXCLUDED.estado, descripcion=EXCLUDED.descripcion;
 
 
@@ -44,8 +45,8 @@ INSERT INTO lotes (id_lote, nro_lote, id_direccion) OVERRIDING SYSTEM VALUE VALU
   (2, '500', 2)
 ON CONFLICT (id_lote) DO UPDATE SET nro_lote=EXCLUDED.nro_lote, id_direccion=EXCLUDED.id_direccion;
 
-UPDATE obras SET id_lote=CASE id_obra WHEN 1 THEN 1 WHEN 2 THEN 2 END
-WHERE id_obra IN (1, 2);
+UPDATE obras SET id_lote=CASE id_obra WHEN 1 THEN 1 WHEN 2 THEN 2 WHEN 3 THEN 1 END
+WHERE id_obra IN (1, 2, 3);
 
 
 -- Documentos (mensuras y escrituras)
@@ -104,7 +105,10 @@ INSERT INTO tareas (id_tarea, id_obra, nombre, descripcion, fecha_inicio_estimad
   (16, 1, 'EQUIPAMIENTOS', 'EQUIPAMIENTOS', '2026-11-20', '2026-12-02'),
   (17, 1, 'VARIOS', 'VARIOS', '2026-12-03', '2026-12-09'),
   (18, 1, 'PILETA', 'PILETA', '2026-12-10', '2026-12-13'),
-  (19, 2, 'Limpieza del terreno', 'Limpieza y nivelación inicial del terreno', '2026-11-10', '2026-11-11')
+  (19, 2, 'Limpieza del terreno', 'Limpieza y nivelación inicial del terreno', '2026-11-10', '2026-11-11'),
+  (20, 3, 'Fundaciones y estructura', 'Ejecución de fundaciones y estructura principal.', '2026-09-01', '2026-09-20'),
+  (21, 3, 'Cerramientos e instalaciones', 'Ejecución de mampostería e instalaciones.', '2026-09-21', '2026-10-10'),
+  (22, 3, 'Terminaciones y entrega', 'Terminaciones finales y entrega de la vivienda.', '2026-10-11', '2026-10-20')
 ON CONFLICT (id_tarea) DO UPDATE SET id_obra=EXCLUDED.id_obra, nombre=EXCLUDED.nombre, descripcion=EXCLUDED.descripcion, fecha_inicio_estimada=EXCLUDED.fecha_inicio_estimada, fecha_fin_estimada=EXCLUDED.fecha_fin_estimada;
 
 
@@ -151,7 +155,13 @@ INSERT INTO subtareas (id_subtarea, id_tarea, nombre, porcentaje, descripcion, c
   (39, 16, 'Portón eléctrico', 0, 'Portón eléctrico', 226000, '2026-11-30', '2026-12-02'),
   (40, 17, 'Limpieza final fina (de la obra)', 0, 'Limpieza final fina (de la obra)', 263000, '2026-12-03', '2026-12-07'),
   (41, 17, 'Limpieza de obra', 0, 'Limpieza de obra', 300000, '2026-12-08', '2026-12-09'),
-  (42, 18, 'Pileta', 0, 'Pileta', 337000, '2026-12-10', '2026-12-13')
+  (42, 18, 'Pileta', 0, 'Pileta', 337000, '2026-12-10', '2026-12-13'),
+  (43, 20, 'Excavación y bases', 100, 'Excavación y ejecución de bases.', 500000, '2026-09-01', '2026-09-10'),
+  (44, 20, 'Estructura de hormigón', 100, 'Armado y colado de la estructura.', 700000, '2026-09-11', '2026-09-20'),
+  (45, 21, 'Mampostería', 100, 'Levantamiento de muros y cerramientos.', 600000, '2026-09-21', '2026-09-30'),
+  (46, 21, 'Instalaciones', 100, 'Instalaciones sanitarias y eléctricas.', 400000, '2026-10-01', '2026-10-10'),
+  (47, 22, 'Revestimientos y pintura', 100, 'Revestimientos interiores y pintura.', 450000, '2026-10-11', '2026-10-16'),
+  (48, 22, 'Limpieza y entrega', 100, 'Limpieza final y entrega de obra.', 350000, '2026-10-17', '2026-10-20')
 ON CONFLICT (id_subtarea) DO UPDATE SET id_tarea=EXCLUDED.id_tarea, nombre=EXCLUDED.nombre, porcentaje=EXCLUDED.porcentaje, descripcion=EXCLUDED.descripcion, costo_estimado=EXCLUDED.costo_estimado, fecha_inicio_estimada=EXCLUDED.fecha_inicio_estimada, fecha_fin_estimada=EXCLUDED.fecha_fin_estimada;
 
 -- Pagos parciales de demostración; su suma define el costo real de cada subtarea.
@@ -184,7 +194,19 @@ INSERT INTO pagos_parciales (id_pago, id_subtarea, descripcion, monto) OVERRIDIN
   (26, 26, 'Pago registrado por avance de: ' || (SELECT nombre FROM subtareas WHERE id_subtarea=26), 174900),
   (27, 27, 'Pago registrado por avance de: ' || (SELECT nombre FROM subtareas WHERE id_subtarea=27), 214120),
   (28, 28, 'Pago registrado por avance de: ' || (SELECT nombre FROM subtareas WHERE id_subtarea=28), 253340),
-  (29, 29, 'Pago registrado por avance de: ' || (SELECT nombre FROM subtareas WHERE id_subtarea=29), 132480)
+  (29, 29, 'Pago registrado por avance de: ' || (SELECT nombre FROM subtareas WHERE id_subtarea=29), 132480),
+  (30, 43, 'Anticipo de excavación y bases', 300000),
+  (31, 43, 'Saldo de excavación y bases', 300000),
+  (32, 44, 'Anticipo de estructura de hormigón', 420000),
+  (33, 44, 'Saldo de estructura de hormigón', 420000),
+  (34, 45, 'Anticipo de mampostería', 360000),
+  (35, 45, 'Saldo de mampostería', 360000),
+  (36, 46, 'Anticipo de instalaciones', 240000),
+  (37, 46, 'Saldo de instalaciones', 240000),
+  (38, 47, 'Anticipo de revestimientos y pintura', 270000),
+  (39, 47, 'Saldo de revestimientos y pintura', 270000),
+  (40, 48, 'Anticipo de limpieza y entrega', 210000),
+  (41, 48, 'Saldo de limpieza y entrega', 210000)
 ON CONFLICT (id_pago) DO UPDATE SET id_subtarea=EXCLUDED.id_subtarea, descripcion=EXCLUDED.descripcion, monto=EXCLUDED.monto;
 
 
@@ -192,6 +214,19 @@ ON CONFLICT (id_pago) DO UPDATE SET id_subtarea=EXCLUDED.id_subtarea, descripcio
 UPDATE subtareas
 SET fecha_inicio_real = CASE WHEN porcentaje > 0 THEN fecha_inicio_estimada ELSE NULL END,
     fecha_fin_real = CASE WHEN porcentaje = 100 THEN fecha_fin_estimada ELSE NULL END;
+
+-- La obra 3 se terminó después de la fecha estimada y cada subtarea excedió su presupuesto.
+UPDATE subtareas
+SET fecha_inicio_real = fecha_inicio_estimada,
+    fecha_fin_real = CASE id_subtarea
+      WHEN 43 THEN '2026-09-12'::date
+      WHEN 44 THEN '2026-09-25'::date
+      WHEN 45 THEN '2026-10-05'::date
+      WHEN 46 THEN '2026-10-15'::date
+      WHEN 47 THEN '2026-10-22'::date
+      WHEN 48 THEN '2026-11-05'::date
+    END
+WHERE id_subtarea BETWEEN 43 AND 48;
 
 -- Recordatorios de seguimiento con fechas próximas al cronograma de las obras.
 INSERT INTO recordatorios (id_recordatorio, id_obra, fecha, descripcion) OVERRIDING SYSTEM VALUE VALUES

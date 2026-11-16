@@ -9,6 +9,19 @@ function fechaLocal(fecha) {
 	return new Date(anio, mes - 1, dia)
 }
 
+function diferenciaDias(fechaInicio, fechaFin) {
+	if (!fechaInicio || !fechaFin) return null
+	const inicio = Date.parse(`${String(fechaInicio).slice(0, 10)}T00:00:00Z`)
+	const fin = Date.parse(`${String(fechaFin).slice(0, 10)}T00:00:00Z`)
+	if (!Number.isFinite(inicio) || !Number.isFinite(fin)) return null
+	return Math.floor((fin - inicio) / 86400000)
+}
+
+function fechaHoyISO() {
+	const hoy = new Date()
+	return `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}`
+}
+
 function construirCronograma(etapas) {
 	const conFechas = etapas.map((tarea) => {
 		const inicioPropio = fechaLocal(tarea['fecha-inicio'])
@@ -57,10 +70,17 @@ export async function obtenerSeguimientoObra(idObra) {
   const pagosObra = pagos.filter((pago) => String(pago['id-obra']) === String(idObra))
   const costoEstimadoTotal = monto(obra.costoEstimadoTotal)
   const montoAbonado = pagosObra.reduce((suma, pago) => suma + monto(pago.monto), 0)
-  const diasAtrasoTotal = resumen.unidades.reduce((suma, tarea) => {
-    const atraso = monto(tarea['duracion-real']) - monto(tarea['duracion-estimada'])
-    return suma + (atraso > 0 && porcentajeTarea(tarea) < 100 ? atraso : 0)
-  }, 0)
+  const fechaFinEstimada = obra['fecha-fin-estimada'] ?? obra['fecha-fin']
+  const fechaFinReal = obra['fecha-fin-real']
+  const finalizada = resumen.total > 0 && resumen.completadas === resumen.total
+  const diasAtrasoTotal = finalizada
+		? Math.max(0, diferenciaDias(fechaFinEstimada, fechaFinReal) ?? 0)
+		: Math.max(0, diferenciaDias(fechaFinEstimada, fechaHoyISO()) ?? 0)
+  const estadoTiempo = diasAtrasoTotal > 0
+		? 'Atrasada'
+		: finalizada
+			? 'A tiempo'
+			: fechaFinEstimada ? 'En plazo' : 'Sin datos'
 
 	return {
 		id: obra['id-obra'],
@@ -77,6 +97,7 @@ export async function obtenerSeguimientoObra(idObra) {
 		direccion: direccionCompleta,
     costoEstimadoTotal, montoAbonado,
     diasAtrasoTotal,
+    estadoTiempo,
     duracionEstimada: obra.duracionEstimada,
     duracionReal: obra.duracionReal,
 		avance,
