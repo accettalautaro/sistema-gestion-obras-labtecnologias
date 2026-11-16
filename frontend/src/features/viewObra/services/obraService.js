@@ -1,4 +1,5 @@
 import { resumirAvanceTareas } from '../../../shared/utils/avanceObra.js'
+import { calcularDiasAtrasoObra } from '../../../shared/utils/atrasoObra.js'
 import { listarObras } from '../../obras/services/obrasService.js'
 import { listarPagosParciales } from '../../pagos/services/pagosService.js'
 import { obtenerPerfilCliente } from '../../clientes/services/clientesService.js'
@@ -17,10 +18,12 @@ export async function obtenerDetalleObra(idObra) {
   const pagosObra = pagos.filter((pago) => String(pago['id-obra']) === String(idObra))
   const duracionEstimada = obra.duracionEstimada
   const duracionReal = obra.duracionReal
-  const diasAtrasoTotal = resumen.unidades.reduce((suma, tarea) => {
-    const atraso = numero(tarea['duracion-real']) - numero(tarea['duracion-estimada'])
-    return suma + (atraso > 0 && numero(tarea.porcentaje) < 100 ? atraso : 0)
-  }, 0)
+  const finalizada = resumen.total > 0 && resumen.completadas === resumen.total
+  const diasAtrasoTotal = calcularDiasAtrasoObra(
+    obra['fecha-fin-estimada'],
+    obra['fecha-fin-real'],
+    finalizada,
+  )
   const estado = String(obra.Estado ?? '')
   const estadoObra = estado.toLowerCase().includes('ejecuci') && diasAtrasoTotal > 0 ? 'Atrasada' : estado
   const direccion = lote?.direccion

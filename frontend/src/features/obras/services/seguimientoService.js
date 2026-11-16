@@ -1,4 +1,5 @@
 import { resumirAvanceTareas, porcentajeTarea } from '../../../shared/utils/avanceObra.js'
+import { calcularDiasAtrasoObra } from '../../../shared/utils/atrasoObra.js'
 import { listarObras } from './obrasService.js'
 import { listarPagosParciales } from '../../pagos/services/pagosService.js'
 
@@ -7,19 +8,6 @@ function fechaLocal(fecha) {
 	const [anio, mes, dia] = String(fecha).slice(0, 10).split('-').map(Number)
 	if (!anio || !mes || !dia) return null
 	return new Date(anio, mes - 1, dia)
-}
-
-function diferenciaDias(fechaInicio, fechaFin) {
-	if (!fechaInicio || !fechaFin) return null
-	const inicio = Date.parse(`${String(fechaInicio).slice(0, 10)}T00:00:00Z`)
-	const fin = Date.parse(`${String(fechaFin).slice(0, 10)}T00:00:00Z`)
-	if (!Number.isFinite(inicio) || !Number.isFinite(fin)) return null
-	return Math.floor((fin - inicio) / 86400000)
-}
-
-function fechaHoyISO() {
-	const hoy = new Date()
-	return `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}`
 }
 
 function construirCronograma(etapas) {
@@ -73,9 +61,7 @@ export async function obtenerSeguimientoObra(idObra) {
   const fechaFinEstimada = obra['fecha-fin-estimada'] ?? obra['fecha-fin']
   const fechaFinReal = obra['fecha-fin-real']
   const finalizada = resumen.total > 0 && resumen.completadas === resumen.total
-  const diasAtrasoTotal = finalizada
-		? Math.max(0, diferenciaDias(fechaFinEstimada, fechaFinReal) ?? 0)
-		: Math.max(0, diferenciaDias(fechaFinEstimada, fechaHoyISO()) ?? 0)
+  const diasAtrasoTotal = calcularDiasAtrasoObra(fechaFinEstimada, fechaFinReal, finalizada)
   const estadoTiempo = diasAtrasoTotal > 0
 		? 'Atrasada'
 		: finalizada

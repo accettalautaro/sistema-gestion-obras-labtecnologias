@@ -64,15 +64,16 @@ function TarjetaObra({ obra }) {
             <span className={`badge ${ESTADO_OBRA_BADGE[obra.estado] ?? 'text-bg-secondary'} rounded-pill px-3 py-2 fw-normal`}>
               {obra.estado}
             </span>
-            {obra.estado === 'Atrasada' && obra.diasAtraso > 0 && (
-              <div className="text-danger mt-1" style={{ fontSize: '0.75rem', fontWeight: '600' }}>
-                {obra.diasAtraso} día{obra.diasAtraso === 1 ? '' : 's'} de atraso
-              </div>
-            )}
+            <div className={`${obra.estadoTiempo === 'Atrasada' ? 'text-danger' : 'text-muted'} mt-1`} style={{ fontSize: '0.75rem', fontWeight: '600' }}>
+              {obra.estadoTiempo === 'Atrasada'
+                ? `Atrasada por ${obra.diasAtraso} día${obra.diasAtraso === 1 ? '' : 's'}`
+                : obra.estadoTiempo}
+            </div>
           </div>
         </div>
 
-        <h5 className="card-title fw-bold mb-3">{obra.direccion}</h5>
+        <h5 className="card-title fw-bold mb-1">{obra.nombre || `Obra N.º ${obra.idObra}`}</h5>
+        <p className="text-muted small mb-3">{obra.direccion}</p>
 
         <ul className="list-unstyled small text-muted mb-4">
           <li className="mb-1">
@@ -222,12 +223,12 @@ function ClientePage() {
   const estadosObra = ['No Inicio', 'En ejecución', 'Atrasada', 'Pausa', 'Finalizada']
   const estadosRec = ['pendiente', 'atrasado', 'completado']
 
-  // CU Buscar obra: texto libre (dirección, lote, arquitecto), estado y año de inicio
+  // CU Buscar obra: texto libre (nombre, dirección, lote, arquitecto), estado y año de inicio
   const obras = useMemo(() => {
     const texto = normalizar(filtrosObras.texto.trim())
     return (datos?.obras ?? [])
       .filter((o) =>
-        normalizar(`${o.direccionCompleta} ${o.nroLote} ${o.arquitecto} ${o.idObra}`).includes(texto)
+        normalizar(`${o.nombre} ${o.direccion} ${o.nroLote} ${o.arquitecto} ${o.idObra}`).includes(texto)
       )
       .filter((o) => !filtrosObras.estado || o.estado === filtrosObras.estado)
       .filter((o) => !filtrosObras.mesAnio || o.fechaInicioEstimada?.startsWith(filtrosObras.mesAnio))

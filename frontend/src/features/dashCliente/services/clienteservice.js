@@ -3,6 +3,7 @@ import { obtenerPerfilCliente } from '../../clientes/services/clientesService.js
 import { listarObras } from '../../obras/services/obrasService.js'
 import { listarTerrenos } from '../../terrenos/services/terrenosService.js'
 import { api } from '../../../shared/services/api.js'
+import { calcularDiasAtrasoObra } from '../../../shared/utils/atrasoObra.js'
 
 export async function obtenerResumenCliente() {
   const [cliente, datosObras, lotes, recordatoriosApi] = await Promise.all([
@@ -15,11 +16,23 @@ export async function obtenerResumenCliente() {
       const direccion = lote?.direcciones?.[0]
       const tareas = obra.tareas ?? []
       const resumen = resumirAvanceTareas(tareas)
-      const atrasadas = resumen.unidades.filter((tarea) => Number(tarea['duracion-real']) > Number(tarea['duracion-estimada']) && Number(tarea.porcentaje) < 100).length
-      const estado = atrasadas && String(obra.Estado).toLowerCase().includes('ejecuci') ? 'Atrasada' : obra.Estado
+      const finalizada = resumen.total > 0 && resumen.completadas === resumen.total
+      const diasAtraso = calcularDiasAtrasoObra(
+        obra['fecha-fin-estimada'],
+        obra['fecha-fin-real'],
+        finalizada,
+      )
+      const estado = diasAtraso > 0 && String(obra.Estado).toLowerCase().includes('ejecuci')
+        ? 'Atrasada'
+        : obra.Estado
+      const estadoTiempo = diasAtraso > 0
+        ? 'Atrasada'
+        : finalizada
+          ? 'A tiempo'
+          : obra['fecha-fin-estimada'] ? 'En plazo' : 'Sin datos'
       return {
-        idObra: obra['id-obra'], nroLote: obra.nrolote, estado, porcentaje: resumen.avance,
-        diasAtraso: atrasadas,
+        idObra: obra['id-obra'], nombre: obra.nombre, nroLote: obra.nrolote, estado, estadoTiempo,
+        porcentaje: resumen.avance, diasAtraso,
         direccion: direccion ? [direccion.calle, direccion.altura, direccion.localidad, direccion.provincia].filter(Boolean).join(', ') : 'Dirección sin registrar',
         arquitecto: obra.arquitectoNombre || 'Sin asignar',
         fechaInicioEstimada: obra['fecha-inicio-estimada'], fechaFinEstimada: obra['fecha-fin-estimada'],
