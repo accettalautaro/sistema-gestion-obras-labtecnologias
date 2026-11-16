@@ -1,12 +1,18 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams, useOutletContext } from 'react-router-dom'
 import { listarDatosPropietarios, crearPropietario, actualizarPropietario, eliminarPropietario } from '../services/propietariosService.js'
 import Volver from '../../../shared/components/Volver.jsx'
 import { useFetch } from '../../../shared/hooks/useFetch.js'
 import { soloLetras, soloNumeros } from '../../../shared/utils/filtrosEntrada.js'
+import '../../../styles/Obras.css'
 
 const FORMULARIO_VACIO = { dniUnico: '', nombre: '', apellido: '', dni: '', estadocivil: '', porcentaje: '', nroescritura: '' }
+const ESTADOS_CIVILES = ['Casado/a', 'Soltero/a', 'Viudo/a', 'Divorciado/a']
 const listarDatosPropietariosPorVersion = (clave) => listarDatosPropietarios(clave.slice(0, clave.lastIndexOf('|')))
+const normalizarEstadoCivil = (valor) => {
+	const estado = String(valor ?? '').trim().toLowerCase().replace(/\/a$/, '')
+	return ESTADOS_CIVILES.find((opcion) => opcion.toLowerCase().replace(/\/a$/, '') === estado) ?? ''
+}
 
 function PropietariosPage() {
 	const { esArquitecto } = useOutletContext() || {}
@@ -14,10 +20,25 @@ function PropietariosPage() {
 	const [version, setVersion] = useState(0)
 	const [formulario, setFormulario] = useState(FORMULARIO_VACIO)
 	const [editando, setEditando] = useState(null)
+	const [formularioAbierto, setFormularioAbierto] = useState(false)
+	const [errorFormulario, setErrorFormulario] = useState('')
 	const [aviso, setAviso] = useState(null)
 	const [guardando, setGuardando] = useState(false)
 	const { datos, cargando, error } = useFetch(listarDatosPropietariosPorVersion, `${nrolote}|${version}`)
 
+	useEffect(() => {
+		if (!formularioAbierto) return
+		const cerrarConEscape = (event) => {
+			if (event.key === 'Escape' && !guardando) {
+				setFormularioAbierto(false)
+				setEditando(null)
+				setFormulario(FORMULARIO_VACIO)
+				setErrorFormulario('')
+			}
+		}
+		window.addEventListener('keydown', cerrarConEscape)
+		return () => window.removeEventListener('keydown', cerrarConEscape)
+	}, [formularioAbierto, guardando])
 
 	if (esArquitecto === null || esArquitecto === undefined) return <p className="obras-page__estado" role="status">Verificando acceso...</p>
 	if (!esArquitecto) return <div className="alert alert-danger" role="alert">Esta pantalla está disponible únicamente para arquitectos.</div>
@@ -41,7 +62,7 @@ function PropietariosPage() {
 				nombre: persona.nombre,
 				apellido: persona.apellido,
 				dni: persona.dni,
-				estadocivil: persona.estadocivil
+				estadocivil: normalizarEstadoCivil(persona.estadocivil)
 			}))
 		}
 	}
@@ -53,37 +74,50 @@ function PropietariosPage() {
 			nombre: prop.nombre ?? '',
 			apellido: prop.apellido ?? '',
 			dni: prop.dni ?? '',
-			estadocivil: prop.estadocivil ?? '',
+			estadocivil: normalizarEstadoCivil(prop.estadocivil),
 			porcentaje: String(prop.porcentaje ?? '').replace('%', ''),
 			nroescritura: String(prop.nroescritura ?? '')
 		})
+		setErrorFormulario('')
+		setFormularioAbierto(true)
 	}
 
-	const nuevo = () => {
+	const abrirNuevo = () => {
 		setEditando(null)
 		setFormulario({
 			...FORMULARIO_VACIO,
 			nroescritura: escriturasLote.length > 0 ? String(escriturasLote[0].nroescritura) : ''
 		})
+		setErrorFormulario('')
+		setFormularioAbierto(true)
+	}
+
+	const cerrarFormulario = () => {
+		setFormularioAbierto(false)
+		setEditando(null)
+		setFormulario(FORMULARIO_VACIO)
+		setErrorFormulario('')
 	}
 
 	const guardar = async (e) => {
 		e.preventDefault()
 		const porcentaje = Number(formulario.porcentaje)
 		if (!Number.isFinite(porcentaje) || porcentaje < 0 || porcentaje > 100) {
-			setAviso({ titulo: 'Porcentaje inválido', mensaje: 'El porcentaje de titularidad debe estar entre 0 y 100.' })
+			setErrorFormulario('El porcentaje de titularidad debe estar entre 0 y 100.')
 			return
 		}
 		setGuardando(true)
+		setErrorFormulario('')
 		try {
 			const escritura = escriturasLote.find((item) => String(item.nroescritura) === nroEscrituraSeleccionada)
 			if (!escritura) throw new Error('Seleccioná una escritura del lote.')
 			const entrada = { nombre: formulario.nombre.trim(), apellido: formulario.apellido.trim(), dni: formulario.dni.trim(), estadoCivil: formulario.estadocivil || null, porcentaje }
-			if (editando === null) await crearPropietario(lote.id, escritura.documentoId, entrada)
+			const estabaEditando = editando !== null
+			if (!estabaEditando) await crearPropietario(lote.id, escritura.documentoId, entrada)
 			else await actualizarPropietario(lote.id, escritura.documentoId, editando, entrada)
-			setVersion((actual) => actual + 1); nuevo()
-			setAviso({ titulo: editando === null ? 'Propietario agregado' : 'Propietario actualizado', mensaje: 'Los cambios se guardaron en PostgreSQL.' })
-		} catch (motivo) { setAviso({ titulo: 'No se pudo guardar', mensaje: motivo.message || 'Ocurrió un error al guardar el propietario.' }) }
+			setVersion((actual) => actual + 1)
+			cerrarFormulario()
+		} catch (motivo) { setErrorFormulario(motivo.message || 'Ocurrió un error al guardar el propietario.') }
 		finally { setGuardando(false) }
 	}
 
@@ -147,77 +181,80 @@ function PropietariosPage() {
 							</tbody>
 						</table>
 					</div>
-				</section>
-
-				<section className="obras-page__formulario" aria-labelledby="prop-form-titulo">
-					<div className="obras-page__form-header">
-						<div>
-							<h2 id="prop-form-titulo">{editando === null ? 'Agregar propietario' : `Editar propietario`}</h2>
-							<p>Los cambios se guardan en PostgreSQL.</p>
-						</div>
-						{editando !== null && (
-							<button className="btn btn-sm btn-outline-secondary" type="button" onClick={nuevo}>Nuevo</button>
-						)}
+					<div className="obras-page__listado-acciones">
+						<button className="btn btn-dark" type="button" onClick={abrirNuevo} disabled={escriturasLote.length === 0}>Agregar propietario</button>
 					</div>
-					<form onSubmit={guardar}>
-						<div className="obras-page__campos">
-							<label>
-								Escritura asociada
-								<input 
-									className="form-control"
-					value={nroEscrituraSeleccionada ? `Escritura N.º ${nroEscrituraSeleccionada}` : 'Sin escrituras'}
-									disabled
-									readOnly
-								/>
-							</label>
-
-							{editando === null && (
-								<label className="mb-2 p-2 bg-light rounded border">
-									<strong>¿Persona existente?</strong>
-									<select className="form-select mt-1" value={formulario.dniUnico} onChange={manejarSeleccionExistente}>
-										<option value="">-- Cargar una persona nueva --</option>
-										{personasUnicas.map(per => (
-											<option key={per.dni} value={per.dni}>{per.nombre} {per.apellido} (DNI: {per.dni})</option>
-										))}
-									</select>
-									<small className="text-muted d-block mt-1">Seleccioná a alguien que ya sea propietario de otro lote, o dejalo en blanco para registrar a alguien nuevo.</small>
-								</label>
-							)}
-
-							<label>
-								Nombre
-								<input className="form-control" maxLength="100" pattern="[A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s'-]+" title="Ingresá solo letras." value={formulario.nombre} onChange={(e) => setFormulario({...formulario, nombre: soloLetras(e.target.value)})} required />
-							</label>
-							<label>
-								Apellido
-								<input className="form-control" maxLength="100" pattern="[A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s'-]+" title="Ingresá solo letras." value={formulario.apellido} onChange={(e) => setFormulario({...formulario, apellido: soloLetras(e.target.value)})} required />
-							</label>
-							<label>
-								DNI
-								<input className="form-control" type="text" inputMode="numeric" pattern="[0-9]{7,8}" minLength="7" maxLength="8" title="El DNI debe tener entre 7 y 8 números." value={formulario.dni} onChange={(e) => setFormulario({...formulario, dni: soloNumeros(e.target.value).slice(0, 8)})} required />
-							</label>
-							<label>
-								Estado Civil
-								<select className="form-select" value={String(formulario.estadocivil ?? '').toLowerCase()} onChange={(e) => setFormulario({...formulario, estadocivil: e.target.value})}>
-									<option value="">Seleccioná estado civil</option>
-									<option value="casado">Casado/a</option>
-									<option value="soltero">Soltero/a</option>
-									<option value="viudo">Viudo/a</option>
-									<option value="divorciado">Divorciado/a</option>
-								</select>
-							</label>
-							<label>
-								Porcentaje (%)
-								<input className="form-control" name="porcentaje" type="number" min="0" max="100" step="any" value={formulario.porcentaje} onChange={(e) => setFormulario({...formulario, porcentaje: e.target.value})} required />
-							</label>
-						</div>
-						<div className="obras-page__form-actions mt-3">
-							{editando !== null && <button className="btn btn-outline-secondary" type="button" onClick={nuevo}>Cancelar</button>}
-							<button className="btn btn-dark" type="submit" disabled={guardando || escriturasLote.length === 0}>{guardando ? 'Guardando...' : editando === null ? 'Agregar propietario' : 'Guardar cambios'}</button>
-						</div>
-					</form>
 				</section>
 			</div>
+
+			{formularioAbierto && (
+				<div className="obras-page__modal-fondo" onMouseDown={(e) => { if (e.target === e.currentTarget && !guardando) cerrarFormulario() }}>
+					<section className="obras-page__modal obras-page__modal--formulario" role="dialog" aria-modal="true" aria-labelledby="prop-form-titulo" aria-describedby="prop-form-ayuda">
+						<div className="obras-page__modal-cabecera">
+							<div>
+								<h2 id="prop-form-titulo">{editando === null ? 'Agregar propietario' : 'Editar propietario'}</h2>
+								<p id="prop-form-ayuda">Los cambios se guardan en PostgreSQL.</p>
+							</div>
+							<button className="obras-page__modal-cerrar" type="button" aria-label="Cerrar" onClick={cerrarFormulario} disabled={guardando}>×</button>
+						</div>
+						<form onSubmit={guardar} aria-busy={guardando}>
+							<div className="obras-page__campos">
+								<label>
+									Escritura asociada
+									<input
+										className="form-control"
+										value={nroEscrituraSeleccionada ? `Escritura N.º ${nroEscrituraSeleccionada}` : 'Sin escrituras'}
+										disabled
+										readOnly
+									/>
+								</label>
+
+								{editando === null && (
+									<label className="mb-2 p-2 bg-light rounded border">
+										<strong>¿Persona existente?</strong>
+										<select className="form-select mt-1" value={formulario.dniUnico} onChange={manejarSeleccionExistente} autoFocus>
+											<option value="">-- Cargar una persona nueva --</option>
+											{personasUnicas.map(per => (
+												<option key={per.dni} value={per.dni}>{per.nombre} {per.apellido} (DNI: {per.dni})</option>
+											))}
+										</select>
+										<small className="text-muted d-block mt-1">Seleccioná a alguien que ya sea propietario de otro lote, o dejalo en blanco para registrar a alguien nuevo.</small>
+									</label>
+								)}
+
+								<label>
+									Nombre
+									<input className="form-control" maxLength="100" pattern="[A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s'-]+" title="Ingresá solo letras." value={formulario.nombre} onChange={(e) => setFormulario({...formulario, nombre: soloLetras(e.target.value)})} required autoFocus={editando !== null} />
+								</label>
+								<label>
+									Apellido
+									<input className="form-control" maxLength="100" pattern="[A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s'-]+" title="Ingresá solo letras." value={formulario.apellido} onChange={(e) => setFormulario({...formulario, apellido: soloLetras(e.target.value)})} required />
+								</label>
+								<label>
+									DNI
+									<input className="form-control" type="text" inputMode="numeric" pattern="[0-9]{7,8}" minLength="7" maxLength="8" title="El DNI debe tener entre 7 y 8 números." value={formulario.dni} onChange={(e) => setFormulario({...formulario, dni: soloNumeros(e.target.value).slice(0, 8)})} required />
+								</label>
+								<label>
+									Estado Civil
+									<select className="form-select" value={formulario.estadocivil} onChange={(e) => setFormulario({...formulario, estadocivil: e.target.value})}>
+										<option value="">Seleccioná estado civil</option>
+										{ESTADOS_CIVILES.map((estado) => <option key={estado} value={estado}>{estado}</option>)}
+									</select>
+								</label>
+								<label>
+									Porcentaje (%)
+									<input className="form-control" name="porcentaje" type="number" min="0" max="100" step="any" value={formulario.porcentaje} onChange={(e) => setFormulario({...formulario, porcentaje: e.target.value})} required />
+								</label>
+							</div>
+							{errorFormulario && <p className="alert alert-danger py-2 mt-3 mb-0" role="alert">{errorFormulario}</p>}
+							<div className="obras-page__form-actions">
+								<button className="btn btn-outline-secondary" type="button" onClick={cerrarFormulario} disabled={guardando}>Cancelar</button>
+								<button className="btn btn-dark" type="submit" disabled={guardando || escriturasLote.length === 0}>{guardando ? 'Guardando...' : editando === null ? 'Agregar propietario' : 'Guardar cambios'}</button>
+							</div>
+						</form>
+					</section>
+				</div>
+			)}
 
 			{aviso && (
 				<div className="obras-page__modal-fondo" onMouseDown={(e) => { if (e.target === e.currentTarget) setAviso(null) }}>
