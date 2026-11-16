@@ -1,7 +1,5 @@
 import { obtenerSesion } from '../../login/service/authService.js'
 
-const URL_BASE = (import.meta.env?.VITE_API_URL || 'http://localhost:3000/api').replace(/\/+$/, '')
-
 const normalizarCliente = (cliente) => {
 	if (!cliente || typeof cliente !== 'object') {
 		throw new Error('El servidor devolvió un cliente inválido.')
@@ -27,7 +25,7 @@ async function solicitar(ruta, opciones = {}) {
 
 	let respuesta
 	try {
-		respuesta = await fetch(`${URL_BASE}${ruta}`, {
+		respuesta = await fetch(`/api${ruta}`, {
 			...opciones,
 			headers: {
 				Authorization: `Bearer ${sesion.token}`,

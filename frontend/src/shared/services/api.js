@@ -1,7 +1,5 @@
 import { obtenerSesion } from '../../features/login/service/authService.js'
 
-export const API_URL = (import.meta.env?.VITE_API_URL || 'http://localhost:3000/api').replace(/\/+$/, '')
-
 export async function api(ruta, opciones = {}) {
   const token = opciones.token ?? obtenerSesion()?.token
   const headers = {
@@ -11,7 +9,7 @@ export async function api(ruta, opciones = {}) {
   }
   let respuesta
   try {
-    respuesta = await fetch(`${API_URL}${ruta}`, { ...opciones, headers })
+    respuesta = await fetch(`/api${ruta}`, { ...opciones, headers })
   } catch {
     throw new Error('No se pudo conectar con el servidor. Verificá que el backend esté iniciado.')
   }

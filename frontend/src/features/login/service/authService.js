@@ -1,12 +1,11 @@
 import { redirect } from 'react-router-dom'
 
-const URL_BASE = (import.meta.env?.VITE_API_URL || 'http://localhost:3000/api').replace(/\/+$/, '')
 const CLAVE_SESION = 'gestion-obras:sesion'
 
 async function solicitar(ruta, opciones) {
   let respuesta
   try {
-    respuesta = await fetch(`${URL_BASE}${ruta}`, opciones)
+    respuesta = await fetch(`/api${ruta}`, opciones)
   } catch {
     throw new Error('No se pudo conectar con el servidor. Intentá más tarde.')
   }

@@ -1,8 +1,6 @@
 import { obtenerSesion } from '../../login/service/authService.js'
 import { resumirAvanceTareas } from '../../../shared/utils/avanceObra.js'
 
-const API_URL = (import.meta.env?.VITE_API_URL || 'http://localhost:3000/api').replace(/\/+$/, '')
-
 function tokenActual() {
 	const token = obtenerSesion()?.token
 	if (!token) throw new Error('Tu sesión venció. Volvé a iniciar sesión.')
@@ -12,7 +10,7 @@ function tokenActual() {
 async function solicitar(ruta, opciones = {}) {
 	let respuesta
 	try {
-		respuesta = await fetch(`${API_URL}${ruta}`, {
+		respuesta = await fetch(`/api${ruta}`, {
 			...opciones,
 			headers: {
 				...(opciones.body ? { 'Content-Type': 'application/json' } : {}),
